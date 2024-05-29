@@ -1,6 +1,7 @@
 'use client';
 
 import react, { useState, useEffect, ReactElement } from 'react';
+import { Oval } from 'react-loader-spinner';
 import { FaStar, FaTimes } from 'react-icons/fa'
 import axios from 'axios';
 import { AnimatePresence, motion } from "framer-motion"
@@ -20,6 +21,7 @@ const Search = (): ReactElement => {
     const [query, setQuery] = useState<string>("");
     const [buttonPressed, setButtonPressed] = useState<boolean>(false);
     const [books, setBooks] = useState<Book[]>([]);
+    const [bookLoading, setBookLoading] = useState<boolean>(false);
 
     //Error handling
     const handleError = (message: string): void => {
@@ -42,18 +44,21 @@ const Search = (): ReactElement => {
         setButtonPressed(true);
         let query_hypenless = query.replaceAll('-', '');
         if (query_hypenless !== '' && validISBN(query_hypenless)) {
+            setBookLoading(true);
             bookSearch(query_hypenless)
                 .then(book => {
                     if (book != undefined){
                         bookToLocalStorage(book);
                         loadBooks();
                     } else {
+                        setBookLoading(false);
                         handleError("Failed to fetch book information. Try again.");
                     }
                 }) 
             setQuery('');
         } else {
             if (query_hypenless !== '') {
+                setBookLoading(false);
                 handleError("Error: Invalid ISBN");
             }
         }
@@ -83,7 +88,7 @@ const Search = (): ReactElement => {
                 return false; 
             }
             if (isbn[isbn.length - 1] == 'X') { return 10 != 11 - (sum % 11); } 
-            else { return Number(isbn[isbn.length - 1]) != 11 - (sum % 11); }
+            return Number(isbn[isbn.length - 1]) != 11 - (sum % 11);
 
         } else if (isbn.length == 13) {
             let sum: number = 0;
@@ -93,16 +98,17 @@ const Search = (): ReactElement => {
                     return false; 
                 }
 
-                if (i+1 % 2 == 0){
-                    sum += Number(isbn[i]);
-                } else {
+                if ((i + 1) % 2 == 0){
                     sum += Number(isbn[i])*3;
+                } else {
+                    sum += Number(isbn[i]);
                 }
             }
             if (!isCharNumber(isbn[isbn.length - 1])) { 
                 handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
                 return false; 
             }
+            console.log('sum: ', sum, '10-sum%10', 10 - (sum % 10), 'last digit: ', isbn[isbn.length - 1]);
             return Number(isbn[isbn.length - 1]) == 10 - (sum % 10);
 
         } else {
@@ -158,8 +164,8 @@ const Search = (): ReactElement => {
                 <FaTimes color='#d40000' onClick={() => handleRemoveBook(book)} />
                 <img className='m-auto mt-2 h-[200px] w-full object-contain rounded-sm max-w-64 pb-2' src={book.coverImage} alt={book.title}/>
                 <div className='h-full flex-col flex-auto justify-end items-end text-center'>
-                    <h2>{book.title}</h2>
-                    <h3>{book.author}</h3>
+                    <h2 className='font-bold'>{book.title}</h2>
+                    <h3 className='font-medium'>{`Author: ${book.author}`}</h3>
                     <p>ISBN: {book.isbn}</p>
                     <div className='flex flex-row justify-center text-center pb-2'>
                         {[...Array(5)].map((elt, i) => (
@@ -177,8 +183,8 @@ const Search = (): ReactElement => {
 
     //Local Storage
     function bookToLocalStorage(book: Book): void {
-        const keys = Object.entries(localStorage).map(([key, serializedBook]) => key);
-        keys.filter((key) => key == book.isbn);
+        let keys = Object.entries(localStorage).map(([key, serializedBook]) => key);
+        keys = keys.filter((key) => key == book.isbn);
         if (keys.length != 0) {
             handleError("Book already in inventory.");
             setQuery("");
@@ -191,6 +197,7 @@ const Search = (): ReactElement => {
 
     //Load all books from local storage
     const loadBooks = (): void => {
+        setBookLoading(false);
         const entries = Object.entries(localStorage).map(([key, serializedBook]) => JSON.parse(serializedBook));
         let newbooks = entries.filter((entry) => validISBN(entry.isbn));
         setBooks(newbooks);
@@ -199,15 +206,15 @@ const Search = (): ReactElement => {
     // Load books initially
     useEffect(loadBooks, []); 
     return (
-    <div className='flex lg:flex-row flex-col flex-2 lg:justify-start justify-center items-center lg:h-screen '>
-        <div className='flex flex-col justify-start items-center w-3/5 lg:w-2/5 h-auto'>
-            <p className='p-2 m-10 -mb-8 w-5/6 lg:w-1/2 text-center font-mono font-semibold'>
+    <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
+        <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:w-2/5'>
+            <p className='p-2 w-5/6 lg:w-3/4 text-center font-mono font-semibold  '>
                 Input into the search bar a books ISBN to add it to your list of books. Don't forget to rate it!
             </p>
-            <div className='flex flex-row flex-3 justify-start m-10 w-auto h-1/5 p-2 min-h-16 '>
-                <input className='border-solid border-black border rounded p-1 m-0.5' 
+            <div className='flex flex-row justify-start w-full h-1/5 lg:h-2 lg:w-3/4 p-2 min-h-16'>
+                <input className='border-solid border-black border rounded p-1 m-0.5 w-3/4 ' 
                 type="text" value={query} onChange={handleQuery} placeholder="Input ISBN" />
-                <button className={`border-solid border-black border rounded p-1 m-0.5 ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
+                <button className={`border-solid border-black border rounded w-1/4 p-1 m-0.5 ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
                 onMouseDown={handleSubmit} onMouseUp={() => setButtonPressed(false)}>Search</button>
             </div>
             <AnimatePresence>
@@ -217,16 +224,30 @@ const Search = (): ReactElement => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className='p-2 -mt-10 font-semibold text-red-900 text-xs'
+                    transition={{ duration: 0.5 }}
+                    className='p-2 font-semibold text-red-900 text-xs'
                 >
                     {error}
                 </motion.div>
             )}
             </AnimatePresence>
         </div>
-        <div className='flex flex-col justify-center items-center lg:grid lg:grid-cols-4 lg:max-h-full xl:grid-cols-5 overflow-auto w-full h-full'>
-            {books.map(book => <div key={book.isbn}>{bookToDiv(book)}</div>)}
+        <div className='flex flex-col justify-center items-center lg:grid lg:grid-cols-4 lg:max-h-full xl:grid-cols-5 w-full h-full'>
+            {books.map(book => 
+            <motion.div
+                key={book.isbn}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+            >
+                {bookToDiv(book)}
+            </motion.div>)}
+            {bookLoading && (
+                <div className='w-full h-2/3 lg:h-1/3 flex justify-center align-middle items-center'>
+                    <Oval color='#abd9f5' secondaryColor='#79d2ed'/>
+                </div>
+            )}
         </div>
     </div>
     )
