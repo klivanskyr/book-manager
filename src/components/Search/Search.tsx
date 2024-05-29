@@ -44,8 +44,12 @@ const Search = (): ReactElement => {
         if (query_hypenless !== '' && validISBN(query_hypenless)) {
             bookSearch(query_hypenless)
                 .then(book => {
-                    bookToLocalStorage(book);
-                    loadBooks();
+                    if (book != undefined){
+                        bookToLocalStorage(book);
+                        loadBooks();
+                    } else {
+                        handleError("Failed to fetch book information. Try again.");
+                    }
                 }) 
             setQuery('');
         } else {
@@ -120,20 +124,27 @@ const Search = (): ReactElement => {
         loadBooks();
     }
 
-    //Book Search
+    //Book Search API REQUEST
     const baseBookUrl = 'http://openlibrary.org/search.json?isbn=';
     const baseCoverUrl = 'https://covers.openlibrary.org/b/isbn/';
 
-    async function bookSearch(query: string): Promise<Book> {
-        const bookResponse = await axios.get(`${baseBookUrl}${query}`);
-        const book: Book = { 
-            title: bookResponse.data.docs[0].title, 
-            author: bookResponse.data.docs[0].author_name[0], 
-            isbn: query, 
-            coverImage: `${baseCoverUrl}${query}-M.jpg`,
-            rating: 0
+    async function bookSearch(query: string): Promise<Book | undefined> {
+        try {
+            const bookResponse = await axios.get(`${baseBookUrl}${query}`);
+            if (bookResponse.data.docs.length == 0){
+                return undefined;
+            }
+            const book: Book = { 
+                title: bookResponse.data.docs[0].title, 
+                author: bookResponse.data.docs[0].author_name[0], 
+                isbn: query, 
+                coverImage: `${baseCoverUrl}${query}-M.jpg`,
+                rating: 0
+            }
+            return book;
+        } catch (error) {
+            return undefined;
         }
-        return book;
     }
     
     //Book type into div
