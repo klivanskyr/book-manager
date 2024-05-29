@@ -1,6 +1,6 @@
 'use client';
 
-import react, { useState, useEffect } from 'react';
+import react, { useState, useEffect, ReactElement } from 'react';
 import { FaStar, FaTimes } from 'react-icons/fa'
 import axios from 'axios';
 import { motion } from "framer-motion"
@@ -13,37 +13,83 @@ type Book = {
     rating: number
 };
 
-const Search = () => {
+const Search = (): ReactElement => {
     
     const [query, setQuery] = useState<string>("");
     const [books, setBooks] = useState<Book[]>([]);
 
     //Search bar handler
-    const handleQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleQuery = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setQuery(e.target.value);
     };
 
     //Submit button handler
-    const handleSubmit = () => {
-        if (query !== '') {
+    const handleSubmit = (): void => {
+        if (query !== '' && validISBN(query)) {
             bookSearch(query)
                 .then(book => {
                     bookToLocalStorage(book);
                     loadBooks();
                 }) 
             setQuery('');
+        } else {
+            console.log('failed in handle submit with ', query)
         }
         
     };
 
+    //Takes in a single character and checks if it is a number
+    const isCharNumber = (char: string): boolean => {
+        return (char.length === 1 && char >= '0' && char <= '9');
+    }
+    
+    //ISBN verification
+    const validISBN = (isbn: string): boolean => {
+        if (typeof isbn !== 'string') { return false; }
+        //If isbn contains hypens, strip hypens
+        isbn = isbn.replaceAll('-', '');
+
+        if (isbn.length == 10) {
+            let sum: number = 0;
+            for (let i = 0; i < isbn.length - 1; i++) {
+                if (!isCharNumber(isbn[i])) { return false; }
+                sum += (Number(isbn[i])*(10-i));
+            }
+            if (!isCharNumber(isbn[isbn.length - 1]) || isbn[isbn.length - 1] !== 'X'){ return false; }
+            if (isbn[isbn.length - 1] == 'X') { return 10 != 11 - (sum % 11); } 
+            else { return Number(isbn[isbn.length - 1]) != 11 - (sum % 11); }
+
+        } else if (isbn.length == 13) {
+            let sum: number = 0;
+            for (let i = 0; i < isbn.length - 1; i++ ) {
+                if (!isCharNumber(isbn[i])){ 
+                    console.log('failed in for loop')
+                    return false; }
+                if (i+1 % 2 == 0){
+                    sum += Number(isbn[i]);
+                } else {
+                    sum += Number(isbn[i])*3;
+                }
+            }
+            if (!isCharNumber(isbn[isbn.length - 1])) { return false; }
+            console.log('sum: ', sum);
+            let bool = Number(isbn[isbn.length - 1]) == 10 - (sum % 10);
+            console.log('return bool is ', bool);
+            return bool;
+
+        } else {
+            return false;
+        }
+    }
+
     //Clear Books handler
-    const handleRemoveBook = (book: Book) => {
+    const handleRemoveBook = (book: Book): void => {
         localStorage.removeItem(`${book.isbn}`);
         loadBooks();
     }
 
     //Update star/rating amount
-    const handleRatingUpdate = (book: Book, i: number) => {
+    const handleRatingUpdate = (book: Book, i: number): void => {
         book.rating = i + 1;
         localStorage.setItem(`${book.isbn}`, JSON.stringify(book)); 
         loadBooks();
@@ -53,7 +99,7 @@ const Search = () => {
     const baseBookUrl = 'http://openlibrary.org/search.json?isbn=';
     const baseCoverUrl = 'https://covers.openlibrary.org/b/isbn/';
 
-    async function bookSearch(query: string) {
+    async function bookSearch(query: string): Promise<Book> {
         const bookResponse = await axios.get(`${baseBookUrl}${query}`);
         const book: Book = { 
             title: bookResponse.data.docs[0].title, 
@@ -62,11 +108,11 @@ const Search = () => {
             coverImage: `${baseCoverUrl}${query}-M.jpg`,
             rating: 0
         }
-        return(book);
+        return book;
     }
     
     //Book type into div
-    function bookToDiv(book: Book) {
+    function bookToDiv(book: Book): ReactElement {
         return (
             <motion.div 
                 className='even:bg-stone-300 odd:bg-slate-300 p-3 md:m-3 m-2 max-w-64 flex-col flex-3 flex-wrap justify-center justify-items-center rounded-2xl shadow-lg' 
@@ -94,16 +140,17 @@ const Search = () => {
     }
 
     //Local Storage
-    function bookToLocalStorage(book: Book) {
+    function bookToLocalStorage(book: Book): void {
         const serializedBook = JSON.stringify(book);
         localStorage.setItem(`${book.isbn}`, serializedBook);
     }
 
     //Load all books from local storage
-    const loadBooks = () => {
-        const newBooks = Object.entries(localStorage).map(([key, serializedBook]) => JSON.parse(serializedBook));
-        setBooks(newBooks);
-        };
+    const loadBooks = (): void => {
+        const entries = Object.entries(localStorage).map(([key, serializedBook]) => JSON.parse(serializedBook));
+        let newbooks = entries.filter((entry) => validISBN(entry.isbn));
+        setBooks(newbooks);
+    };
 
     // Load books initially
     useEffect(loadBooks, []); 
