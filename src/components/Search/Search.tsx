@@ -3,7 +3,7 @@
 import react, { useState, useEffect, ReactElement } from 'react';
 import { FaStar, FaTimes } from 'react-icons/fa'
 import axios from 'axios';
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 
 type Book = { 
     title: string,
@@ -15,8 +15,22 @@ type Book = {
 
 const Search = (): ReactElement => {
     
+    const [error, setError] = useState<string>("");
+    const [errorVisable, setErrorVisable] = useState<boolean>(false);
     const [query, setQuery] = useState<string>("");
+    const [buttonPressed, setButtonPressed] = useState<boolean>(false);
     const [books, setBooks] = useState<Book[]>([]);
+
+    //Error handling
+    const handleError = (message: string): void => {
+        setError(message);
+        setErrorVisable(true);
+        setQuery('');
+        console.log('error:', error, 'visable?: ', errorVisable);
+        setTimeout(() => {
+            setErrorVisable(false);
+        }, 10000);
+    };
 
     //Search bar handler
     const handleQuery = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -25,17 +39,20 @@ const Search = (): ReactElement => {
 
     //Submit button handler
     const handleSubmit = (): void => {
-        if (query !== '' && validISBN(query)) {
-            bookSearch(query)
+        setButtonPressed(true);
+        let query_hypenless = query.replaceAll('-', '');
+        if (query_hypenless !== '' && validISBN(query_hypenless)) {
+            bookSearch(query_hypenless)
                 .then(book => {
                     bookToLocalStorage(book);
                     loadBooks();
                 }) 
             setQuery('');
         } else {
-            console.log('failed in handle submit with ', query)
+            if (query_hypenless !== '') {
+                handleError("Error: Invalid ISBN");
+            }
         }
-        
     };
 
     //Takes in a single character and checks if it is a number
@@ -47,37 +64,45 @@ const Search = (): ReactElement => {
     const validISBN = (isbn: string): boolean => {
         if (typeof isbn !== 'string') { return false; }
         //If isbn contains hypens, strip hypens
-        isbn = isbn.replaceAll('-', '');
 
         if (isbn.length == 10) {
             let sum: number = 0;
             for (let i = 0; i < isbn.length - 1; i++) {
-                if (!isCharNumber(isbn[i])) { return false; }
+                if (!isCharNumber(isbn[i])) {
+                    handleError("Error: ISBN-10 should contain only digits (may contain hypens, last character may be 'X').");
+                    return false; 
+                }
                 sum += (Number(isbn[i])*(10-i));
             }
-            if (!isCharNumber(isbn[isbn.length - 1]) || isbn[isbn.length - 1] !== 'X'){ return false; }
+            if (!isCharNumber(isbn[isbn.length - 1]) || isbn[isbn.length - 1] !== 'X'){
+                handleError("Error: ISBN-10 should contain only digits (may contain hypens, last character may be 'X').");
+                return false; 
+            }
             if (isbn[isbn.length - 1] == 'X') { return 10 != 11 - (sum % 11); } 
             else { return Number(isbn[isbn.length - 1]) != 11 - (sum % 11); }
 
         } else if (isbn.length == 13) {
             let sum: number = 0;
             for (let i = 0; i < isbn.length - 1; i++ ) {
-                if (!isCharNumber(isbn[i])){ 
-                    console.log('failed in for loop')
-                    return false; }
+                if (!isCharNumber(isbn[i])){
+                    handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
+                    return false; 
+                }
+
                 if (i+1 % 2 == 0){
                     sum += Number(isbn[i]);
                 } else {
                     sum += Number(isbn[i])*3;
                 }
             }
-            if (!isCharNumber(isbn[isbn.length - 1])) { return false; }
-            console.log('sum: ', sum);
-            let bool = Number(isbn[isbn.length - 1]) == 10 - (sum % 10);
-            console.log('return bool is ', bool);
-            return bool;
+            if (!isCharNumber(isbn[isbn.length - 1])) { 
+                handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
+                return false; 
+            }
+            return Number(isbn[isbn.length - 1]) == 10 - (sum % 10);
 
         } else {
+            handleError("Error: Incorrect ISBN length. Length should be 10 or 13 digits.");
             return false;
         }
     }
@@ -141,6 +166,14 @@ const Search = (): ReactElement => {
 
     //Local Storage
     function bookToLocalStorage(book: Book): void {
+        const keys = Object.entries(localStorage).map(([key, serializedBook]) => key);
+        keys.filter((key) => key == book.isbn);
+        if (keys.length != 0) {
+            handleError("Book already in inventory.");
+            setQuery("");
+            return
+        }
+
         const serializedBook = JSON.stringify(book);
         localStorage.setItem(`${book.isbn}`, serializedBook);
     }
@@ -156,19 +189,33 @@ const Search = (): ReactElement => {
     useEffect(loadBooks, []); 
     return (
     <div className='flex lg:flex-row flex-col flex-2 lg:justify-start justify-center items-center lg:h-screen '>
-        <div className='flex flex-col justify-center items-center'>
+        <div className='flex flex-col justify-start items-center w-3/5 lg:w-2/5 h-auto'>
             <p className='p-2 m-10 -mb-8 w-5/6 lg:w-1/2 text-center font-mono font-semibold'>
                 Input into the search bar a books ISBN to add it to your list of books. Don't forget to rate it!
             </p>
-            <div className='flex flex-row flex-3 justify-start m-10 w-auto h-1/5 p-2 min-h-16'>
+            <div className='flex flex-row flex-3 justify-start m-10 w-auto h-1/5 p-2 min-h-16 '>
                 <input className='border-solid border-black border rounded p-1 m-0.5' 
                 type="text" value={query} onChange={handleQuery} placeholder="Input ISBN" />
-                <button className='border-solid border-black border rounded p-1 m-0.5'
-                onClick={handleSubmit}>Submit</button>
+                <button className={`border-solid border-black border rounded p-1 m-0.5 ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
+                onMouseDown={handleSubmit} onMouseUp={() => setButtonPressed(false)}>Search</button>
             </div>
+            <AnimatePresence>
+                {errorVisable && (
+                <motion.div
+                    key={error}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className='p-2 -mt-10 font-semibold text-red-900 text-xs'
+                >
+                    {error}
+                </motion.div>
+            )}
+            </AnimatePresence>
         </div>
         <div className='flex flex-col justify-center items-center lg:grid lg:grid-cols-4 lg:max-h-full xl:grid-cols-5 overflow-auto w-full h-full'>
-            {books.map((book) => (bookToDiv(book)))}
+            {books.map(book => <div key={book.isbn}>{bookToDiv(book)}</div>)}
         </div>
     </div>
     )
