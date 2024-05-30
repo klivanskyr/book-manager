@@ -1,18 +1,11 @@
 'use client';
 
-import react, { useState, useEffect, ReactElement } from 'react';
+import react, { useState, useEffect, ReactElement, useRef } from 'react';
 import { Oval } from 'react-loader-spinner';
-import { FaStar, FaTimes } from 'react-icons/fa'
 import axios from 'axios';
 import { AnimatePresence, motion } from "framer-motion"
 
-type Book = { 
-    title: string,
-    author: string,
-    isbn: string,
-    coverImage: string,
-    rating: number
-};
+import { BookCard, Book } from "./Book"
 
 const Search = (): ReactElement => {
     
@@ -21,7 +14,6 @@ const Search = (): ReactElement => {
     const [query, setQuery] = useState<string>("");
     const [buttonPressed, setButtonPressed] = useState<boolean>(false);
     const [books, setBooks] = useState<Book[]>([]);
-    const [bookLoading, setBookLoading] = useState<boolean>(false);
 
     //Error handling
     const handleError = (message: string): void => {
@@ -44,21 +36,18 @@ const Search = (): ReactElement => {
         setButtonPressed(true);
         let query_hypenless = query.replaceAll('-', '');
         if (query_hypenless !== '' && validISBN(query_hypenless)) {
-            setBookLoading(true);
             bookSearch(query_hypenless)
                 .then(book => {
                     if (book != undefined){
                         bookToLocalStorage(book);
                         loadBooks();
                     } else {
-                        setBookLoading(false);
                         handleError("Failed to fetch book information. Try again.");
                     }
                 }) 
             setQuery('');
         } else {
             if (query_hypenless !== '') {
-                setBookLoading(false);
                 handleError("Error: Invalid ISBN");
             }
         }
@@ -108,7 +97,6 @@ const Search = (): ReactElement => {
                 handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
                 return false; 
             }
-            console.log('sum: ', sum, '10-sum%10', 10 - (sum % 10), 'last digit: ', isbn[isbn.length - 1]);
             return Number(isbn[isbn.length - 1]) == 10 - (sum % 10);
 
         } else {
@@ -145,40 +133,14 @@ const Search = (): ReactElement => {
                 author: bookResponse.data.docs[0].author_name[0], 
                 isbn: query, 
                 coverImage: `${baseCoverUrl}${query}-M.jpg`,
-                rating: 0
+                bgColor: [127, 127, 127],
+                rating: 0,
+                bgLoaded: false,
             }
             return book;
         } catch (error) {
             return undefined;
         }
-    }
-    
-    //Book type into div
-    function bookToDiv(book: Book): ReactElement {
-        return (
-            <motion.div 
-                className='even:bg-stone-300 odd:bg-slate-300 p-3 md:m-3 m-2 max-w-64 flex-col flex-3 flex-wrap justify-center justify-items-center rounded-2xl shadow-lg' 
-                whileHover={{ scale: 1.05 }}
-                
-            >
-                <FaTimes color='#d40000' onClick={() => handleRemoveBook(book)} />
-                <img className='m-auto mt-2 h-[200px] w-full object-contain rounded-sm max-w-64 pb-2' src={book.coverImage} alt={book.title}/>
-                <div className='h-full flex-col flex-auto justify-end items-end text-center'>
-                    <h2 className='font-bold'>{book.title}</h2>
-                    <h3 className='font-medium'>{`Author: ${book.author}`}</h3>
-                    <p>ISBN: {book.isbn}</p>
-                    <div className='flex flex-row justify-center text-center pb-2'>
-                        {[...Array(5)].map((elt, i) => (
-                            <FaStar 
-                                key={i} 
-                                color={i < book.rating ? '#01af93' : '#bbbbbb'} 
-                                onClick={() => handleRatingUpdate(book, i)} 
-                            />
-                        ))}
-                    </div>
-                </div>
-            </motion.div>
-        )
     }
 
     //Local Storage
@@ -197,14 +159,19 @@ const Search = (): ReactElement => {
 
     //Load all books from local storage
     const loadBooks = (): void => {
-        setBookLoading(false);
         const entries = Object.entries(localStorage).map(([key, serializedBook]) => JSON.parse(serializedBook));
         let newbooks = entries.filter((entry) => validISBN(entry.isbn));
         setBooks(newbooks);
+        console.log(books);
     };
 
+    const handleBgLoaded = (loadedBook: Book, index: Number): void => {
+        setBooks(prevBooks => prevBooks.map((book, i) => i === index ? {...book, bgLoaded: true} : book));
+    }
+
     // Load books initially
-    useEffect(loadBooks, []); 
+    useEffect(loadBooks, []);
+      
     return (
     <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
         <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:w-2/5'>
@@ -233,21 +200,22 @@ const Search = (): ReactElement => {
             </AnimatePresence>
         </div>
         <div className='flex flex-col justify-center items-center lg:grid lg:grid-cols-4 lg:max-h-full xl:grid-cols-5 w-full h-full'>
-            {books.map(book => 
+            {books.map((book, i) => 
             <motion.div
                 key={book.isbn}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
+                transition={{ duration: 1.25 }}
+                className='relative'
             >
-                {bookToDiv(book)}
+                <BookCard book={book} handleRemoveBook={handleRemoveBook} handleRatingUpdate={handleRatingUpdate} handleBgLoaded={handleBgLoaded} i={i} />
+                {!book.bgLoaded && (
+                    <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
+                        <Oval color='#abd9f5' secondaryColor='#79d2ed'/>
+                    </div>
+                )}
             </motion.div>)}
-            {bookLoading && (
-                <div className='w-full h-2/3 lg:h-1/3 flex justify-center align-middle items-center'>
-                    <Oval color='#abd9f5' secondaryColor='#79d2ed'/>
-                </div>
-            )}
         </div>
     </div>
     )
