@@ -1,11 +1,11 @@
 'use client';
 
 import react, { useState, useEffect, ReactElement, useRef } from 'react';
-import { Oval } from 'react-loader-spinner';
 import axios from 'axios';
 import { AnimatePresence, motion } from "framer-motion"
 
-import { BookCard, Book } from "./Book"
+import { Book } from "./Book"
+import { Shelf } from './Shelf'
 
 const Search = (): ReactElement => {
     
@@ -13,6 +13,7 @@ const Search = (): ReactElement => {
     const [errorVisable, setErrorVisable] = useState<boolean>(false);
     const [query, setQuery] = useState<string>("");
     const [buttonPressed, setButtonPressed] = useState<boolean>(false);
+    const [triggerLoad, setTriggerLoad] = useState<boolean>(false);
     const [books, setBooks] = useState<Book[]>([]);
 
     //Error handling
@@ -40,7 +41,7 @@ const Search = (): ReactElement => {
                 .then(book => {
                     if (book != undefined){
                         bookToLocalStorage(book);
-                        loadBooks();
+                        triggerLoading();
                     } else {
                         handleError("Failed to fetch book information. Try again.");
                     }
@@ -105,19 +106,6 @@ const Search = (): ReactElement => {
         }
     }
 
-    //Clear Books handler
-    const handleRemoveBook = (book: Book): void => {
-        localStorage.removeItem(`${book.isbn}`);
-        loadBooks();
-    }
-
-    //Update star/rating amount
-    const handleRatingUpdate = (book: Book, i: number): void => {
-        book.rating = i + 1;
-        localStorage.setItem(`${book.isbn}`, JSON.stringify(book)); 
-        loadBooks();
-    }
-
     //Book Search API REQUEST
     const baseBookUrl = 'http://openlibrary.org/search.json?isbn=';
     const baseCoverUrl = 'https://covers.openlibrary.org/b/isbn/';
@@ -162,19 +150,31 @@ const Search = (): ReactElement => {
         const entries = Object.entries(localStorage).map(([key, serializedBook]) => JSON.parse(serializedBook));
         let newbooks = entries.filter((entry) => validISBN(entry.isbn));
         setBooks(newbooks);
-        console.log(books);
     };
 
+    //handle Background color loading from color thief
     const handleBgLoaded = (loadedBook: Book, index: Number): void => {
-        setBooks(prevBooks => prevBooks.map((book, i) => i === index ? {...book, bgLoaded: true} : book));
+        setBooks(books.map((book, i) => i === index ? loadedBook : book));
     }
 
-    // Load books initially
-    useEffect(loadBooks, []);
-      
+    //Clear Books handler
+    const handleRemoveBook = (book: Book): void => {
+        localStorage.removeItem(`${book.isbn}`);
+        triggerLoading();
+    }
+
+    const triggerLoading = (): void => {
+        setTriggerLoad(!triggerLoad);
+    }
+
+    // Load books
+    useEffect(() => {
+        loadBooks();
+    }, [triggerLoad]);
+
     return (
     <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
-        <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:w-2/5'>
+        <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:w-5/12'>
             <p className='p-2 w-5/6 lg:w-3/4 text-center font-mono font-semibold  '>
                 Input into the search bar a books ISBN to add it to your list of books.
             </p>
@@ -199,24 +199,7 @@ const Search = (): ReactElement => {
             )}
             </AnimatePresence>
         </div>
-        <div className='flex flex-col justify-center items-center lg:grid lg:grid-cols-4 lg:max-h-full xl:grid-cols-5 w-full h-full'>
-            {books.map((book, i) => 
-            <motion.div
-                key={book.isbn}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.25 }}
-                className='relative'
-            >
-                <BookCard book={book} handleRemoveBook={handleRemoveBook} handleRatingUpdate={handleRatingUpdate} handleBgLoaded={handleBgLoaded} i={i} />
-                {!book.bgLoaded && (
-                    <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
-                        <Oval color='#abd9f5' secondaryColor='#79d2ed'/>
-                    </div>
-                )}
-            </motion.div>)}
-        </div>
+        <Shelf books={books} handleBgLoaded={handleBgLoaded} handleRemoveBook={handleRemoveBook} />
     </div>
     )
 }

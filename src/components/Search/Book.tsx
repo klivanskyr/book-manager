@@ -15,8 +15,8 @@ export type Book = {
 };
 
 
-export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgLoaded, i}: { book:Book, handleRemoveBook: Function, handleRatingUpdate: Function, handleBgLoaded: Function, i: number }): ReactElement => {
-    const [bgColor, setBgColor] = useState<string>("");
+export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgLoaded, i }: { book:Book, handleRemoveBook: Function, handleRatingUpdate: Function, handleBgLoaded: Function, i: number }): ReactElement => {
+    // const [bgColor, setBgColor] = useState<string>("");
 
     useEffect(() => {
         const fetchDominantColor = async () => {
@@ -27,8 +27,8 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
 
             img.onload = function () {
                 const color = colorThief.getColor(img);
-                setBgColor(`rgb(${color[0]+50}, ${color[1]+50}, ${color[2]+50})`); //CAN OVERFLOW
-                console.log(book);
+                book.bgColor = [Math.min(color[0]+50, 255), Math.min(color[1]+50, 255), Math.min(color[2]+50, 255)];
+                book.bgLoaded = true;
                 handleBgLoaded(book, i);
             };
         };
@@ -38,8 +38,8 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
 
     return (
         <motion.div 
-            style={{ backgroundColor: bgColor }}
-            className={`p-3 md:m-3 m-2 max-w-64 flex-col flex-wrap justify-center justify-items-center rounded-2xl shadow-lg ${book.bgLoaded ? 'opacity-100' : 'opacity-0'}`}  
+            style={{ backgroundColor: `rgb(${book.bgColor[0]}, ${book.bgColor[1]}, ${book.bgColor[2]})` }}
+            className={`h-full w-30 lg:w-50 1670:w-60 py-2 px-3 m-3 flex-col rounded-2xl shadow-lg ${book.bgLoaded ? 'opacity-100' : 'opacity-0'}`}  
             whileHover={{ scale: 1.05 }}
             
         >
@@ -55,7 +55,7 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
                     priority={true}
                 />
             </div>
-            <div className='h-full flex-col flex-auto justify-end items-end text-center'>
+            <div className='h-full flex-col flex-auto justify-end items-end text-center mx-2'>
                 <h2 className='font-bold'>{book.title}</h2>
                 <h3 className='font-medium'>{`Author: ${book.author}`}</h3>
                 <p>ISBN: {book.isbn}</p>
