@@ -176,7 +176,7 @@ const Search = (): ReactElement => {
     <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
         <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:w-2/5'>
             <p className='p-2 w-5/6 lg:w-3/4 text-center font-mono font-semibold  '>
-                Input into the search bar a books ISBN to add it to your list of books. Don't forget to rate it!
+                Input into the search bar a books ISBN to add it to your list of books.
             </p>
             <div className='flex flex-row justify-start w-full h-1/5 lg:h-2 lg:w-3/4 p-2 min-h-16'>
                 <input className='border-solid border-black border rounded p-1 m-0.5 w-3/4 ' 
