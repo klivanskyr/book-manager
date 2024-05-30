@@ -119,6 +119,7 @@ const Search = (): ReactElement => {
             const book: Book = { 
                 title: bookResponse.data.docs[0].title, 
                 author: bookResponse.data.docs[0].author_name[0], 
+                review: null,
                 isbn: query, 
                 coverImage: `${baseCoverUrl}${query}-M.jpg`,
                 bgColor: [127, 127, 127],
@@ -199,7 +200,7 @@ const Search = (): ReactElement => {
             )}
             </AnimatePresence>
         </div>
-        <Shelf books={books} handleBgLoaded={handleBgLoaded} handleRemoveBook={handleRemoveBook} />
+        <Shelf books={books} handleBgLoaded={handleBgLoaded} handleRemoveBook={handleRemoveBook} triggerLoading={triggerLoading} />
     </div>
     )
 }
