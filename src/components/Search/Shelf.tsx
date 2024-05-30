@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Oval } from 'react-loader-spinner';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-export const Shelf = ({ books, handleBgLoaded, handleRemoveBook }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function }): ReactElement => {
+export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function, triggerLoading: Function }): ReactElement => {
     const [shelfIndex, setShelfIndex] = useState(0);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
 
@@ -31,8 +31,13 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook }: { books: Book
 
     //Update star/rating amount
     const handleRatingUpdate = (book: Book, i: number): void => {
-        book.rating = i + 1;
-        localStorage.setItem(`${book.isbn}`, JSON.stringify(book)); 
+        if (book.rating == i + 1){
+            book.rating = 0;
+        } else {
+            book.rating = i + 1;
+        }
+        localStorage.setItem(`${book.isbn}`, JSON.stringify(book));
+        triggerLoading();
     }
 
     //handle shelf incrementing and decrementing
