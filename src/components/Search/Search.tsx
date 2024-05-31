@@ -1,6 +1,6 @@
 'use client';
 
-import react, { useState, useEffect, ReactElement, useRef } from 'react';
+import react, { useState, useEffect, ReactElement } from 'react';
 import axios from 'axios';
 import { AnimatePresence, motion } from "framer-motion"
 
@@ -59,11 +59,12 @@ const Search = (): ReactElement => {
         return (char.length === 1 && char >= '0' && char <= '9');
     }
     
-    //ISBN verification
+    /* 
+        ISBN verification
+        isbn-10 and isbn-13 use unique checksum algorithms to authenticate isbn codes
+    */
     const validISBN = (isbn: string): boolean => {
         if (typeof isbn !== 'string') { return false; }
-        //If isbn contains hypens, strip hypens
-
         if (isbn.length == 10) {
             let sum: number = 0;
             for (let i = 0; i < isbn.length - 1; i++) {
@@ -119,7 +120,7 @@ const Search = (): ReactElement => {
             const book: Book = { 
                 title: bookResponse.data.docs[0].title, 
                 author: bookResponse.data.docs[0].author_name[0], 
-                review: null,
+                review: '',
                 isbn: query, 
                 coverImage: `${baseCoverUrl}${query}-M.jpg`,
                 bgColor: [127, 127, 127],
@@ -175,11 +176,11 @@ const Search = (): ReactElement => {
 
     return (
     <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
-        <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:w-5/12'>
+        <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:m-5 lg:h-[250px] lg:w-[500px] lg:flex-shrink-0'>
             <p className='p-2 w-5/6 lg:w-3/4 text-center font-Urbanist font-semibold text-[1.5rem]  '>
                 Input into the search bar a books ISBN to add it to your list of books.
             </p>
-            <div className='flex flex-row justify-start w-full h-1/5 lg:h-2 lg:w-3/4 p-2 min-h-16'>
+            <div className='flex flex-row justify-start w-full h-1/5 p-2 min-h-16'>
                 <input className='border border-gray-300 hover:border-gray-500 focus:ring-blue-500 focus:hover:ring-blue-500 focus:hover:outline-none rounded-md focus:outline-none focus:ring-2 resize-none overflow-auto p-1 m-0.5 w-3/4 ' 
                 type="text" value={query} onChange={handleQuery} placeholder="Input ISBN" />
                 <button className={`border border-gray-300 hover:border-gray-500 rounded w-1/4 p-1 m-0.5 font-medium ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
