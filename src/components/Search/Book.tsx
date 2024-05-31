@@ -1,6 +1,6 @@
 import react, { useState, useEffect, ReactElement } from 'react';
 import Image from 'next/image';
-import { FaStar, FaTimes } from 'react-icons/fa'
+import { FaTimes } from 'react-icons/fa'
 import ColorThief from 'colorthief'
 import { motion } from "framer-motion"
 import Review from './Review';
@@ -32,6 +32,7 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
         localStorage.setItem(`${book.isbn}`, JSON.stringify(book));
     }
 
+    //API call to find background color using Color Thief
     useEffect(() => {
         const fetchDominantColor = async () => {
             const colorThief = new ColorThief();
@@ -55,7 +56,7 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
             <Review active={reviewVisable} book={book} handleReviewClose={handleReviewClose} handleRatingUpdate={handleRatingUpdate} />
             <motion.div 
                 style={{ backgroundColor: `rgb(${book.bgColor[0]}, ${book.bgColor[1]}, ${book.bgColor[2]})` }}
-                className={`select-none h-full w-30 lg:w-50 1670:w-60 py-2 px-3 m-3 flex-col rounded-2xl shadow-lg ${book.bgLoaded ? 'opacity-100' : 'opacity-0'} cursor-pointer`}  
+                className={`select-none h-full w-auto py-2 px-3 m-3 flex-col rounded-2xl shadow-lg ${book.bgLoaded ? 'opacity-100' : 'opacity-0'} cursor-pointer`}  
                 whileHover={{ scale: 1.05 }}
             >
                 <FaTimes color={book.bgColor[0] > 150 && book.bgColor[1] < 100 && book.bgColor[2] < 100 ? '#2e2e2e' : '#d40000' } onClick={() => handleRemoveBook(book)} />

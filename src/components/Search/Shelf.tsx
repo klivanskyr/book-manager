@@ -10,10 +10,21 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
     const [shelfIndex, setShelfIndex] = useState(0);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
 
+    /*
+        When window is shrunk, dynamically change the number of books on shelf
+        x-pxs < 1023 (MOBILE) 8 books and goes into large column
+        x-pxs < 1225 3 books
+        x-pxs < 1450 4 books
+        else 5 books
+        ***Might want to make it a constant for every 250pxls add a book for
+        ***very wide screens
+    */
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 1023) {
                 setNumBooksOnShelf(8);
+            } else if (window.innerWidth < 1225) {
+                setNumBooksOnShelf(3);
             } else if (window.innerWidth < 1450) {
                 setNumBooksOnShelf(4);
             } else {
@@ -22,9 +33,10 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
         }
 
         window.addEventListener('resize', handleResize);
-        handleResize(); // call the function initially to set the state based on initial window size
+        handleResize();
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
 
     const numOfShelves =  Math.max(1, Math.ceil(books.length / numBooksOnShelf));
     if (shelfIndex >= numOfShelves) {
@@ -34,7 +46,7 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
     //Update star/rating amount
     const handleRatingUpdate = (book: Book, i: number): void => {
         if (book.rating == i + 1){
-            book.rating = 0;
+            book.rating = 0; //Clicking same star twice removes rating
         } else {
             book.rating = i + 1;
         }
@@ -48,8 +60,8 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
     }
 
     return (
-        <div>
-            <div className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start '>
+        <div className='lg:w-full'>
+            <div className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start'>
                 {books.slice(0 + shelfIndex*numBooksOnShelf, numBooksOnShelf + shelfIndex*numBooksOnShelf).map((book, i) => 
                 <motion.div
                     key={book.isbn}
@@ -57,7 +69,7 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.25 }}
-                    className='flex-none lg:flex-1 lg:flex w-full h-full'
+                    className='flex-none lg:flex-[0_1_20%] lg:flex w-full h-full'
                 >
                     <BookCard book={book} handleRemoveBook={handleRemoveBook} handleRatingUpdate={handleRatingUpdate} handleBgLoaded={handleBgLoaded} i={i + shelfIndex * numBooksOnShelf} />
                     {!book.bgLoaded && (
