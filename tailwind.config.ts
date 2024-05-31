@@ -1,3 +1,4 @@
+import { Urbanist } from "next/font/google";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -17,6 +18,10 @@ const config: Config = {
         '1670': '1670px',
         // => @media (min-width: 992px) { ... }
       },
+
+      fontFamily: {
+        Urbanist: ['Urbanist'],
+      }
     },
   },
   plugins: [],
