@@ -176,13 +176,13 @@ const Search = (): ReactElement => {
     return (
     <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
         <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:w-5/12'>
-            <p className='p-2 w-5/6 lg:w-3/4 text-center font-mono font-semibold  '>
+            <p className='p-2 w-5/6 lg:w-3/4 text-center font-Urbanist font-semibold text-[1.5rem]  '>
                 Input into the search bar a books ISBN to add it to your list of books.
             </p>
             <div className='flex flex-row justify-start w-full h-1/5 lg:h-2 lg:w-3/4 p-2 min-h-16'>
-                <input className='border-solid border-black border rounded p-1 m-0.5 w-3/4 ' 
+                <input className='border border-gray-300 hover:border-gray-500 focus:ring-blue-500 focus:hover:ring-blue-500 focus:hover:outline-none rounded-md focus:outline-none focus:ring-2 resize-none overflow-auto p-1 m-0.5 w-3/4 ' 
                 type="text" value={query} onChange={handleQuery} placeholder="Input ISBN" />
-                <button className={`border-solid border-black border rounded w-1/4 p-1 m-0.5 ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
+                <button className={`border border-gray-300 hover:border-gray-500 rounded w-1/4 p-1 m-0.5 font-medium ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
                 onMouseDown={handleSubmit} onMouseUp={() => setButtonPressed(false)}>Search</button>
             </div>
             <AnimatePresence>
