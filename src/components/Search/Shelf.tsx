@@ -1,8 +1,10 @@
 import React, { useState, useEffect, ReactElement } from 'react'
-import { BookCard, Book } from "./Book"
 import { motion } from "framer-motion"
 import { Oval } from 'react-loader-spinner';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Button } from "antd";
+
+import { BookCard, Book } from "./Book"
 
 export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function, triggerLoading: Function }): ReactElement => {
     const [shelfIndex, setShelfIndex] = useState(0);
@@ -67,8 +69,8 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
             </div>
             {(books.length > numBooksOnShelf) && (
             <div className='flex flex-row justify-center'>
-                <FaChevronLeft className='m-2' onClick={() => (handleClick(1))} />
-                <FaChevronRight className='m-2' onClick={() => (handleClick(-1))} />
+                <Button className='m-2' type="primary" shape='circle' icon={<FaChevronLeft />} onClick={() => (handleClick(1))}/>
+                <Button className='m-2' type="primary" shape='circle' icon={<FaChevronRight />} onClick={() => (handleClick(-1))}/>
             </div> 
             )}
         </div>
