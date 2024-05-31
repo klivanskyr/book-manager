@@ -10,7 +10,6 @@ import { Book } from './Book'
 const Review = ({ active, book, handleReviewClose, handleRatingUpdate }: { active: boolean, book: Book, handleReviewClose: Function, handleRatingUpdate: Function }) => {
 
   const [review, setReview] = useState(book.review);
-  const [textAreaValue, setTextAreaValue] = useState('auto');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setReview(e.target.value);
