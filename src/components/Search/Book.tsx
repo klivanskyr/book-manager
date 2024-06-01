@@ -20,7 +20,21 @@ export type Book = {
 };
 
 
-export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgLoaded, i }: { book:Book, handleRemoveBook: Function, handleRatingUpdate: Function, handleBgLoaded: Function, i: number }): ReactElement => {
+export const BookCard = ({ 
+    book, 
+    booksIndex, 
+    handleRemoveBook, 
+    handleRatingUpdate, 
+    handleBgLoaded,
+    handleReviewUpdate }:
+    { 
+        book:Book, 
+        booksIndex: number,
+        handleRemoveBook: Function,
+        handleRatingUpdate: Function,
+        handleBgLoaded: Function,
+        handleReviewUpdate: Function }):
+    ReactElement => {
 
     const [reviewVisable, setReviewVisable] = useState(false);
 
@@ -30,7 +44,8 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
 
     const handleReviewClose = (newReview: string) => {
         setReviewVisable(false);
-        handleRatingUpdate();
+        book.review = newReview;
+        handleReviewUpdate(book, book.rating - 1);
     }
 
     //API call to find background color using Color Thief
@@ -45,7 +60,7 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
                 const color = colorThief.getColor(img);
                 book.bgColor = [Math.min(color[0]+75, 255), Math.min(color[1]+75, 255), Math.min(color[2]+75, 255)];
                 book.bgLoaded = true;
-                handleBgLoaded(book, i);
+                handleBgLoaded(book, booksIndex);
             };
         };
         
