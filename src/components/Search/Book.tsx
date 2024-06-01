@@ -6,15 +6,17 @@ import { motion } from "framer-motion"
 import Review from './Review';
 import Stars from './Stars'
 
-export type Book = { 
+export type Book = {
+    key: string,
     title: string,
     author: string,
     review: string,
+    rating: number
     isbn: string,
     coverImage: string,
     bgColor: number[],
-    rating: number
     bgLoaded: boolean,
+    selected: boolean,
 };
 
 
@@ -28,8 +30,7 @@ export const BookCard = ({ book, handleRemoveBook, handleRatingUpdate, handleBgL
 
     const handleReviewClose = (newReview: string) => {
         setReviewVisable(false);
-        book.review = newReview;
-        localStorage.setItem(`${book.isbn}`, JSON.stringify(book));
+        handleRatingUpdate();
     }
 
     //API call to find background color using Color Thief
