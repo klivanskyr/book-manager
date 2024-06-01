@@ -115,23 +115,14 @@ const Search = (): ReactElement => {
     }
 
     //Local Storage
-    function bookToLocalStorage(book: Book): void {
-        let keys = Object.entries(localStorage).map(([key, serializedBook]) => key);
-        keys = keys.filter((key) => key == book.key);
-        if (keys.length != 0) {
-            handleError("Book already in inventory.");
-            setQuery("");
-            return
-        }
-        const serializedBook = JSON.stringify(book);
-        localStorage.setItem(book.key, serializedBook);
+    function booksToLocalStorage(books: Book[]): void {
+        const serializedBooks = JSON.stringify(books);
+        localStorage.setItem('books', serializedBooks);
     }
 
     //Load all books from local storage
     const loadBooks = (): void => {
-        const entries = Object.entries(localStorage).map(([key, serializedBook]) => JSON.parse(serializedBook));
-        let newbooks = entries.filter((entry) => validISBN(entry.isbn)); //Will only allow books from local storage
-        setBooks(newbooks);
+        setBooks(localStorage.getItem('books') ? JSON.parse(localStorage.getItem('books')!) : []);
     };
 
     //handle Background color loading from color thief
@@ -141,7 +132,7 @@ const Search = (): ReactElement => {
 
     //Clear Books handler
     const handleRemoveBook = (book: Book): void => {
-        localStorage.removeItem(book.key);
+        booksToLocalStorage(books.filter(b => b !== book));
         triggerLoading();
     }
 
