@@ -6,7 +6,7 @@ import { Button } from "antd";
 
 import { BookCard, Book } from "./Book"
 
-export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function, triggerLoading: Function }): ReactElement => {
+export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading, bookToLocalStorage }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function, triggerLoading: Function, bookToLocalStorage: Function }): ReactElement => {
     const [shelfIndex, setShelfIndex] = useState(0);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
 
@@ -50,9 +50,9 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
         } else {
             book.rating = i + 1;
         }
-        localStorage.setItem(`${book.isbn}`, JSON.stringify(book));
+        bookToLocalStorage(book);
         triggerLoading();
-    }
+    };
 
     //handle shelf incrementing and decrementing
     const handleClick = (increment: number): void => {
@@ -64,7 +64,7 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading 
             <div className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start'>
                 {books.slice(0 + shelfIndex*numBooksOnShelf, numBooksOnShelf + shelfIndex*numBooksOnShelf).map((book, i) => 
                 <motion.div
-                    key={book.isbn}
+                    key={book.key}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
