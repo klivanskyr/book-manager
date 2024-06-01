@@ -1,11 +1,11 @@
 'use client';
 
 import react, { useState, useEffect, ReactElement } from 'react';
-import axios from 'axios';
 import { AnimatePresence, motion } from "framer-motion"
 
 import { Book } from "./Book"
 import { Shelf } from './Shelf'
+import BookSelect from './BookSelect';
 
 const Search = (): ReactElement => {
     
@@ -15,6 +15,7 @@ const Search = (): ReactElement => {
     const [buttonPressed, setButtonPressed] = useState<boolean>(false);
     const [triggerLoad, setTriggerLoad] = useState<boolean>(false);
     const [books, setBooks] = useState<Book[]>([]);
+    const [bookSelectVisable, setBookSelectVisable] = useState<boolean>(false);
 
     //Error handling
     const handleError = (message: string): void => {
@@ -35,24 +36,30 @@ const Search = (): ReactElement => {
     //Submit button handler
     const handleSubmit = (): void => {
         setButtonPressed(true);
-        let query_hypenless = query.replaceAll('-', '');
-        if (query_hypenless !== '' && validISBN(query_hypenless)) {
-            bookSearch(query_hypenless)
-                .then(book => {
-                    if (book != undefined){
-                        bookToLocalStorage(book);
-                        triggerLoading();
-                    } else {
-                        handleError("Failed to fetch book information. Try again.");
-                    }
-                }) 
-            setQuery('');
-        } else {
-            if (query_hypenless !== '') {
-                handleError("Error: Invalid ISBN");
-            }
-        }
+        setBookSelectVisable(true);
+        // if (query_hypenless !== '' && validISBN(query_hypenless)) {
+        //     bookSearch(query_hypenless)
+        //         .then(book => {
+        //             if (book != undefined){
+        //                 bookToLocalStorage(book);
+        //                 triggerLoading();
+        //             } else {
+        //                 handleError("Failed to fetch book information. Try again.");
+        //             }
+        //         }) 
+        //     setQuery('');
+        // } else {
+        //     if (query_hypenless !== '') {
+        //         handleError("Error: Invalid ISBN");
+        //     }
+        // }
     };
+
+    //Handler for selecting book from modal/BookSelect
+    const handleBookSelectClose = (): void => {
+        setBookSelectVisable(false);
+        setQuery('');
+    }
 
     //Takes in a single character and checks if it is a number
     const isCharNumber = (char: string): boolean => {
@@ -107,32 +114,6 @@ const Search = (): ReactElement => {
         }
     }
 
-    //Book Search API REQUEST
-    const baseBookUrl = 'http://openlibrary.org/search.json?isbn=';
-    const baseCoverUrl = 'https://covers.openlibrary.org/b/isbn/';
-
-    async function bookSearch(query: string): Promise<Book | undefined> {
-        try {
-            const bookResponse = await axios.get(`${baseBookUrl}${query}`);
-            if (bookResponse.data.docs.length == 0){
-                return undefined;
-            }
-            const book: Book = { 
-                title: bookResponse.data.docs[0].title, 
-                author: bookResponse.data.docs[0].author_name[0], 
-                review: '',
-                isbn: query, 
-                coverImage: `${baseCoverUrl}${query}-M.jpg`,
-                bgColor: [127, 127, 127],
-                rating: 0,
-                bgLoaded: false,
-            }
-            return book;
-        } catch (error) {
-            return undefined;
-        }
-    }
-
     //Local Storage
     function booksToLocalStorage(books: Book[]): void {
         const serializedBooks = JSON.stringify(books);
@@ -159,40 +140,52 @@ const Search = (): ReactElement => {
         setTriggerLoad(!triggerLoad);
     }
 
+    const handleBookSelection = (book: Book): void => {
+        //book.selected = true; //Even though it was done in BookSelect, when it was passed in, it wasn't selected
+        bookToLocalStorage(book);
+        triggerLoading();
+    }
+
+    const handleBookRemoval = (book: Book): void => {
+    }
+
     // Load books
     useEffect(() => {
         loadBooks();
     }, [triggerLoad]);
 
     return (
-    <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
-        <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:m-5 lg:h-[250px] lg:w-[500px] lg:flex-shrink-0'>
-            <p className='p-2 w-5/6 lg:w-3/4 text-center font-Urbanist font-semibold text-[1.5rem]  '>
-                Input into the search bar a books ISBN to add it to your list of books.
-            </p>
-            <div className='flex flex-row justify-start w-full h-1/5 p-2 min-h-16'>
-                <input className='border border-gray-300 hover:border-gray-500 focus:ring-blue-500 focus:hover:ring-blue-500 focus:hover:outline-none rounded-md focus:outline-none focus:ring-2 resize-none overflow-auto p-1 m-0.5 w-3/4 ' 
-                type="text" value={query} onChange={handleQuery} placeholder="Input ISBN" />
-                <button className={`border border-gray-300 hover:border-gray-500 rounded w-1/4 p-1 m-0.5 font-medium ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
-                onMouseDown={handleSubmit} onMouseUp={() => setButtonPressed(false)}>Search</button>
+    <>
+        <BookSelect active={bookSelectVisable} query={query} currentBooks={books} handleBookSelection={handleBookSelection} handleBookSelectClose={handleBookSelectClose} handleBookRemoval={handleBookRemoval} />
+        <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
+            <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:m-5 lg:h-[250px] lg:w-[500px] lg:flex-shrink-0'>
+                <p className='p-2 w-5/6 lg:w-3/4 text-center font-Urbanist font-semibold text-[1.5rem]  '>
+                    Input into the search bar a books ISBN to add it to your list of books.
+                </p>
+                <div className='flex flex-row justify-start w-full h-1/5 p-2 min-h-16'>
+                    <input className='border border-gray-300 hover:border-gray-500 focus:ring-blue-500 focus:hover:ring-blue-500 focus:hover:outline-none rounded-md focus:outline-none focus:ring-2 resize-none overflow-auto p-1 m-0.5 w-3/4 ' 
+                    type="text" value={query} onChange={handleQuery} placeholder="Input ISBN" />
+                    <button className={`border border-gray-300 hover:border-gray-500 rounded w-1/4 p-1 m-0.5 font-medium ${buttonPressed ? 'transform translate-y-px shadow-lg' : 'shadow-md'} transition duration-100`}
+                    onMouseDown={handleSubmit} onMouseUp={() => setButtonPressed(false)}>Search</button>
+                </div>
+                <AnimatePresence>
+                    {errorVisable && (
+                    <motion.div
+                        key={error}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className='p-2 font-semibold text-red-900 text-xs'
+                    >
+                        {error}
+                    </motion.div>
+                )}
+                </AnimatePresence>
             </div>
-            <AnimatePresence>
-                {errorVisable && (
-                <motion.div
-                    key={error}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className='p-2 font-semibold text-red-900 text-xs'
-                >
-                    {error}
-                </motion.div>
-            )}
-            </AnimatePresence>
+            <Shelf books={books} handleBgLoaded={handleBgLoaded} handleRemoveBook={handleRemoveBook} triggerLoading={triggerLoading} bookToLocalStorage={bookToLocalStorage} />
         </div>
-        <Shelf books={books} handleBgLoaded={handleBgLoaded} handleRemoveBook={handleRemoveBook} triggerLoading={triggerLoading} />
-    </div>
+    </>
     )
 }
 
