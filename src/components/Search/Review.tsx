@@ -24,7 +24,7 @@ const Review = ({ active, book, handleReviewClose, handleRatingUpdate }: { activ
       isOpen={active}
       onRequestClose={onRequestClose}
       className="flex items-center justify-center h-auto outline-none"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center "
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center "
     >
       <div className="bg-white p-6 rounded-lg shadow-lg w-full h-auto">
         <FaTimes onClick={onRequestClose} />

@@ -23,9 +23,9 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
         const handleResize = () => {
             if (window.innerWidth < 1023) {
                 setNumBooksOnShelf(8);
-            } else if (window.innerWidth < 1225) {
+            } else if (window.innerWidth < 1050) {
                 setNumBooksOnShelf(3);
-            } else if (window.innerWidth < 1450) {
+            } else if (window.innerWidth < 1680) {
                 setNumBooksOnShelf(4);
             } else {
                 setNumBooksOnShelf(5);
@@ -66,7 +66,7 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
     }
 
     return (
-        <div className='lg:w-full'>
+        <div className='lg:w-full lg:h-auto'>
             <div className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start'>
                 {books.slice(0 + shelfIndex*numBooksOnShelf, numBooksOnShelf + shelfIndex*numBooksOnShelf).map((book, i) => 
                 <motion.div
@@ -75,7 +75,7 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.25 }}
-                    className='flex-none lg:flex-[0_1_25%] lg:flex w-full h-full'
+                    className='flex-none w-full 1023:w-1/3 1150:w-1/4 1670:w-1/5 h-auto'
                 >
                     <BookCard book={book} booksIndex={i + shelfIndex * numBooksOnShelf} handleRemoveBook={handleRemoveBook} handleRatingUpdate={handleRatingUpdate} handleBgLoaded={handleBgLoaded} handleReviewUpdate={handleReviewUpdate} />
                     {!book.bgLoaded && (

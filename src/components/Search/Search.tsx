@@ -134,7 +134,7 @@ const Search = (): ReactElement => {
     return (
     <>
         <BookSelect active={bookSelectVisable} query={query} currentBooks={books} booksToLocalStorage={booksToLocalStorage} handleBookSelectClose={handleBookSelectClose}  />
-        <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
+        <div className='flex flex-col lg:justify-start justify-center items-center h-full m-2'>
             <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:m-5 lg:h-[250px] lg:w-[400px] lg:flex-shrink-0'>
                 <p className='p-2 w-5/6 lg:w-3/4 text-center font-Urbanist font-semibold text-[1.5rem]  '>
                     Input into the search bar a books ISBN to add it to your list of books.

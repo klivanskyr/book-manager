@@ -91,7 +91,7 @@ const BookSelect = ({ active, query, currentBooks, booksToLocalStorage, handleBo
         isOpen={active}
         onRequestClose={() => handleBookSelectClose()}
         className="flex items-center justify-center h-3/4 outline-none"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
         >
         <div className="flex bg-white border p-6 rounded-lg shadow-lg w-full h-full overflow-y-scroll">
             <FaTimes onClick={() => handleBookSelectClose()} />
