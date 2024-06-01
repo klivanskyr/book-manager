@@ -37,22 +37,6 @@ const Search = (): ReactElement => {
     const handleSubmit = (): void => {
         setButtonPressed(true);
         setBookSelectVisable(true);
-        // if (query_hypenless !== '' && validISBN(query_hypenless)) {
-        //     bookSearch(query_hypenless)
-        //         .then(book => {
-        //             if (book != undefined){
-        //                 bookToLocalStorage(book);
-        //                 triggerLoading();
-        //             } else {
-        //                 handleError("Failed to fetch book information. Try again.");
-        //             }
-        //         }) 
-        //     setQuery('');
-        // } else {
-        //     if (query_hypenless !== '') {
-        //         handleError("Error: Invalid ISBN");
-        //     }
-        // }
     };
 
     //Handler for selecting book from modal/BookSelect
@@ -116,8 +100,10 @@ const Search = (): ReactElement => {
 
     //Local Storage
     function booksToLocalStorage(books: Book[]): void {
+        console.log('storing', books);
         const serializedBooks = JSON.stringify(books);
         localStorage.setItem('books', serializedBooks);
+        triggerLoading();
     }
 
     //Load all books from local storage
@@ -140,15 +126,6 @@ const Search = (): ReactElement => {
         setTriggerLoad(!triggerLoad);
     }
 
-    const handleBookSelection = (book: Book): void => {
-        //book.selected = true; //Even though it was done in BookSelect, when it was passed in, it wasn't selected
-        bookToLocalStorage(book);
-        triggerLoading();
-    }
-
-    const handleBookRemoval = (book: Book): void => {
-    }
-
     // Load books
     useEffect(() => {
         loadBooks();
@@ -156,9 +133,9 @@ const Search = (): ReactElement => {
 
     return (
     <>
-        <BookSelect active={bookSelectVisable} query={query} currentBooks={books} handleBookSelection={handleBookSelection} handleBookSelectClose={handleBookSelectClose} handleBookRemoval={handleBookRemoval} />
+        <BookSelect active={bookSelectVisable} query={query} currentBooks={books} booksToLocalStorage={booksToLocalStorage} handleBookSelectClose={handleBookSelectClose}  />
         <div className='flex lg:flex-row flex-col lg:justify-start justify-center items-center h-full lg:h-screen m-2'>
-            <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:m-5 lg:h-[250px] lg:w-[500px] lg:flex-shrink-0'>
+            <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:m-5 lg:h-[250px] lg:w-[400px] lg:flex-shrink-0'>
                 <p className='p-2 w-5/6 lg:w-3/4 text-center font-Urbanist font-semibold text-[1.5rem]  '>
                     Input into the search bar a books ISBN to add it to your list of books.
                 </p>
@@ -183,7 +160,7 @@ const Search = (): ReactElement => {
                 )}
                 </AnimatePresence>
             </div>
-            <Shelf books={books} handleBgLoaded={handleBgLoaded} handleRemoveBook={handleRemoveBook} triggerLoading={triggerLoading} bookToLocalStorage={bookToLocalStorage} />
+            <Shelf books={books} handleBgLoaded={handleBgLoaded} handleRemoveBook={handleRemoveBook} triggerLoading={triggerLoading} booksToLocalStorage={booksToLocalStorage} />
         </div>
     </>
     )

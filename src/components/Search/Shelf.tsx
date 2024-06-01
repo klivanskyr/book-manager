@@ -6,7 +6,7 @@ import { Button } from "antd";
 
 import { BookCard, Book } from "./Book"
 
-export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading, bookToLocalStorage }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function, triggerLoading: Function, bookToLocalStorage: Function }): ReactElement => {
+export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading, booksToLocalStorage }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function, triggerLoading: Function, booksToLocalStorage: Function }): ReactElement => {
     const [shelfIndex, setShelfIndex] = useState(0);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
 
@@ -44,15 +44,21 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
     }
 
     //Update star/rating amount
-    const handleRatingUpdate = (book: Book, i: number): void => {
-        if (book.rating == i + 1){
+    const handleRatingUpdate = (book: Book, starIndex: number): void => {
+        if (book.rating == starIndex + 1){
             book.rating = 0; //Clicking same star twice removes rating
         } else {
-            book.rating = i + 1;
+            book.rating = starIndex + 1;
         }
-        bookToLocalStorage(book);
+        booksToLocalStorage(books.map((b) => (b.key === book.key ? book : b)));
         triggerLoading();
     };
+
+    const handleReviewUpdate = (book: Book, newReview: string): void => {
+        book.review = newReview;
+        booksToLocalStorage(books.map((b) => (b.key === book.key ? book : b)));
+        triggerLoading();
+    }
 
     //handle shelf incrementing and decrementing
     const handleClick = (increment: number): void => {
@@ -69,9 +75,9 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.25 }}
-                    className='flex-none lg:flex-[0_1_20%] lg:flex w-full h-full'
+                    className='flex-none lg:flex-[0_1_25%] lg:flex w-full h-full'
                 >
-                    <BookCard book={book} handleRemoveBook={handleRemoveBook} handleRatingUpdate={handleRatingUpdate} handleBgLoaded={handleBgLoaded} i={i + shelfIndex * numBooksOnShelf} />
+                    <BookCard book={book} booksIndex={i + shelfIndex * numBooksOnShelf} handleRemoveBook={handleRemoveBook} handleRatingUpdate={handleRatingUpdate} handleBgLoaded={handleBgLoaded} handleReviewUpdate={handleReviewUpdate} />
                     {!book.bgLoaded && (
                         <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
                             <Oval color='#abd9f5' secondaryColor='#79d2ed'/>

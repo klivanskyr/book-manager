@@ -8,20 +8,23 @@ import { Button } from "antd";
 
 import { Book } from './Book';
 
-const BookSelect = ({ active, query, currentBooks, handleBookSelection, handleBookSelectClose, handleBookRemoval }: { active: boolean, query: string, currentBooks: Book[], handleBookSelection: Function, handleBookSelectClose: Function, handleBookRemoval: Function }) => {
+const BookSelect = ({ active, query, currentBooks, booksToLocalStorage, handleBookSelectClose }: { active: boolean, query: string, currentBooks: Book[], booksToLocalStorage: Function, handleBookSelectClose: Function }) => {
 
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
 
     //handle selecting book from modal
     const handleClickAdd = (i: number) => {
-        setFoundBooks(foundBooks.map((book, index) => index === i ? { ...book, selected: !book.selected } : book));
-        handleBookSelection(foundBooks[i]);
-    }
+        const updatedBook = { ...foundBooks[i], selected: true };
+        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
+        booksToLocalStorage([...currentBooks, updatedBook]);
+}
 
     //handle removing book from modal
     const handleClickRemove = (i: number) => {
-        setFoundBooks(foundBooks.map((book, index) => index === i ? { ...book, selected: !book.selected } : book));
-        handleBookRemoval(foundBooks[i]);
+        const updatedBook = { ...foundBooks[i], selected: false };
+        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
+        const updatedCurrentBooks = currentBooks.filter((book) => (book.key !== updatedBook.key));
+        booksToLocalStorage(updatedCurrentBooks);
     }
 
     //Book Search API REQUEST
@@ -55,10 +58,11 @@ const BookSelect = ({ active, query, currentBooks, handleBookSelection, handleBo
                 Loops through books pulled from API
                 for every pulled book, loop through currentBooks and see if
                 there is a match. If so replace the pulled book with the
-                current book.
+                current book so the reviews and rating is preserved
             */
             books = books.map((book) => {
-                const currentBook = currentBooks.find(curBook => curBook.key === book.key);
+                const currentBook = currentBooks.find(curBook => curBook.key == book.key);
+                console.log('found book:', currentBook);
                 return currentBook ? currentBook : book;
             })
             setFoundBooks(books);
