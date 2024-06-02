@@ -5,6 +5,7 @@ import ColorThief from 'colorthief'
 import { motion } from "framer-motion"
 import Review from './Review';
 import Stars from './Stars'
+import coverPlaceholder from '../../../public/coverPlaceholder.jpg'
 
 export type Book = {
     key: string,
@@ -57,13 +58,20 @@ export const BookCard = ({
             img.src = book.coverImage;
 
             img.onload = function () {
-                const color = colorThief.getColor(img);
-                book.bgColor = [Math.min(color[0]+75, 255), Math.min(color[1]+75, 255), Math.min(color[2]+75, 255)];
-                book.bgLoaded = true;
-                handleBgLoaded(book, booksIndex);
+                try {
+                    const color = colorThief.getColor(img);
+                    book.bgColor = [Math.min(color[0]+75, 255), Math.min(color[1]+75, 255), Math.min(color[2]+75, 255)];
+                    book.bgLoaded = true;
+                    handleBgLoaded(book, booksIndex);
+                } catch (error) {
+                    book.bgColor = [127, 127, 127];
+                    book.coverImage = coverPlaceholder.src;
+                    book.bgLoaded = true;
+                    handleBgLoaded(book, booksIndex);
+                }  
             };
         };
-        
+
         fetchDominantColor();
     }, [book.bgLoaded]);
 
