@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Button } from "antd";
 
 import { Book } from './Book';
+import coverPlaceholder from '../../../public/coverPlaceholder.jpg'
 
 const BookSelect = ({ active, query, currentBooks, booksToLocalStorage, handleBookSelectClose }: { active: boolean, query: string, currentBooks: Book[], booksToLocalStorage: Function, handleBookSelectClose: Function }) => {
 
@@ -49,7 +50,7 @@ const BookSelect = ({ active, query, currentBooks, booksToLocalStorage, handleBo
                 review: '',
                 rating: 0,
                 isbn: query_hypenless,
-                coverImage: `${baseCoverUrl}${entry.cover_edition_key}-M.jpg`,
+                coverImage: `${baseCoverUrl}${entry.cover_edition_key}-M.jpg?default=false`,
                 bgColor: [127, 127, 127], //default
                 selected: false
             }));
@@ -101,9 +102,14 @@ const BookSelect = ({ active, query, currentBooks, booksToLocalStorage, handleBo
                         whileHover={{ scale: 1.03 }}
                         key={book.key} className='bg-neutral-50 flex flex-col text-center rounded-md shadow-md m-3 p-2'
                     >
-                        <Image
+                        <img
                             className='m-auto mt-2 h-[150px] w-full object-contain rounded-sm max-w-64 pb-2'
                             src={book.coverImage} 
+                            onError={(e: React.ChangeEvent<HTMLImageElement>) => {
+                                e.target.onerror = null;
+                                e.target.src = coverPlaceholder.src;
+                                book.coverImage = coverPlaceholder.src;
+                            }}
                             alt={book.title}
                             width={200} height={200} />
                         <h1>{book.title}</h1>
