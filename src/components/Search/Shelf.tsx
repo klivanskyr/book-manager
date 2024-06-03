@@ -55,9 +55,8 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
     };
 
     const handleReviewUpdate = (book: Book, newReview: string): void => {
-        book.review = newReview;
-        booksToLocalStorage(books.map((b) => (b.key === book.key ? book : b)));
-        triggerLoading();
+        const newBook = {...book, review: newReview};
+        booksToLocalStorage(books.map((b) => (b.key == newBook.key ? newBook : b)));
     }
 
     //handle shelf incrementing and decrementing
