@@ -17,6 +17,7 @@ export type Book = {
     coverImage: string,
     bgColor: number[],
     bgLoaded: boolean,
+    imgLoaded: boolean,
     selected: boolean,
 };
 
