@@ -45,8 +45,7 @@ export const BookCard = ({
 
     const handleReviewClose = (newReview: string) => {
         setReviewVisable(false);
-        book.review = newReview;
-        handleReviewUpdate(book, book.rating - 1);
+        handleReviewUpdate(book, newReview);
     }
 
     //API call to find background color using Color Thief

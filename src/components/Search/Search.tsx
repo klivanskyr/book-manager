@@ -98,7 +98,7 @@ const Search = (): ReactElement => {
         }
     }
 
-    //Local Storage
+    //Loads a list of books into local storage overwriting any previous books
     function booksToLocalStorage(books: Book[]): void {
         console.log('storing', books);
         const serializedBooks = JSON.stringify(books);
