@@ -100,10 +100,10 @@ const BookSelect = ({ active, query, currentBooks, booksToLocalStorage, handleBo
                 {foundBooks.map((book, i) => (
                     <motion.div 
                         whileHover={{ scale: 1.03 }}
-                        key={book.key} className='bg-neutral-50 flex flex-col text-center rounded-md shadow-md m-3 p-2'
+                        key={book.key} className='bg-neutral-50 flex flex-col justify-center text-center rounded-md shadow-md m-3 p-2'
                     >
                         <img
-                            className='m-auto mt-2 h-[150px] w-full object-contain rounded-sm max-w-64 pb-2'
+                            className='mx-auto mt-4 h-[200px] w-full object-contain rounded-sm max-w-64 pb-2'
                             src={book.coverImage} 
                             onError={(e: React.ChangeEvent<HTMLImageElement>) => {
                                 e.target.onerror = null;
