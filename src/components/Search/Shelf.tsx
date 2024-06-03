@@ -3,12 +3,14 @@ import { motion } from "framer-motion"
 import { Oval } from 'react-loader-spinner';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { Button } from "antd";
+import { Link } from 'react-scroll';
 
 import { BookCard, Book } from "./Book"
 
 export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading, booksToLocalStorage }: { books: Book[], handleBgLoaded: Function, handleRemoveBook: Function, triggerLoading: Function, booksToLocalStorage: Function }): ReactElement => {
     const [shelfIndex, setShelfIndex] = useState(0);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
+    const [isMobile, setIsMobile] = useState(false);
 
     /*
         When window is shrunk, dynamically change the number of books on shelf
@@ -23,12 +25,16 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
         const handleResize = () => {
             if (window.innerWidth < 1023) {
                 setNumBooksOnShelf(8);
+                setIsMobile(true);
             } else if (window.innerWidth < 1050) {
                 setNumBooksOnShelf(3);
+                setIsMobile(false);
             } else if (window.innerWidth < 1680) {
                 setNumBooksOnShelf(4);
+                setIsMobile(false);
             } else {
                 setNumBooksOnShelf(5);
+                setIsMobile(false);
             }
         }
 
@@ -65,8 +71,8 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
     }
 
     return (
-        <div className='lg:w-full lg:h-auto'>
-            <div className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start'>
+        <div className='w-1/2 lg:w-full h-auto scroll-smooth'>
+            <div id='shelf' className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start'>
                 {books.slice(0 + shelfIndex*numBooksOnShelf, numBooksOnShelf + shelfIndex*numBooksOnShelf).map((book, i) => 
                 <motion.div
                     key={book.key}
@@ -85,11 +91,20 @@ export const Shelf = ({ books, handleBgLoaded, handleRemoveBook, triggerLoading,
                 </motion.div>)}
             </div>
             {(books.length > numBooksOnShelf) && (
-            <div className='flex flex-row justify-center'>
-                <Button className='m-2' type="primary" shape='circle' icon={<FaChevronLeft />} onClick={() => (handleClick(1))}/>
-                <Button className='m-2' type="primary" shape='circle' icon={<FaChevronRight />} onClick={() => (handleClick(-1))}/>
-            </div> 
-            )}
+            isMobile ? (
+                <div className='flex flex-row justify-center'>
+                    <Link to='shelf' offset={-75} >
+                        <Button className='m-2' type="primary" shape='circle' icon={<FaChevronLeft />} onClick={() => (handleClick(1))}/>
+                        <Button className='m-2' type="primary" shape='circle' icon={<FaChevronRight />} onClick={() => (handleClick(-1))}/>
+                    </Link>
+                </div> 
+            ) : (
+                <div className='flex flex-row justify-center'>
+                    <Button className='m-2' type="primary" shape='circle' icon={<FaChevronLeft />} onClick={() => (handleClick(1))}/>
+                    <Button className='m-2' type="primary" shape='circle' icon={<FaChevronRight />} onClick={() => (handleClick(-1))}/>
+                </div> 
+            )
+        )}
         </div>
     )
 }
