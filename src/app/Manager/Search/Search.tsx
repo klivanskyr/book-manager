@@ -4,7 +4,7 @@ import react, { useState, useEffect, ReactElement } from 'react';
 import { AnimatePresence, motion } from "framer-motion"
 
 import { Book } from "./Book"
-import { Shelf } from './Shelf'
+import { Shelf } from '../Shelf/Shelf'
 import BookSelect from './BookSelect';
 
 const Search = (): ReactElement => {
