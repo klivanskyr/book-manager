@@ -19,13 +19,15 @@ const Search = (): ReactElement => {
 
     //Error handling
     const handleError = (message: string): void => {
-        setError(message);
-        setErrorVisable(true);
-        setQuery('');
-        console.log('error:', error, 'visable?: ', errorVisable);
-        setTimeout(() => {
-            setErrorVisable(false);
-        }, 10000);
+        if (message !== "") {
+            console.log('error:', error, 'visable?: ', errorVisable);
+            setError(message);
+            setErrorVisable(true);
+            setQuery('');
+            setTimeout(() => {
+                setErrorVisable(false);
+            }, 10000);
+        }
     };
 
     //Search bar handler
@@ -46,57 +48,57 @@ const Search = (): ReactElement => {
     }
 
     //Takes in a single character and checks if it is a number
-    const isCharNumber = (char: string): boolean => {
-        return (char.length === 1 && char >= '0' && char <= '9');
-    }
+    // const isCharNumber = (char: string): boolean => {
+    //     return (char.length === 1 && char >= '0' && char <= '9');
+    // }
     
-    /* 
-        ISBN verification
-        isbn-10 and isbn-13 use unique checksum algorithms to authenticate isbn codes
-    */
-    const validISBN = (isbn: string): boolean => {
-        if (typeof isbn !== 'string') { return false; }
-        if (isbn.length == 10) {
-            let sum: number = 0;
-            for (let i = 0; i < isbn.length - 1; i++) {
-                if (!isCharNumber(isbn[i])) {
-                    handleError("Error: ISBN-10 should contain only digits (may contain hypens, last character may be 'X').");
-                    return false; 
-                }
-                sum += (Number(isbn[i])*(10-i));
-            }
-            if (!isCharNumber(isbn[isbn.length - 1]) || isbn[isbn.length - 1] !== 'X'){
-                handleError("Error: ISBN-10 should contain only digits (may contain hypens, last character may be 'X').");
-                return false; 
-            }
-            if (isbn[isbn.length - 1] == 'X') { return 10 != 11 - (sum % 11); } 
-            return Number(isbn[isbn.length - 1]) != 11 - (sum % 11);
+    // /* 
+    //     ISBN verification
+    //     isbn-10 and isbn-13 use unique checksum algorithms to authenticate isbn codes
+    // */
+    // const validISBN = (isbn: string): boolean => {
+    //     if (typeof isbn !== 'string') { return false; }
+    //     if (isbn.length == 10) {
+    //         let sum: number = 0;
+    //         for (let i = 0; i < isbn.length - 1; i++) {
+    //             if (!isCharNumber(isbn[i])) {
+    //                 handleError("here1, Error: ISBN-10 should contain only digits (may contain hypens, last character may be 'X').");
+    //                 return false; 
+    //             }
+    //             sum += (Number(isbn[i])*(10-i));
+    //         }
+    //         if (!isCharNumber(isbn[isbn.length - 1]) && isbn[isbn.length - 1] !== 'X'){
+    //             handleError("here2, Error: ISBN-10 should contain only digits (may contain hypens, last character may be 'X').");
+    //             return false; 
+    //         }
+    //         if (isbn[isbn.length - 1] == 'X') { return 10 != 11 - (sum % 11); } 
+    //         return Number(isbn[isbn.length - 1]) != 11 - (sum % 11);
 
-        } else if (isbn.length == 13) {
-            let sum: number = 0;
-            for (let i = 0; i < isbn.length - 1; i++ ) {
-                if (!isCharNumber(isbn[i])){
-                    handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
-                    return false; 
-                }
+    //     } else if (isbn.length == 13) {
+    //         let sum: number = 0;
+    //         for (let i = 0; i < isbn.length - 1; i++ ) {
+    //             if (!isCharNumber(isbn[i])){
+    //                 handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
+    //                 return false; 
+    //             }
 
-                if ((i + 1) % 2 == 0){
-                    sum += Number(isbn[i])*3;
-                } else {
-                    sum += Number(isbn[i]);
-                }
-            }
-            if (!isCharNumber(isbn[isbn.length - 1])) { 
-                handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
-                return false; 
-            }
-            return Number(isbn[isbn.length - 1]) == 10 - (sum % 10);
+    //             if ((i + 1) % 2 == 0){
+    //                 sum += Number(isbn[i])*3;
+    //             } else {
+    //                 sum += Number(isbn[i]);
+    //             }
+    //         }
+    //         if (!isCharNumber(isbn[isbn.length - 1])) { 
+    //             handleError("Error: ISBN-13 should contain only digits (may contain hypens).");
+    //             return false; 
+    //         }
+    //         return Number(isbn[isbn.length - 1]) == 10 - (sum % 10);
 
-        } else {
-            handleError("Error: Incorrect ISBN length. Length should be 10 or 13 digits.");
-            return false;
-        }
-    }
+    //     } else {
+    //         handleError("Error: Incorrect ISBN length. Length should be 10 or 13 digits.");
+    //         return false;
+    //     }
+    // }
 
     //Loads a list of books into local storage overwriting any previous books
     function booksToLocalStorage(books: Book[]): void {
@@ -132,8 +134,9 @@ const Search = (): ReactElement => {
     }, [triggerLoad]);
 
     return (
-    <>
-        <BookSelect active={bookSelectVisable} query={query} currentBooks={books} booksToLocalStorage={booksToLocalStorage} handleBookSelectClose={handleBookSelectClose}  />
+    <>  
+
+        <BookSelect active={bookSelectVisable} query={query} currentBooks={books} handleError={handleError} booksToLocalStorage={booksToLocalStorage} handleBookSelectClose={handleBookSelectClose}  />
         <div className='flex flex-col lg:justify-start justify-center items-center h-full m-2'>
             <div className='flex flex-col justify-start items-center h-1/5 w-auto lg:m-5 lg:h-[250px] lg:w-[400px] lg:flex-shrink-0'>
                 <p className='p-2 w-5/6 lg:w-3/4 text-center font-Urbanist font-semibold text-[1.5rem]  '>
