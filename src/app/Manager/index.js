@@ -1,0 +1,1 @@
+export { default, booksToLocalStorage } from './Manager';

@@ -1,33 +1,18 @@
-import React, { useState, useEffect } from 'react'
+'use client';
+
+import React, { useState, useEffect, ReactElement } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
-import axios from 'axios';
-import coverPlaceholder from '../../../public/coverPlaceholder.jpg'
 
-import { Book } from './Book';
-import ModalGrid from './ModalGrid';
+import { coverPlaceholder } from '@/assets';
+import { Book } from '../../Book';
+import { booksToLocalStorage } from '../../Manager';
+import BookSelectGrid from './BookSelectGrid';
 
-const BookSelect = ({ active, query, currentBooks, handleError, booksToLocalStorage, handleBookSelectClose }: { active: boolean, query: string, currentBooks: Book[], handleError: Function, booksToLocalStorage: Function, handleBookSelectClose: Function }) => {
+export default function BookSelect({ active, query, books, handleError, handleBookSelectClose }:
+     { active: boolean, query: string, books: Book[], handleError: Function, handleBookSelectClose: Function }): ReactElement {
 
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
-    const [skeletonLength, SetSkeletonLength] = useState<number>(1);
-    const [isTitlesLoaded, setIsTitlesLoaded] = useState<boolean>(false);
-    const [isImagesLoaded, setIsImagesLoaded] = useState<boolean>(false);
-
-    //handle selecting book from modal
-    const handleClickAdd = (i: number) => {
-        const updatedBook = { ...foundBooks[i], selected: true };
-        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        booksToLocalStorage([...currentBooks, updatedBook]);
-}
-
-    //handle removing book from modal
-    const handleClickRemove = (i: number) => {
-        const updatedBook = { ...foundBooks[i], selected: false };
-        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        const updatedCurrentBooks = currentBooks.filter((book) => (book.key !== updatedBook.key));
-        booksToLocalStorage(updatedCurrentBooks);
-    }
 
     //Book Search API REQUEST
     const baseBookUrl = 'http://openlibrary.org/search.json?isbn=';
@@ -35,20 +20,17 @@ const BookSelect = ({ active, query, currentBooks, handleError, booksToLocalStor
 
     //API call to get books to display to pick from
     async function getBooks(query: string): Promise<Book | undefined> {
-        setIsTitlesLoaded(false);
-        setIsImagesLoaded(false);
         if (query === '') { return undefined; }
         const query_hypenless = query.replaceAll('-', '');
         try {
-            const bookResponse = await axios.get(`${baseBookUrl}${query_hypenless}`);
-            if (bookResponse.data.docs.length == 0){
+            const res = await fetch(`${baseBookUrl}${query_hypenless}`);
+            const data = await res.json();
+            if (data.docs.length == 0){
                 handleError(`No books found with ISBN ${query}.`);
                 handleBookSelectClose();
                 return undefined;
             }
-            setIsTitlesLoaded(true);
-            SetSkeletonLength(bookResponse.data.docs.length);
-            let books: Book[] = bookResponse.data.docs
+            let books: Book[] = data.docs
             .filter((entry: any) => entry.title && entry.author_name && entry.author_name[0]) //Filter out undefined entires then map to book datatype
             .map((entry: any) => ({
                 key: entry.key,
@@ -71,29 +53,29 @@ const BookSelect = ({ active, query, currentBooks, handleError, booksToLocalStor
                 current book so the reviews and rating is preserved
             */
             books = books.map((book) => {
-                const currentBook = currentBooks.find(curBook => curBook.key == book.key);
+                const currentBook = books.find(curBook => curBook.key == book.key);
                 return currentBook ? currentBook : book;
             })
             setFoundBooks(books);
-            setIsImagesLoaded(true);
 
         } catch (error) {
-            setIsTitlesLoaded(false);
-            setIsImagesLoaded(false);
             return undefined;
         }
     }
 
-    const loadedImg = (book: Book) => {
-        console.log(book.title, 'is loaded with', book.coverImage);
-        setFoundBooks(foundBooks.map((b) => (b.key === book.key ? { ...book, imgLoaded: true } : b)));
-    }
+    //handle selecting book from modal
+    function handleClickAdd(i: number): void {
+        const updatedBook = { ...foundBooks[i], selected: true };
+        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
+        booksToLocalStorage([...books, updatedBook]);
+}
 
-    const updateSRC = (e: React.ChangeEvent<HTMLImageElement>, book: Book) => {
-        console.log('updating src', book.title)
-        const updatedBooks = foundBooks.map((b) => (b.key === book.key ? { ...book, coverImage: coverPlaceholder.src, imgLoaded: true } : b));
-        setFoundBooks(updatedBooks);
-        e.target.src = coverPlaceholder.src;
+    //handle removing book from modal
+    const handleClickRemove = (i: number) => {
+        const updatedBook = { ...foundBooks[i], selected: false };
+        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
+        const updatedCurrentBooks = books.filter((book) => (book.key !== updatedBook.key));
+        booksToLocalStorage(updatedCurrentBooks);
     }
 
     //Removes page scorll when modal active
@@ -113,26 +95,20 @@ const BookSelect = ({ active, query, currentBooks, handleError, booksToLocalStor
     
     return (
         <Modal
-            isOpen={active && foundBooks.length > 0}
+            isOpen={active}
+            ariaHideApp={false}
             onRequestClose={() => handleBookSelectClose()}
             className="flex items-center justify-center h-3/4 outline-none"
             overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
         >
             <div className="flex bg-white border p-6 rounded-lg shadow-lg w-full h-full overflow-y-scroll">
                 <FaTimes onClick={() => handleBookSelectClose()} />
-                <ModalGrid 
-                    isTitlesLoaded={isTitlesLoaded} 
-                    isImagesLoaded={isImagesLoaded} 
+                <BookSelectGrid 
                     foundBooks={foundBooks}
-                    skeletonLength={skeletonLength} 
                     handleClickAdd={handleClickAdd} 
                     handleClickRemove={handleClickRemove} 
-                    loadedImg={loadedImg} 
-                    updateSRC={updateSRC}
                 />
             </div>
         </Modal>
     )
 }
-
-export default BookSelect
