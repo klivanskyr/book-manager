@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react'
+import React, { useState, ReactElement} from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
-import Stars from '../Stars/Stars'
+import Stars from '../Shelf/Stars/Stars'
 import { Book } from './Book'
 
-const Review = ({ active, book, handleReviewClose, handleRatingUpdate }: { active: boolean, book: Book, handleReviewClose: Function, handleRatingUpdate: Function }) => {
+export default function Review({ active, book, handleReviewClose, handleRatingUpdate }: { active: boolean, book: Book, handleReviewClose: Function, handleRatingUpdate: Function }): ReactElement {
 
   const [review, setReview] = useState(book.review);
 
@@ -40,5 +40,3 @@ const Review = ({ active, book, handleReviewClose, handleRatingUpdate }: { activ
     </Modal>
   )
 }
-
-export default Review
