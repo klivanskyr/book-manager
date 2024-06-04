@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
-import Stars from './Stars'
+import Stars from '../Stars/Stars'
 import { Book } from './Book'
 
 const Review = ({ active, book, handleReviewClose, handleRatingUpdate }: { active: boolean, book: Book, handleReviewClose: Function, handleRatingUpdate: Function }) => {
