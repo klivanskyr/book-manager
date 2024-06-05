@@ -26,7 +26,7 @@ export type Book = {
 };
 
 
-export default function BookCard({ book, handleRemoveBook, handleRatingUpdate, handleReviewUpdate, handleBgLoaded}: 
+export function BookCard({ book, handleRemoveBook, handleRatingUpdate, handleReviewUpdate, handleBgLoaded}: 
     { book: Book, handleRemoveBook: Function, handleRatingUpdate: Function, handleReviewUpdate: Function, handleBgLoaded: Function }): ReactElement {
 
     const [reviewVisable, setReviewVisable] = useState(false);

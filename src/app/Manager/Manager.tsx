@@ -5,6 +5,18 @@ import Search from './Search'
 import Shelf from './Shelf'
 import { Book } from './Book'
 
+import { prisma } from '../../../lib/prisma'
+
+async function getNames(): Promise<string[]> {
+  const names = await prisma.user.findMany({
+    select: {
+      username: true
+    }
+  })
+  return names.map((name) => name.username);
+}
+
+
 
 export function booksToLocalStorage(books: Book[]): void {
   localStorage.setItem('books', JSON.stringify(books));
@@ -40,7 +52,7 @@ export default function Manager(): ReactElement {
   return (
     <div className='flex flex-col items-center h-auto'>
       <Search books={books} />
-      {/* <Shelf books={books} /> */}
+      <Shelf books={books} />
     </div>
   )
 }
