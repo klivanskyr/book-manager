@@ -51,8 +51,8 @@ async function getBooks(): Promise<Book[]> {
       key: elt.key,
       title: elt.title,
       author: elt.author,
-      review: elt.Review[0]?.review,
-      rating: elt.Review[0]?.rating,
+      review: elt.Review[0].review ? elt.Review[0].review : '',
+      rating: elt.Review[0].rating ? elt.Review[0].rating : 0,
       isbn: elt.isbn.toString(),
       coverImage: '',
       bgColor: [127, 127, 127], //default
