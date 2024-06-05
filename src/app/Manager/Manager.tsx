@@ -40,7 +40,7 @@ export default function Manager(): ReactElement {
   return (
     <div className='flex flex-col items-center h-auto'>
       <Search books={books} />
-      <Shelf books={books} />
+      {/* <Shelf books={books} /> */}
     </div>
   )
 }
