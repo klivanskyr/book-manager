@@ -75,6 +75,24 @@ async function main() {
         bookId: 1,
     }
   })
+
+  await prisma.user_book.upsert({
+    where: { id: 3},
+    update: {},
+    create: {
+        userId: 1,
+        bookId: 3,
+    }
+  })
+
+  await prisma.user_book.upsert({
+    where: { id: 2},
+    update: {},
+    create: {
+        userId: 2,
+        bookId: 1,
+    }
+  })
 }
 
 main()
