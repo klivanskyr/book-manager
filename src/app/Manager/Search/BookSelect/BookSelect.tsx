@@ -6,11 +6,11 @@ import Modal from 'react-modal'
 
 import { coverPlaceholder } from '@/assets';
 import { Book } from '../../Book';
-import { booksToLocalStorage } from '../../Manager';
+import { Userinfo, createBook, deleteBook } from '../../Userinfo';
 import BookSelectGrid from './BookSelectGrid';
 
-export default function BookSelect({ active, query, books, handleError, handleBookSelectClose }:
-     { active: boolean, query: string, books: Book[], handleError: Function, handleBookSelectClose: Function }): ReactElement {
+export default function BookSelect({ active, query, user, handleError, handleBookSelectClose }: 
+    { active: boolean, query: string, user: Userinfo, handleError: Function, handleBookSelectClose: Function }): ReactElement {
 
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
 
@@ -19,7 +19,7 @@ export default function BookSelect({ active, query, books, handleError, handleBo
     const baseCoverUrl = 'https://covers.openlibrary.org/b/olid/';
 
     //API call to get books to display to pick from
-    async function getBooks(query: string): Promise<Book | undefined> {
+    async function getNewBooks(query: string): Promise<Book | undefined> {
         if (query === '') { return undefined; }
         const query_hypenless = query.replaceAll('-', '');
         try {
@@ -30,9 +30,11 @@ export default function BookSelect({ active, query, books, handleError, handleBo
                 handleBookSelectClose();
                 return undefined;
             }
+            
             let books: Book[] = data.docs
-            .filter((entry: any) => entry.title && entry.author_name && entry.author_name[0]) //Filter out undefined entires then map to book datatype
+            .filter((entry: any) => entry.title && entry.author_name && entry.author_name[0]) 
             .map((entry: any) => ({
+                id: null,
                 key: entry.key,
                 title: entry.title,
                 author: entry.author_name[0],
@@ -64,18 +66,18 @@ export default function BookSelect({ active, query, books, handleError, handleBo
     }
 
     //handle selecting book from modal
-    function handleClickAdd(i: number): void {
+    async function handleClickAdd(i: number): Promise<void> {
         const updatedBook = { ...foundBooks[i], selected: true };
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        booksToLocalStorage([...books, updatedBook]);
-}
+        await createBook(updatedBook, user);
+    }
 
     //handle removing book from modal
-    const handleClickRemove = (i: number) => {
+    async function handleClickRemove(i: number): Promise<void> {
         const updatedBook = { ...foundBooks[i], selected: false };
+        console.log('foundbook at i is: ', foundBooks[i])
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        const updatedCurrentBooks = books.filter((book) => (book.key !== updatedBook.key));
-        booksToLocalStorage(updatedCurrentBooks);
+        await deleteBook(foundBooks[i].id, user.user_id);
     }
 
     //Removes page scorll when modal active
@@ -90,7 +92,7 @@ export default function BookSelect({ active, query, books, handleError, handleBo
     //Run getBooks on init
     useEffect(() => {
         setFoundBooks([]);
-        getBooks(query);
+        getNewBooks(query);
     }, [active])
     
     return (

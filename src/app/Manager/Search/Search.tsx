@@ -3,7 +3,7 @@
 import React, { useState, ReactElement, ChangeEvent, MouseEvent } from 'react';
 import { AnimatePresence, motion } from "framer-motion"
 
-import { Book } from "../Book"
+import { Userinfo } from "../Userinfo"
 import BookSelect from './BookSelect';
 
 function InputArea({ query, buttonPressed, error, errorVisable, handleSubmit, handleQueryChange, handleMouseUp }: 
@@ -42,7 +42,7 @@ function InputArea({ query, buttonPressed, error, errorVisable, handleSubmit, ha
     )
 }
 
-export default function Search({ books }: { books: Book[] }): ReactElement {
+export default function Search({ user }: { user: Userinfo }): ReactElement {
     const [error, setError] = useState<string>("");
     const [errorVisable, setErrorVisable] = useState<boolean>(false);
     const [query, setQuery] = useState<string>("");
@@ -138,7 +138,7 @@ export default function Search({ books }: { books: Book[] }): ReactElement {
 
     return (
     <>  
-        <BookSelect active={bookSelectVisable} query={query} books={books} handleError={handleError} handleBookSelectClose={handleBookSelectClose} />
+        <BookSelect active={bookSelectVisable} query={query} user={user} handleError={handleError} handleBookSelectClose={handleBookSelectClose} />
         <InputArea buttonPressed={buttonPressed} error={error} errorVisable={errorVisable} handleMouseUp={handleMouseUp} handleQueryChange={handleQueryChange} handleSubmit={handleSubmit} query={query} />
     </>
     )
