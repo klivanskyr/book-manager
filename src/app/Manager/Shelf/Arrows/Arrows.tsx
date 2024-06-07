@@ -1,8 +1,9 @@
 import { ReactElement } from 'react';
-import { Book } from '../../Book';
 import { Button } from 'antd';
 import { Link } from 'react-scroll';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+
+import { Book } from '../../Book';
 
 export default function Arrows({ books, isMobile, numBooksOnShelf, handleClick }: { books: Book[], isMobile: boolean, numBooksOnShelf: number, handleClick: Function }): ReactElement {
     //if there are less books than the number of books on the shelf, don't show arrows

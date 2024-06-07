@@ -3,33 +3,33 @@ import { motion } from 'framer-motion';
 import { Oval } from 'react-loader-spinner';
 
 import { BookCard, Book } from '../../Book'
-import { booksToLocalStorage } from '../../Manager'
+import { Userinfo, updateBook, updateReview, deleteBook } from '../../Userinfo'
 
-export default function BookRow({ books, shelfIndex, numBooksOnShelf }: { books: Book[], shelfIndex: number, numBooksOnShelf: number }): ReactElement {
+export default function BookRow({ user, shelfIndex, numBooksOnShelf }: { user: Userinfo, shelfIndex: number, numBooksOnShelf: number }): ReactElement {
     // Update star/rating amount
-    function handleRatingUpdate(book: Book, starIndex: number): void {
+    async function handleRatingUpdate(book: Book, starIndex: number): Promise<void> {
         if (book.rating == starIndex + 1){
             book.rating = 0; //Clicking same star twice removes rating
         } else {
             book.rating = starIndex + 1;
         }
-        booksToLocalStorage(books.map((b) => (b.key === book.key ? book : b)));
+        await updateReview(book, user.user_id);
     };
 
-    function handleReviewUpdate(book: Book, newReview: string): void {
+    async function handleReviewUpdate(book: Book, newReview: string): Promise<void> {
         const newBook = {...book, review: newReview};
-        booksToLocalStorage(books.map((b) => (b.key == newBook.key ? newBook : b)));
+        await updateReview(newBook, user.user_id);
     }
 
     //Clear Books handler
-    function handleRemoveBook(book: Book): void {
-        booksToLocalStorage(books.filter(b => b.key !== book.key));
+    async function handleRemoveBook(book: Book): Promise<void> {
+        await deleteBook(book.id, user.user_id);
     }
 
     //handle Background color loading from color thief
     function handleBgLoaded(book: Book, color: number[]): void {
         const updatedBook = {...book, bgColor: color, bgLoaded: true};
-        booksToLocalStorage(books.map((book) => book.key == updatedBook.key ? updatedBook : book));
+        updateBook(user, updatedBook);
     }
 
     //Prevents hydration error
@@ -41,9 +41,9 @@ export default function BookRow({ books, shelfIndex, numBooksOnShelf }: { books:
 
     return (
         <div id='shelf' className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start'>
-            {books.slice(0 + shelfIndex*numBooksOnShelf, numBooksOnShelf + shelfIndex*numBooksOnShelf).map((book: Book, i: number) => (
+            {user.books.slice(0 + shelfIndex*numBooksOnShelf, numBooksOnShelf + shelfIndex*numBooksOnShelf).map((book: Book) => (
                 <motion.div
-                    key={book.key}
+                    key={book.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

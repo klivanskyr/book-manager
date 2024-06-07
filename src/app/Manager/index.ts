@@ -1,1 +1,1 @@
-export { default, booksToLocalStorage } from './Manager';
+export { default } from './Manager';

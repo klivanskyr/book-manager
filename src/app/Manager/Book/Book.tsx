@@ -12,6 +12,7 @@ import Stars  from '../Shelf/Stars'
 import { coverPlaceholder } from '@/assets'
 
 export type Book = {
+    id: number,
     key: string,
     title: string,
     author: string,
@@ -46,15 +47,18 @@ export function BookCard({ book, handleRemoveBook, handleRatingUpdate, handleRev
         img.onload = function () {
             try {
                 const color = colorThief.getColor(img);
+                console.log('success color grab');
                 handleBgLoaded(book, [Math.min(color[0]+75, 255), Math.min(color[1]+75, 255), Math.min(color[2]+75, 255)]);
             } catch (error) {
+                console.log('error color grab');
                 handleBgLoaded(book, [127, 127, 127]);
             }  
         }
     }
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && !book.bgLoaded) {
+        if (!book.bgLoaded) {
+            console.log("fetching color");
             fetchDominantColor({ book });
         }
     }, [book]);

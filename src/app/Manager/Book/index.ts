@@ -1,1 +1,2 @@
-export { Book, BookCard } from './Book';
+export { BookCard } from './Book';
+export type { Book } from './Book';

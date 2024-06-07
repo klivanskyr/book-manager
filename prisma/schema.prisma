@@ -22,7 +22,11 @@ model Book {
   key       String      @unique
   title     String
   author    String
-  isbn      Int         @unique
+  isbn      String      @unique
+  cover     String      @default("")
+  r         Int         @default(127)
+  g         Int         @default(127)
+  b         Int         @default(127)
   createdAt DateTime    @default(now())
   Review    Review[]
   User_book User_book[]
@@ -35,6 +39,7 @@ model User_book {
   createdAt DateTime @default(now())
   Book      Book     @relation(fields: [bookId], references: [id])
   User      User     @relation(fields: [userId], references: [id])
+  @@unique([bookId, userId])
 }
 
 model Review {
@@ -42,8 +47,9 @@ model Review {
   userId    Int
   bookId    Int
   rating    Int
-  review    String
+  review    String   @default("")
   createdAt DateTime @default(now())
   book      Book     @relation(fields: [bookId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+  @@unique([bookId, userId])
 }

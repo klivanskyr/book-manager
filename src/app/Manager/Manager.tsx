@@ -1,107 +1,46 @@
-import { useState, useEffect, ReactElement } from 'react';
+'use client';
+
+import { ReactElement, useEffect, useState } from 'react';
+
 import Search from './Search'
 import Shelf from './Shelf'
-import { Book } from './Book'
+import { Userinfo, getUserId, loadBooks } from './Userinfo'
 
-import { prisma } from '../../../lib/prisma'
-import { BsSignRailroad } from 'react-icons/bs';
-
-const EMAIL = 'test@test.com';
-
-async function getBooks(): Promise<Book[]> {
-  
-  // Find the user by username
-  const user = await prisma.user.findUnique({
-    where: {
-      email: EMAIL
-    }
-  });
-
-  // If the user is not found, return an empty array
-  if (!user) {
-    return [];
-  }
-
-  // Use the user's ID in the subsequent query
-  const userWithBooks = await prisma.user.findFirst({
-    where: {
-      id: user.id
-    },
-    include: {
-      User_book: {
-        include: {
-          Book: {
-            include: {
-              Review: {
-                where: {
-                  userId: user.id, // Use the user's ID here
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  
-  const bookObjects = userWithBooks ? userWithBooks?.User_book.map((userBook) => userBook.Book) : [];
-  const books = bookObjects?.map((elt) => {
-    return {
-      key: elt.key,
-      title: elt.title,
-      author: elt.author,
-      review: elt.Review[0].review ? elt.Review[0].review : '',
-      rating: elt.Review[0].rating ? elt.Review[0].rating : 0,
-      isbn: elt.isbn.toString(),
-      coverImage: '',
-      bgColor: [127, 127, 127], //default
-      bgLoaded: false,
-      imgLoaded: false,
-      selected: true //true because it is in the database
-    };
-  });
-  console.log('books', books)
-  return books;
-}
-
-export function booksToLocalStorage(books: Book[]): void {
-  localStorage.setItem('books', JSON.stringify(books));
-  window.dispatchEvent(new Event('storage'));
-}
-
-// function loadBooks(): Book[] {
-//   if (typeof window !== 'undefined') {
-//     const res = localStorage.getItem('books');
-//     return res ? JSON.parse(res) : [];
-//   }
-//   return [];
-// }
+const TESTEMAIL = 'test@test.com';
 
 export default function Manager(): ReactElement {
-  // const [books, setBooks] = useState<Book[]>(loadBooks());
+  const [user, setUser] = useState<Userinfo | null>(null);
 
-  // Fetch books from local storage on startup
-  // useEffect(() => {
-  //   setBooks(loadBooks());
-  // }, []);
+  //fetches books on load
+  useEffect(() => {
+    const fetchData = async () => {
+      const id = await getUserId(TESTEMAIL);
+      if (!id) {
+        return;
+      }
 
-  // Update state when local storage changes
-  // useEffect(() => {
-  //   function handleStorageChange(): void {
-  //     setBooks(loadBooks());
-  //   };
+      const res = await loadBooks(id);
+      console.log('\n\nresults:', res);
+      const books = res.map((book) => {
+        console.log(book);
+        return book;
+      })
 
-  //   window.addEventListener('storage', handleStorageChange);
-  //   return () => window.removeEventListener('storage', handleStorageChange);
-  // }, []);
+      const user: Userinfo = {
+        user_id: id,
+        books: books
+      }
 
-  const books = getBooks();
-  console.log(books);
+      setUser(user);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className='flex flex-col items-center h-auto'>
-      <Search books={books} />
-      <Shelf books={books} />
+      {user && <Search user={user} />}
+      {user && <Shelf user={user} />}
     </div>
   )
 }

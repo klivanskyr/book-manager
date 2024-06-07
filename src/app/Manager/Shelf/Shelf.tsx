@@ -2,11 +2,11 @@
 
 import { useState, useEffect, ReactElement } from 'react'
 
-import { Book } from "../Book"
 import BookRow from './BookRow';
 import Arrows from './Arrows';
+import { Userinfo } from '../Userinfo';
 
-export default function Shelf ({ books }: { books: Book[] }): ReactElement {
+export default function Shelf ({ user }: { user: Userinfo }): ReactElement {
     const [isMobile, setIsMobile] = useState(false); //records if mobile view
     const [shelfIndex, setShelfIndex] = useState(0); //records which shelf is being viewed
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5); //records number of books on shelf
@@ -44,21 +44,22 @@ export default function Shelf ({ books }: { books: Book[] }): ReactElement {
     }, []);
 
     useEffect(() => {
-        setNumOfShelves(Math.max(1, Math.ceil(books.length / numBooksOnShelf)));
+        setNumOfShelves(Math.max(1, Math.ceil(user.books.length / numBooksOnShelf)));
         if (shelfIndex >= numOfShelves) {
             setShelfIndex(0);
         }
-    }, [books.length, shelfIndex, numOfShelves]);
+    }, [user.books.length, shelfIndex, numOfShelves]);
     
     // handle shelf incrementing and decrementing
-    const handleClick = (increment: number): void => {
+    function handleClick(increment: number): void {
         setShelfIndex((numOfShelves + shelfIndex + increment) % numOfShelves);
     }
 
     return (
+        
         <div className='w-1/2 lg:w-full h-auto scroll-smooth'>
-            <BookRow books={books} shelfIndex={0} numBooksOnShelf={5} />
-            <Arrows books={books} handleClick={handleClick} isMobile={isMobile} numBooksOnShelf={numBooksOnShelf} />
+            <BookRow user={user} shelfIndex={0} numBooksOnShelf={5} />
+            <Arrows books={user.books} handleClick={handleClick} isMobile={isMobile} numBooksOnShelf={numBooksOnShelf} />
         </div>
     )
 }
