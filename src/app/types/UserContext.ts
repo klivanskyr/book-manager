@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { ReactNode, useState, createContext } from 'react';
 import { Book } from './Book';
 
 export type User = {
@@ -12,9 +12,9 @@ export type UserContextType = {
 }
 
 export const UserContext = createContext<UserContextType>({
-    user: null as User | null,
-    setUser: (user: User | null) => {}
-})
+  user: null as User | null,
+  setUser: (user: User | null) => {}
+});
 
 ///////////////////////////////////////////////////////
 

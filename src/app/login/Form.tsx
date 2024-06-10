@@ -16,6 +16,7 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
     title: "Login",
     questions: [
       {
+        id: "1",
         name: "email",
         title: "Enter your email: ",
         type: "text",
@@ -26,6 +27,7 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
         ]
       },
       {
+        id: "2",
         name: "password",
         title: "Enter your password: ",
         type: "text",
@@ -46,9 +48,7 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
     id: "sign-up-button",
     title: "Sign Up",
     action: (() => router.push('/sign-up'))
-  })
-
-  console.log(survey.css);
-
+  });
+  
   return <Survey model={survey} />;
 }
