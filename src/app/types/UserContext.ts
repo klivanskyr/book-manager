@@ -34,6 +34,15 @@ export function updateBook(user: User, book: Book): void {
 
 ///////////////////////API CALLS
 
+export async function createUser(email: string, password: string): Promise<number | null> {
+  const res = await fetch(`http://localhost:3000/api/?createUser=true&email=${email}&password=${password}`, { method: 'POST', cache: 'no-cache' });
+  const data = await res.json();
+  if (data.code !== 200) {
+    console.log(data.message);
+    return null;
+  }
+  return data.userId;
+}
 
 export async function getUserId(email: string): Promise<number | null> {
   const res = await fetch(`http://localhost:3000/api/?getUserId=true&email=${email}`, { method: 'GET', cache: 'no-cache' });
