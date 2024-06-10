@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect, ReactElement } from 'react'
+import { useState, useEffect, useContext, ReactElement } from 'react'
 
 import BookRow from './BookRow';
 import Arrows from './Arrows';
-import { Userinfo } from '../Userinfo';
+import { UserContext, UserContextType } from '@/app/UserContext';
 
-export default function Shelf ({ user }: { user: Userinfo }): ReactElement {
-    const [isMobile, setIsMobile] = useState(false); //records if mobile view
+export default function Shelf ({ }: { }): ReactElement {
+    const { user, setUser } = useContext<UserContextType>(UserContext);
     const [shelfIndex, setShelfIndex] = useState(0); //records which shelf is being viewed
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5); //records number of books on shelf
     const [numOfShelves, setNumOfShelves] = useState(1); //records number of shelves
+    const [isMobile, setIsMobile] = useState(false); //records if on mobile
 
     /*
     When window is shrunk, dynamically change the number of books on shelf
@@ -43,12 +44,16 @@ export default function Shelf ({ user }: { user: Userinfo }): ReactElement {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    //updates number of shelves when books are added or removed
+    //If there are less books than the number of books on a shelf, there is only one shelf
     useEffect(() => {
-        setNumOfShelves(Math.max(1, Math.ceil(user.books.length / numBooksOnShelf)));
-        if (shelfIndex >= numOfShelves) {
-            setShelfIndex(0);
+        if (user) {
+            setNumOfShelves(Math.max(1, Math.ceil(user.books.length / numBooksOnShelf)));
+            if (shelfIndex >= numOfShelves) {
+                setShelfIndex(0);
+            }
         }
-    }, [user.books.length, shelfIndex, numOfShelves]);
+    }, [user, shelfIndex, numOfShelves]);
     
     // handle shelf incrementing and decrementing
     function handleClick(increment: number): void {
@@ -58,8 +63,8 @@ export default function Shelf ({ user }: { user: Userinfo }): ReactElement {
     return (
         
         <div className='w-1/2 lg:w-full h-auto scroll-smooth'>
-            <BookRow user={user} shelfIndex={0} numBooksOnShelf={5} />
-            <Arrows books={user.books} handleClick={handleClick} isMobile={isMobile} numBooksOnShelf={numBooksOnShelf} />
+            <BookRow shelfIndex={shelfIndex} numBooksOnShelf={numBooksOnShelf} />
+            <Arrows isMobile={isMobile} numBooksOnShelf={numBooksOnShelf} handleClick={(handleClick)} />
         </div>
     )
 }

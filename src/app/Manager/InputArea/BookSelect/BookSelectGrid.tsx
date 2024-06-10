@@ -3,11 +3,10 @@ import { Button } from "antd";
 import { motion } from "framer-motion"
 import Image from 'next/image';
 
-import { Book } from '../../Book'
+import { Book } from '../../Card'
 import { coverPlaceholder } from '@/assets';
 
-export default function BookSelectGrid({ foundBooks, handleClickAdd, handleClickRemove }: 
-    { foundBooks: Book[], handleClickAdd: Function, handleClickRemove: Function }) {
+export default function BookSelectGrid({ foundBooks, handleClickAdd, handleClickRemove }: { foundBooks: Book[], handleClickAdd: Function, handleClickRemove: Function }) {
     
   return (
     <div className='grid grid-cols-3 items-center'>

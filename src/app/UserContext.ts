@@ -1,12 +1,26 @@
-import { Book } from './Book'
+import { createContext } from 'react';
+import { Book } from './Book';
 
-export type Userinfo = {
-  user_id: number;
-  books: Book[];
+export type User = {
+    user_id: number;
+    books: Book[];
+  }
+
+export type UserContextType = {
+    user: User | null;
+    setUser: (user: User | null) => void;
 }
 
+export const UserContext = createContext<UserContextType>({
+    user: null as User | null,
+    setUser: (user: User | null) => {}
+})
+
+///////////////////////////////////////////////////////
+
+
 //Used for updating book background loaded. DONT RELOAD
-export function updateBook(user: Userinfo, book: Book): void {
+export function updateBook(user: User, book: Book): void {
     const updatedBooks = user.books.map((elt) => {
         if (elt.id === book.id) {
           return book;
@@ -16,6 +30,9 @@ export function updateBook(user: Userinfo, book: Book): void {
     user.books = updatedBooks;
     console.log(user.books);
 }
+
+
+///////////////////////API CALLS
 
 
 export async function getUserId(email: string): Promise<number | null> {
@@ -41,7 +58,7 @@ export async function loadBooks(user_id: number): Promise<Book[]> {
     return data.books;
 }
 
-export async function createBook(book: Book, user: Userinfo): Promise<any> {
+export async function createBook(book: Book, user: User): Promise<any> {
   const key = book.key;
   const title = book.title;
   const author = book.author;
@@ -60,7 +77,6 @@ export async function createBook(book: Book, user: Userinfo): Promise<any> {
     return null;
   }
   user.books = [...user.books, book];
-  triggerReload(); //reload books
   return data;
 }
 
@@ -72,7 +88,6 @@ export async function deleteBook(book_id: number, user_id: number): Promise<any>
       console.log(data.message);
       return null;
     }
-    triggerReload(); //reload books
     return data;
 }
 
@@ -87,6 +102,5 @@ export async function updateReview(book: Book, user_id: number): Promise<any> {
       console.log(data.message);
       return null;
     }
-    triggerReload(); //reload books
     return data;
 }
