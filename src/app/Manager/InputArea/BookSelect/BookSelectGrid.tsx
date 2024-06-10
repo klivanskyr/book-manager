@@ -3,7 +3,7 @@ import { Button } from "antd";
 import { motion } from "framer-motion"
 import Image from 'next/image';
 
-import { Book } from '../../Card'
+import { Book } from '@/app/Book';
 import { coverPlaceholder } from '@/assets';
 
 export default function BookSelectGrid({ foundBooks, handleClickAdd, handleClickRemove }: { foundBooks: Book[], handleClickAdd: Function, handleClickRemove: Function }) {
