@@ -1,21 +1,27 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+'use client';
+
+import React, { ReactElement, useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Oval } from 'react-loader-spinner';
 
-import { BookCard, Book } from '../../Book';
-import { Userinfo } from '../../Userinfo';
+import { Book } from '@/app/Book';
+import { UserContext } from '@/app/UserContext';
+import { Card } from '../Card'
 
-export default function BookRow({ user, shelfIndex, numBooksOnShelf }: { user: Userinfo, shelfIndex: number, numBooksOnShelf: number }): ReactElement {
+export default function BookRow({ shelfIndex, numBooksOnShelf }: { shelfIndex: number, numBooksOnShelf: number }): ReactElement {
+
+    const { user, setUser } = useContext(UserContext);
 
     //Prevents hydration error
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
         setIsMounted(true);
     }, [])
-    if (!isMounted) return <div></div>;
+    if (!isMounted || !user) return <div></div>; //NO USER, NO SHELF
 
     return (
         <div id='shelf' className='flex flex-col justify-center items-center w-full h-full lg:flex-row lg:justify-start'>
+            {/* shows only a subset of the books in order to create pagaination for shelving */}
             {user.books.slice(0 + shelfIndex*numBooksOnShelf, numBooksOnShelf + shelfIndex*numBooksOnShelf).map((book: Book) => (
                 <motion.div
                     key={book.id}
@@ -25,12 +31,7 @@ export default function BookRow({ user, shelfIndex, numBooksOnShelf }: { user: U
                     transition={{ duration: 1.25 }}
                     className='flex-none w-full 1023:w-1/3 1150:w-1/4 1670:w-1/5 h-auto'
                 >
-                    {!book.bgLoaded && (
-                        <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
-                            <Oval color='#abd9f5' secondaryColor='#79d2ed'/>
-                        </div>
-                    )}
-                    <BookCard book={book} handleRemoveBook={handleRemoveBook} handleReviewUpdate={handleReviewUpdate} handleRatingUpdate={handleRatingUpdate} handleBgLoaded={handleBgLoaded} />
+                    <Card book={book} />
                 </motion.div>
             ))}
         </div>

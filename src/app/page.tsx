@@ -1,11 +1,16 @@
+import React, { useState } from 'react';
+
+import { UserContext, User } from './UserContext'; 
 import Header from './Header';
 import Manager from './Manager';
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
+
   return (
-    <main>
+    <UserContext.Provider value={{ user, setUser }}>
       <Header />
       <Manager />
-    </main>
+    </UserContext.Provider>
   );
 }

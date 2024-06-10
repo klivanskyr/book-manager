@@ -1,15 +1,14 @@
 'use client';
 
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useContext, useEffect } from 'react';
 
-import Search from './Search'
-import Shelf from './Shelf'
-import { Userinfo, getUserId, loadBooks } from './Userinfo'
+import { UserContext, User, getUserId, loadBooks } from '../UserContext';
+import Search from './InputArea';
+import Shelf from './Shelf';
 
 const TESTEMAIL = 'test@test.com';
-
 export default function Manager(): ReactElement {
-  const [user, setUser] = useState<Userinfo | null>(null);
+  const { user, setUser } = useContext(UserContext);
 
   //fetches books on load
   useEffect(() => {
@@ -26,7 +25,7 @@ export default function Manager(): ReactElement {
         return book;
       })
 
-      const user: Userinfo = {
+      const user: User = {
         user_id: id,
         books: books
       }
@@ -39,8 +38,8 @@ export default function Manager(): ReactElement {
 
   return (
     <div className='flex flex-col items-center h-auto'>
-      {user && <Search user={user} />}
-      {user && <Shelf user={user} />}
+      {user ? <Search /> : null}
+      {user ? <Shelf /> : null}
     </div>
   )
 }

@@ -4,7 +4,7 @@ import React, { useState, ReactElement} from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
-import Stars from '../Shelf/Stars/Stars'
+import Stars from '../Shelf/Stars'
 import { Book } from './Card'
 
 export default function Review({ active, book, handleReviewClose, handleRatingUpdate }: { active: boolean, book: Book, handleReviewClose: Function, handleRatingUpdate: Function }): ReactElement {
