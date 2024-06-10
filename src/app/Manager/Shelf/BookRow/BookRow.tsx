@@ -2,35 +2,10 @@ import React, { ReactElement, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Oval } from 'react-loader-spinner';
 
-import { BookCard, Book } from '../../Book'
-import { Userinfo, updateBook, updateReview, deleteBook } from '../../Userinfo'
+import { BookCard, Book } from '../../Book';
+import { Userinfo } from '../../Userinfo';
 
 export default function BookRow({ user, shelfIndex, numBooksOnShelf }: { user: Userinfo, shelfIndex: number, numBooksOnShelf: number }): ReactElement {
-    // Update star/rating amount
-    async function handleRatingUpdate(book: Book, starIndex: number): Promise<void> {
-        if (book.rating == starIndex + 1){
-            book.rating = 0; //Clicking same star twice removes rating
-        } else {
-            book.rating = starIndex + 1;
-        }
-        await updateReview(book, user.user_id);
-    };
-
-    async function handleReviewUpdate(book: Book, newReview: string): Promise<void> {
-        const newBook = {...book, review: newReview};
-        await updateReview(newBook, user.user_id);
-    }
-
-    //Clear Books handler
-    async function handleRemoveBook(book: Book): Promise<void> {
-        await deleteBook(book.id, user.user_id);
-    }
-
-    //handle Background color loading from color thief
-    function handleBgLoaded(book: Book, color: number[]): void {
-        const updatedBook = {...book, bgColor: color, bgLoaded: true};
-        updateBook(user, updatedBook);
-    }
 
     //Prevents hydration error
     const [isMounted, setIsMounted] = useState(false);
