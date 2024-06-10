@@ -9,6 +9,7 @@ import { UserContext, UserContextType, createBook, deleteBook } from '@/app/User
 import BookSelectGrid from './BookSelectGrid';
 import { queryOpenLibrary } from '@/app/utils/openlibrary';
 import { Book } from '@/app/Book';
+import { fetchDominantColor } from '@/app/utils/color';
 
 export default function BookSelect({ active, query, handleError, handleBookSelectClose }: 
     { active: boolean, query: string, handleError: Function, handleBookSelectClose: Function }): ReactElement {
@@ -43,7 +44,8 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
 
     //handle selecting book from modal
     async function handleClickAdd(i: number): Promise<void> {
-        const updatedBook = { ...foundBooks[i], selected: true };
+        const [r, g, b] = await fetchDominantColor(foundBooks[i].coverImage);
+        const updatedBook = { ...foundBooks[i], selected: true, r: r, g: g, b: b};
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
         if (user) { await createBook(updatedBook, user); } //IF STATEMENT ON USER
     }
