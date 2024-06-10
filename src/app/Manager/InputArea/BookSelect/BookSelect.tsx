@@ -38,7 +38,7 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
             setFoundBooks(books);
         }
 
-        getNewBooks(query);
+        if (query !== '') { getNewBooks(query); }
     }, [active])
 
     //handle selecting book from modal

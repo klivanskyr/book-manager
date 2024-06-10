@@ -2,7 +2,7 @@
 
 import { ReactElement, useState } from "react";
 
-export default function InputArea({ query, setQuery, setBookSelectVisable, }: { query: string, setQuery: Function, setBookSelectVisable: Function, }): ReactElement {
+export default function Buttons({ query, setQuery, setBookSelectVisable, }: { query: string, setQuery: Function, setBookSelectVisable: Function, }): ReactElement {
     const [buttonPressed, setButtonPressed] = useState<boolean>(false);
 
     function handleSubmit(): void {

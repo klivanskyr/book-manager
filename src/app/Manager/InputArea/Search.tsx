@@ -4,7 +4,7 @@ import React, { useState, ReactElement } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 
 import BookSelect from './BookSelect';
-import InputArea from './InputArea';
+import Buttons from './Buttons';
 
 export default function Search(): ReactElement {
     const [query, setQuery] = useState<string>("");
@@ -88,7 +88,7 @@ export default function Search(): ReactElement {
     return (
         <div>
             <BookSelect active={bookSelectVisable} query={query} handleError={handleError} handleBookSelectClose={handleBookSelectClose} />
-            <InputArea query={query} setQuery={setQuery} setBookSelectVisable={setBookSelectVisable} />
+            <Buttons query={query} setQuery={setQuery} setBookSelectVisable={setBookSelectVisable} />
             <AnimatePresence>
                     {errorVisable && (
                     <motion.div
