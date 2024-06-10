@@ -1,27 +1,26 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useContext } from 'react';
 
-import { UserContext, User } from '@/app/types/UserContext'; 
-import Form from './components/Form';
+import { UserContext } from '@/app/types/UserContext'; 
+import ContextWrapper from '@/app/utils/ContextWrapper';
 
-export default function Home() {
+function Home() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useContext(UserContext);
 
   if (user !== null) {
     router.push('/dashboard');
-  }
-
-  function handleSubmit({ email, password }: { email: string, password: string }): void {
-    console.log('email:', email);
-    console.log('password:', password);
+  } else {
+    router.push('/login');
   }
 
   return (
     <div>
-      <Form handleSubmit={handleSubmit} /> 
-    </div>   
-  );
+      <h1>Home</h1>
+    </div>
+  )
 }
+
+export default Home;
