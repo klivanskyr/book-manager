@@ -41,6 +41,7 @@ export async function DELETE(req: NextRequest) {
             }
             const book_id = parseInt(params[1][1]);
             const user_id = parseInt(params[2][1]);
+            console.log('Passing book_id:', book_id, 'and user_id:', user_id);
             await deleteBook(book_id, user_id);
             return NextResponse.json({ code: 200, message: "Book deleted" });
     }
@@ -154,7 +155,7 @@ async function deleteBook(book_id: number, user_id: number): Promise<void> {
     //delete review from review
     //check if that was the last reference to the book
     //if so, delete the book from books
-    console.log('in delete book')
+    console.log('\n\nHHHHHHHHHHHHHHHHHHHHHH\n\nin delete book')
     await prisma.user_book.delete({
         where: { bookId_userId: { bookId: book_id, userId: user_id } }
     });
