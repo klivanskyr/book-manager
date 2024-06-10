@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
 
 import { UserContext } from '@/app/types/UserContext'; 
-import ContextWrapper from '@/app/utils/ContextWrapper';
 
 function Home() {
   const router = useRouter();
