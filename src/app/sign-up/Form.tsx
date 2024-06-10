@@ -9,13 +9,14 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 
 import { getUserId } from '@/app/types/UserContext'; 
+import { AutoComplete } from "antd";
 
 export default function Form({ handleSubmit }: { handleSubmit: Function }): ReactElement {
     const router = useRouter();
 
     const surveyJson = {
         checkErrorsMode: "onComplete",
-        title: "Login",
+        title: "Sign Up",
         questions: [
         {
             name: "email",
@@ -38,6 +39,15 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
             requiredErrorText: "Password is required",
             inputType: "password",
             AutoComplete: "password"
+        },
+        {
+            name: "re-enter password",
+            title: "Reeneter your password: ",
+            type: "text",
+            isRequired: true,
+            requiredErrorText: "Reentering your password is required",
+            inputType: "password",
+            AutoComplete: "password"
         }],
         showQuestionNumbers: false
     };
@@ -51,28 +61,33 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
     });
 
     survey.addNavigationItem({
-        id: "sign-up-button",
-        title: "Sign Up",
-        action: (() => router.push('/sign-up'))
+        id: "sign-in-button",
+        title: "Sign In",
+        action: (() => router.push('/login'))
     });
 
-    async function validateEmail(survey: any, { data, errors, complete }: { data: any, errors: any, complete: Function}) {
+    async function EmailAlreadyInUse(survey: any, { data, errors, complete }: { data: any, errors: any, complete: Function}) {
         const email = data['email'];
         if (!email) {
             complete();
             return;
         }
         const id = await getUserId(email);
-        if (!id) {
-            errors['email'] = 'Email not found';
+        if (id) {
+            errors['email'] = 'Email already in use. Please sign in or use a different email.';
         }
         complete();
     }
 
-    survey.onServerValidateQuestions.add(validateEmail);
+    survey.onServerValidateQuestions.add(EmailAlreadyInUse);
 
-
+    survey.onValidateQuestion.add((sender, options) => {
+        if (options.name === 'reenter password') {
+            if (options.value !== survey.getValue('password')) {
+                options.error = 'Passwords do not match';
+            }
+        }
+    });
     
-  
-  return <Survey model={survey} />;
+     return <Survey model={survey} />;
 }
