@@ -5,7 +5,6 @@ import { User, UserContext, loadBooks } from '@/app/types/UserContext';
 
 import Search from './InputArea';
 import Shelf from './Shelf';
-import ContextWrapper from '@/app/utils/ContextWrapper';
 
 function Dashboard(): ReactElement {
     const { user, setUser } = useContext(UserContext);
