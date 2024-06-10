@@ -3,8 +3,8 @@
 import React, { ReactElement, useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 
-import { Book } from '@/app/Book';
-import { UserContext } from '@/app/UserContext';
+import { Book } from '@/app/types/Book';
+import { UserContext } from '@/app/types/UserContext';
 import { Card } from '../Card'
 
 export default function BookRow({ shelfIndex, numBooksOnShelf }: { shelfIndex: number, numBooksOnShelf: number }): ReactElement {

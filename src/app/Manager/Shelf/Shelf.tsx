@@ -4,7 +4,7 @@ import { useState, useEffect, useContext, ReactElement } from 'react'
 
 import BookRow from './BookRow';
 import Arrows from './Arrows';
-import { UserContext, UserContextType } from '@/app/UserContext';
+import { UserContext, UserContextType } from '@/app/types/UserContext';
 
 export default function Shelf ({ }: { }): ReactElement {
     const { user, setUser } = useContext<UserContextType>(UserContext);

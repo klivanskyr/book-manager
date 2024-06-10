@@ -2,7 +2,7 @@
 
 import { ReactElement, useContext, useEffect } from 'react';
 
-import { UserContext, User, getUserId, loadBooks } from '../UserContext';
+import { UserContext, User, getUserId, loadBooks } from '@/app/types/UserContext';
 import Search from './InputArea';
 import Shelf from './Shelf';
 

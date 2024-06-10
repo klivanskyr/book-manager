@@ -1,7 +1,7 @@
 import React from 'react'
 import { FaStar } from 'react-icons/fa'
 
-import { Book } from '@/app/Book'
+import { Book } from '@/app/types/Book'
 
 const Stars = ({ size, book, handleRatingUpdate }: { size: number, book: Book, handleRatingUpdate: Function }) => {
   return (
