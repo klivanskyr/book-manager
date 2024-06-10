@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
-import { UserContext, User, UserContextType, createBook, deleteBook, loadBooks } from '@/app/UserContext';
+import { UserContext, User, UserContextType, createBook, deleteBook, loadBooks } from '@/app/types/UserContext';
 import BookSelectGrid from './BookSelectGrid';
 import { queryOpenLibrary } from '@/app/utils/openlibrary';
 import { Book } from '@/app/types/Book';
