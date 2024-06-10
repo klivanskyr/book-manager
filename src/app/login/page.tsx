@@ -3,18 +3,14 @@
 import React, { useState } from 'react';
 
 import { UserContext, User } from '@/app/types/UserContext'; 
-import Manager from './Manager';
+import Form from './Form';
 
-export default function Home() {
-  const [user, setUser] = useState<User | null>(null);
+export default function Login() {
+    const [user, setUser] = useState<User | null>(null);
 
-  if (!user) {
-    //redirect to login page
-
-  }
   return (
     <UserContext.Provider value={{ user, setUser }}>
-      <Manager />
+      <Form />
     </UserContext.Provider>
   );
 }

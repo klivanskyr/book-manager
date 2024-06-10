@@ -8,7 +8,7 @@ import Modal from 'react-modal'
 import { UserContext, User, UserContextType, createBook, deleteBook, loadBooks } from '@/app/UserContext';
 import BookSelectGrid from './BookSelectGrid';
 import { queryOpenLibrary } from '@/app/utils/openlibrary';
-import { Book } from '@/app/Book';
+import { Book } from '@/app/types/Book';
 import { fetchDominantColor } from '@/app/utils/color';
 
 export default function BookSelect({ active, query, handleError, handleBookSelectClose }: 

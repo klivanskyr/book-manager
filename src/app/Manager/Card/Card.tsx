@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 
 import Review from './Review';
 import Stars  from '../Shelf/Stars'
-import { Book } from '@/app/Book';
+import { Book } from '@/app/types/Book';
 import { coverPlaceholder } from '@/assets'
 import { UserContext, User, loadBooks, updateReview, deleteBook } from '@/app/UserContext'
 

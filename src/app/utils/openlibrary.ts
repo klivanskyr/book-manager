@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { Book } from '../Book';
+import { Book } from '../types/Book';
 import { coverPlaceholder } from '@/assets';
 
 //Book Search API REQUEST

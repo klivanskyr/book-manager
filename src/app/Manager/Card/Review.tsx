@@ -5,7 +5,7 @@ import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
 import Stars from '../Shelf/Stars'
-import { Book } from '@/app/Book'
+import { Book } from '@/app/types/Book'
 
 export default function Review({ active, book, handleReviewClose, handleRatingUpdate }: { active: boolean, book: Book, handleReviewClose: Function, handleRatingUpdate: Function }): ReactElement {
 
