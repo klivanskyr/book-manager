@@ -5,7 +5,7 @@ import { Button } from 'antd';
 import { Link } from 'react-scroll';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-import { UserContext } from '@/app/UserContext';
+import { UserContext } from '@/app/types/UserContext';
 
 export default function Arrows({ isMobile, numBooksOnShelf, handleClick }: { isMobile: boolean, numBooksOnShelf: number, handleClick: Function }): ReactElement {
     const { user, setUser } = useContext(UserContext);

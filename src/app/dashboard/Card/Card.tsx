@@ -9,7 +9,7 @@ import Review from './Review';
 import Stars  from '../Shelf/Stars'
 import { Book } from '@/app/types/Book';
 import { coverPlaceholder } from '@/assets'
-import { UserContext, User, loadBooks, updateReview, deleteBook } from '@/app/UserContext'
+import { UserContext, User, loadBooks, updateReview, deleteBook } from '@/app/types/UserContext'
 
 
 export function Card({ book }: { book: Book }): ReactElement {
