@@ -3,13 +3,13 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import Image from 'next/image';
 import { FaTimes } from 'react-icons/fa'
-import ColorThief from 'colorthief'
 import { motion } from "framer-motion"
 import { Oval } from 'react-loader-spinner';
 
 import Review from './Review';
 import Stars  from '../Shelf/Stars'
 import { coverPlaceholder } from '@/assets'
+import { Userinfo, updateBook, updateReview, deleteBook } from '@/app/Manager/Userinfo'
 
 export type Book = {
     id: number,
@@ -21,47 +21,45 @@ export type Book = {
     isbn: string,
     coverImage: string,
     bgColor: number[],
-    bgLoaded: boolean,
     imgLoaded: boolean,
     selected: boolean,
 };
 
 
-export function BookCard({ book, handleRemoveBook, handleRatingUpdate, handleReviewUpdate, handleBgLoaded}: 
-    { book: Book, handleRemoveBook: Function, handleRatingUpdate: Function, handleReviewUpdate: Function, handleBgLoaded: Function }): ReactElement {
-
+export function BookCard({ user, book }: { user: Userinfo, book: Book }): ReactElement {
     const [reviewVisable, setReviewVisable] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     function handleReviewClose(newReview: string): void {
         setReviewVisable(false);
         handleReviewUpdate(book, newReview);
     }
 
-    //API call to find background color using Color Thief
-    async function fetchDominantColor({ book }: { book: Book }): Promise<void> {
-        const colorThief = new ColorThief();
-        const img = new window.Image();
-        img.crossOrigin = 'anonymous';
-        img.src = book.coverImage;
-
-        img.onload = function () {
-            try {
-                const color = colorThief.getColor(img);
-                console.log('success color grab');
-                handleBgLoaded(book, [Math.min(color[0]+75, 255), Math.min(color[1]+75, 255), Math.min(color[2]+75, 255)]);
-            } catch (error) {
-                console.log('error color grab');
-                handleBgLoaded(book, [127, 127, 127]);
-            }  
+    // Update star/rating amount
+    async function handleRatingUpdate(book: Book, starIndex: number): Promise<void> {
+        if (book.rating == starIndex + 1){
+            book.rating = 0; //Clicking same star twice removes rating
+        } else {
+            book.rating = starIndex + 1;
         }
+        await updateReview(book, user.user_id);
+    };
+
+    async function handleReviewUpdate(book: Book, newReview: string): Promise<void> {
+        const newBook = {...book, review: newReview};
+        await updateReview(newBook, user.user_id);
     }
 
-    useEffect(() => {
-        if (!book.bgLoaded) {
-            console.log("fetching color");
-            fetchDominantColor({ book });
-        }
-    }, [book]);
+    //Clear Books handler
+    async function handleRemoveBook(book: Book): Promise<void> {
+        await deleteBook(book.id, user.user_id);
+    }
+
+    //handle Background color loading from color thief
+    function handleBgLoaded(book: Book, color: number[]): void {
+        const updatedBook = {...book, bgColor: color, bgLoaded: true};
+        updateBook(user, updatedBook);
+    }
 
     return (
         <>
