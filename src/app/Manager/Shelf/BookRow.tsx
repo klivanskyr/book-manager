@@ -2,7 +2,6 @@
 
 import React, { ReactElement, useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { Oval } from 'react-loader-spinner';
 
 import { Book } from '@/app/Book';
 import { UserContext } from '@/app/UserContext';
