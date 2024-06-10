@@ -9,7 +9,7 @@ import Review from './Review';
 import Stars  from '../Shelf/Stars'
 import { Book } from '@/app/Book';
 import { coverPlaceholder } from '@/assets'
-import { UserContext, updateReview, deleteBook } from '@/app/UserContext'
+import { UserContext, User, loadBooks, updateReview, deleteBook } from '@/app/UserContext'
 
 
 export function Card({ book }: { book: Book }): ReactElement {
@@ -29,12 +29,28 @@ export function Card({ book }: { book: Book }): ReactElement {
         } else {
             book.rating = starIndex + 1;
         }
-        if (user) { await updateReview(book, user.user_id); } //IF USER
+        if (user) { 
+            await updateReview(book, user.user_id);
+            const res = await loadBooks(user.user_id);
+            const userUpdatedBook: User = { 
+                user_id: user.user_id,
+                books: res
+            };
+            setUser(userUpdatedBook);
+        } //IF USER
     };
 
     //Clear Books handler
     async function handleRemoveBook(book: Book): Promise<void> {
-        if (user) { await deleteBook(book.id, user.user_id); } //IF USER
+        if (user) {
+            await deleteBook(book.id, user.user_id);
+            const res = await loadBooks(user.user_id); 
+            const userRemovedBook: User = { 
+                user_id: user.user_id,
+                books: res
+            };
+            setUser(userRemovedBook);
+        };
     }
 
     return (

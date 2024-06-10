@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
-import { UserContext, UserContextType, createBook, deleteBook } from '@/app/UserContext';
+import { UserContext, User, UserContextType, createBook, deleteBook, loadBooks } from '@/app/UserContext';
 import BookSelectGrid from './BookSelectGrid';
 import { queryOpenLibrary } from '@/app/utils/openlibrary';
 import { Book } from '@/app/Book';
@@ -47,7 +47,16 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
         const [r, g, b] = await fetchDominantColor(foundBooks[i].coverImage);
         const updatedBook = { ...foundBooks[i], selected: true, r: r, g: g, b: b};
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        if (user) { await createBook(updatedBook, user); } //IF STATEMENT ON USER
+        if (user) {  //IF STATEMENT ON USER
+            await createBook(updatedBook, user);
+            const res = await loadBooks(user.user_id);
+            const userAddedBook: User = { 
+                user_id: user.user_id,
+                books: res
+            };
+            
+            setUser(userAddedBook);
+        } 
     }
 
     //handle removing book from modal
@@ -55,7 +64,19 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
         const updatedBook = { ...foundBooks[i], selected: false };
         console.log('foundbook at i is: ', foundBooks[i])
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        if (user) { await deleteBook(foundBooks[i].id, user.user_id); } //IF STATEMENT ON USER
+        if (user) { //IF STATEMENT ON USER
+            //Find book in user books where it will have an id.
+            const userBookRef = user.books.find((book) => book.key === foundBooks[i].key);
+            if (!userBookRef) { return; } //Not possible to remove book that is not in user books
+            await deleteBook(userBookRef.id, user.user_id);
+            const res = await loadBooks(user.user_id); 
+            const userRemovedBook: User = { 
+                user_id: user.user_id,
+                books: res
+            };
+            
+            setUser(userRemovedBook);
+        };
     }
 
     //Removes page scorll when modal active
