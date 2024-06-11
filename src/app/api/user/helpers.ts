@@ -14,7 +14,7 @@ export async function getUser(email: string): Promise<number | null> {
     return user.id;
 }
 
-export async function postUser(username: string, password: string, email: string): Promise<number | null> {
+export async function postUser(username: string, email: string, password: string): Promise<number | null> {
     const user = await prisma.user.create({
       data: {
         username: username,
