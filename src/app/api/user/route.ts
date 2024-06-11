@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const body = await req.json();
         const { email, username, password } = body;
 
-        if (!email || !username || !password) {
+        if (email === undefined || username === undefined || password === undefined) {
             return NextResponse.json({ code: 400, message: "Missing parameters, requires email, username, password" });
         }
 
