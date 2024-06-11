@@ -50,17 +50,12 @@ export async function getUserId(email: string): Promise<number | null> {
 }
 
 export async function loadBooks(user_id: number): Promise<Book[]> {
-  const res = await fetch(`http://localhost:3000/api/books?user_id=${user_id}`, {
-    method: 'GET',
-    cache: 'no-cache',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: user_id })
-  });
+  const res = await fetch(`http://localhost:3000/api/books?user_id=${user_id}`,
+   { method: 'GET', cache: 'no-cache' });
   const data = await res.json();
-
   if (data.code !== 200) {
-    console.log(data.message);
-    return [];
+      console.log(data.message);
+      return [];
   }
 
   return data.books;

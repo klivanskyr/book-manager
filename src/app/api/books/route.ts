@@ -30,8 +30,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const body = await req.json();
         const { key, title, author, isbn, rating, review, cover, r, g, b, user_id } = body;
 
-        if (!key || !title || !author || !isbn || !rating || !review || !cover || !r || !g || !b || !user_id) {
-            return NextResponse.json({ code: 400, message: "Missing parameters, requires key, title, author, isbn, rating, review, cover, r, g, b, user_id" });
+        if (key === undefined || title === undefined || author === undefined || isbn === undefined || rating === undefined || review === undefined || cover === undefined || r === undefined || g === undefined || b === undefined || user_id === undefined) {
+            return NextResponse.json({ code: 400, message: `Missing parameters, requires key, title, author, isbn, rating, review, cover, r, g, b, user_id, inputted ${key} , ${title} , ${author}, ${isbn}, ${rating}, ${review}, ${cover}, ${r}, ${g}, ${b}, ${user_id}` });
         }
 
         const id = await postBook(key, title, author, isbn, rating, review, cover, r, g, b, user_id);
@@ -42,6 +42,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         return NextResponse.json({ code: 200, bookId: id });
 
     } catch (error) {
+        console.log(error);
         return NextResponse.json({ code: 400, message: "Invalid request body" });
     }
 }
@@ -53,7 +54,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         const body = await req.json();
         const { book_id, rating, review, user_id } = body;
 
-        if (!book_id || !rating || !review || !user_id) {
+        if (book_id === undefined || rating === undefined || review === undefined || user_id === undefined) {
             return NextResponse.json({ code: 400, message: "Missing parameters, requires book_id, rating, review, user_id" });
         }
 
