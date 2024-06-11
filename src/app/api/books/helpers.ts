@@ -43,7 +43,7 @@ export async function getBooks(user_id: number): Promise<Book[]> {
     return books;
 }   
 
-export async function postBook(key: string, title: string, author: string, isbn: string, rating: number, review: string, cover: string, r: number, g: number, b: number, user_id: number): Promise<void> {
+export async function postBook(key: string, title: string, author: string, isbn: string, rating: number, review: string, cover: string, r: number, g: number, b: number, user_id: number): Promise<number> {
     //check if book already exists using key
     //if not, create book
     //create user_book
@@ -82,6 +82,8 @@ export async function postBook(key: string, title: string, author: string, isbn:
     }
     });
     console.log('created review');
+
+    return foundBook.id;
 }
 
 export async function putBook(book_id: number, rating: number, review: string, user_id: number): Promise<void> {

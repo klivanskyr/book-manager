@@ -26,63 +26,43 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
 //createBook
 export async function POST(req: NextRequest, res: NextResponse) {
-    const { searchParams } = new URL(req.nextUrl);
-    const params = Array.from(searchParams);
-    console.log(params);
+    try {
+        const body = await req.json();
+        const { key, title, author, isbn, rating, review, cover, r, g, b, user_id } = body;
 
-    if (params.length === 0) {
-        return NextResponse.json({ code: 400, message: "No parameters provided, requires key, title, author, isbn, rating, review, cover, r, g, b, user_id" });
-    } else if (params.length > 11) {
-        return NextResponse.json({ code: 400, message: "Too many parameters provided, requires key, title, author, isbn, rating, review, cover, r, g, b, user_id" });
-    } else if (params.length < 11) {
-        return NextResponse.json({ code: 400, message: "Missing parameters, requires key, title, author, isbn, rating, review, cover, r, g, b, user_id" });
-    } else {
-        const key = params.find(([key, value]) => key === 'key');
-        const title = params.find(([key, value]) => key === 'title');
-        const author = params.find(([key, value]) => key === 'author');
-        const isbn = params.find(([key, value]) => key === 'isbn');
-        const rating = params.find(([key, value]) => key === 'rating');
-        const review = params.find(([key, value]) => key === 'review');
-        const cover = params.find(([key, value]) => key === 'cover');
-        const r = params.find(([key, value]) => key === 'r');
-        const g = params.find(([key, value]) => key === 'g');
-        const b = params.find(([key, value]) => key === 'b');
-        const user_id = params.find(([key, value]) => key === 'user_id');
-
-        if (key && title && author && isbn && rating && review && cover && r && g && b && user_id) {
-            await postBook(key[1], title[1], author[1], isbn[1], parseInt(rating[1]), review[1], cover[1], parseInt(r[1]), parseInt(g[1]), parseInt(b[1]), parseInt(user_id[1]));
-            return NextResponse.json({ code: 200, message: "Book created for user" });
-        } else {
+        if (!key || !title || !author || !isbn || !rating || !review || !cover || !r || !g || !b || !user_id) {
             return NextResponse.json({ code: 400, message: "Missing parameters, requires key, title, author, isbn, rating, review, cover, r, g, b, user_id" });
         }
+
+        const id = await postBook(key, title, author, isbn, rating, review, cover, r, g, b, user_id);
+        if (!id) {
+            return NextResponse.json({ code: 400, message: "Book not created" });
+        }
+
+        return NextResponse.json({ code: 200, bookId: id });
+
+    } catch (error) {
+        return NextResponse.json({ code: 400, message: "Invalid request body" });
     }
 }
 
 
 //updateReview
 export async function PUT(req: NextRequest, res: NextResponse) {
-    const { searchParams } = new URL(req.nextUrl);
-    const params = Array.from(searchParams);
-    console.log(params);
+    try {
+        const body = await req.json();
+        const { book_id, rating, review, user_id } = body;
 
-    if (params.length === 0){
-        return NextResponse.json({ code: 400, message: "No parameters provided, requires book_id, rating, review, user_id" });
-    } else if (params.length > 4) {
-        return NextResponse.json({ code: 400, message: "Too many parameters provided, requires book_id, rating, review, user_id" });
-    } else if (params.length < 4) {
-        return NextResponse.json({ code: 400, message: "Missing parameters, requires book_id, rating, review, user_id" });
-    } else {
-        const book_id = params.find(([key, value]) => key === 'book_id');
-        const rating = params.find(([key, value]) => key === 'rating');
-        const review = params.find(([key, value]) => key === 'review');
-        const user_id  = params.find(([key, value]) => key === 'user_id');
-
-        if (book_id && rating && review && user_id) {
-            await putBook(parseInt(book_id[1]), parseInt(rating[1]), review[1], parseInt(user_id[1]));
-            return NextResponse.json({ code: 200, message: "Review updated for user" });
-        } else {
+        if (!book_id || !rating || !review || !user_id) {
             return NextResponse.json({ code: 400, message: "Missing parameters, requires book_id, rating, review, user_id" });
         }
+
+        await putBook(book_id, rating, review, user_id);
+
+        return NextResponse.json({ code: 200, message: "Review updated for user" });
+
+    } catch (error) {
+        return NextResponse.json({ code: 400, message: "Invalid request body" });
     }
 }
 
