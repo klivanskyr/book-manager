@@ -33,22 +33,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (params.length === 0) {
         return NextResponse.json({ code: 400, message: "No parameters provided, requires email" });
     } else if (params.length > 3) {
-        return NextResponse.json({ code: 400, message: "Too many parameters provided, requires email, password, name" });
+        return NextResponse.json({ code: 400, message: "Too many parameters provided, requires email, username, password" });
     } else if (params.length < 3) {
-        return NextResponse.json({ code: 400, message: "Missing parameters, requires email, password, name" });
+        return NextResponse.json({ code: 400, message: "Missing parameters, requires email, username, password" });
     } else {
         const email = params.find(([key, value]) => key === 'email');
         const password = params.find(([key, value]) => key === 'password');
-        const name = params.find(([key, value]) => key === 'name');
+        const username = params.find(([key, value]) => key === 'username');
 
-        if (email && password && name) {
-            const id = await postUser(name[1], password[1], email[1]);
+        if (email && password && username) {
+            const id = await postUser(username[1], email[1], password[1]);
             if (!id) {
                 return NextResponse.json({ code: 400, message: "User not created" });
             }
             return NextResponse.json({ code: 200, userId: id });
         } else {
-            return NextResponse.json({ code: 400, message: "Missing parameters, requires email, password, name" });
+            return NextResponse.json({ code: 400, message: "Missing parameters, requires email, username, password" });
         }
     }
 }

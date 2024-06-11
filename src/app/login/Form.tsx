@@ -15,6 +15,7 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
 
     const surveyJson = {
         checkErrorsMode: "onComplete",
+        showCompletedPage: false,
         title: "Login",
         questions: [
         {

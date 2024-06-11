@@ -7,15 +7,16 @@ import 'survey-core/defaultV2.css';
 import { PlainLight } from "survey-core/themes/plain-light";
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
+import { FunctionFactory } from "survey-core";
 
 import { getUserId } from '@/app/types/UserContext'; 
-import { AutoComplete } from "antd";
 
-export default function Form({ handleSubmit }: { handleSubmit: Function }): ReactElement {
+export default async function Form({ handleSubmit }: { handleSubmit: Function }): Promise<ReactElement> {
     const router = useRouter();
 
     const surveyJson = {
         checkErrorsMode: "onComplete",
+        showCompletedPage: false,
         title: "Sign Up",
         questions: [
         {
@@ -32,6 +33,13 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
             ]
         },
         {
+            name: "username",
+            title: "Username: ",
+            type: "text",
+            isRequired: true,
+            requiredErrorText: "Username is required",
+        },
+        {
             name: "password",
             title: "Enter your password: ",
             type: "text",
@@ -40,15 +48,16 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
             inputType: "password",
             AutoComplete: "password"
         },
-        {
-            name: "re-enter password",
-            title: "Reeneter your password: ",
-            type: "text",
-            isRequired: true,
-            requiredErrorText: "Reentering your password is required",
-            inputType: "password",
-            AutoComplete: "password"
-        }],
+        // {
+        //     name: "re-enter password",
+        //     title: "Re-eneter your password: ",
+        //     type: "text",
+        //     isRequired: true,
+        //     requiredErrorText: "Reentering your password is required",
+        //     inputType: "password",
+        //     AutoComplete: "password"
+        // }],
+        ],
         showQuestionNumbers: false
     };
 
@@ -56,8 +65,11 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
     survey.applyTheme(PlainLight);
 
     survey.onComplete.add((result) => {
-        handleSubmit(result.data);
-        survey.clear(true, true);
+        console.log('\n\nsurvery data: \n', survey);
+        if (!survey.hasErrors()){
+            handleSubmit(result.data);
+            survey.clear(true, true);
+        }
     });
 
     survey.addNavigationItem({
@@ -66,7 +78,7 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
         action: (() => router.push('/login'))
     });
 
-    async function EmailAlreadyInUse(survey: any, { data, errors, complete }: { data: any, errors: any, complete: Function}) {
+    async function emailAlreadyInUse(_: any, { data, errors, complete }: { data: any, errors: any, complete: Function}) {
         const email = data['email'];
         if (!email) {
             complete();
@@ -78,16 +90,15 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
         }
         complete();
     }
-
-    survey.onServerValidateQuestions.add(EmailAlreadyInUse);
-
-    survey.onValidateQuestion.add((sender, options) => {
-        if (options.name === 'reenter password') {
-            if (options.value !== survey.getValue('password')) {
-                options.error = 'Passwords do not match';
-            }
-        }
-    });
     
-     return <Survey model={survey} />;
+
+    // survey.onValueChanged.add(function (survey, options) {
+    //     survey.currentPage.hasErrors(true, false);
+    //     survey.currentPage.questions.forEach()
+    // })
+
+    survey.onServerValidateQuestions.add(await emailAlreadyInUse);
+    // survey.onValidateQuestion.add(passwordsMatch);
+    
+    return <Survey model={survey} />;
 }
