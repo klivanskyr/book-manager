@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode, useState, createContext } from 'react';
 import { Book } from './Book';
 
@@ -20,22 +22,23 @@ export const UserContext = createContext<UserContextType>({
 
 
 //Used for updating book background loaded. DONT RELOAD
-export function updateBook(user: User, book: Book): void {
-    const updatedBooks = user.books.map((elt) => {
-        if (elt.id === book.id) {
-          return book;
-        }
-          return elt;
-    });
-    user.books = updatedBooks;
-    console.log(user.books);
-}
+// export function updateBook(user: User, book: Book): void {
+//     const updatedBooks = user.books.map((elt) => {
+//         if (elt.id === book.id) {
+//           return book;
+//         }
+//           return elt;
+//     });
+//     user.books = updatedBooks;
+//     console.log(user.books);
+// }
 
 
 ///////////////////////API CALLS
 
-export async function createUser(email: string, password: string): Promise<number | null> {
-  const res = await fetch(`http://localhost:3000/api/?createUser=true&email=${email}&password=${password}`, { method: 'POST', cache: 'no-cache' });
+export async function createUser(username: string, password: string, email: string): Promise<number | null> {
+  const res = await fetch(`http://localhost:3000/api/user?username=${username}&password=${password}&email=${email}`,
+   { method: 'POST', cache: 'no-cache' });
   const data = await res.json();
   if (data.code !== 200) {
     console.log(data.message);
@@ -45,7 +48,8 @@ export async function createUser(email: string, password: string): Promise<numbe
 }
 
 export async function getUserId(email: string): Promise<number | null> {
-  const res = await fetch(`http://localhost:3000/api/?getUserId=true&email=${email}`, { method: 'GET', cache: 'no-cache' });
+  const res = await fetch(`http://localhost:3000/api/user?email=${email}`,
+   { method: 'GET', cache: 'no-cache' });
   const data = await res.json();
   console.log('\n\n', data, '\n\n');
   if (data.code !== 200) {
@@ -57,7 +61,8 @@ export async function getUserId(email: string): Promise<number | null> {
 }
 
 export async function loadBooks(user_id: number): Promise<Book[]> {
-    const res = await fetch(`http://localhost:3000/api/?loadBooks=true&user_id=${user_id}`, { method: 'GET', cache: 'no-cache' });
+    const res = await fetch(`http://localhost:3000/api/books?user_id=${user_id}`,
+     { method: 'GET', cache: 'no-cache' });
     const data = await res.json();
     if (data.code !== 200) {
         console.log(data.message);
