@@ -45,17 +45,18 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
     //handle selecting book from modal
     async function handleClickAdd(i: number): Promise<void> {
         const [r, g, b] = await fetchDominantColor(foundBooks[i].coverImage);
-        const updatedBook = { ...foundBooks[i], selected: true, r: r, g: g, b: b};
+        const updatedBook = { ...foundBooks[i], selected: true, bgColor: [Math.min(r+75, 255), Math.min(g+75, 255), Math.min(b+75, 255)]};
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
         if (user) {  //IF STATEMENT ON USER
+            console.log('r,g,b,updatedBook: ', r, g, b, updatedBook);
             await createBook(updatedBook, user);
             const res = await loadBooks(user.user_id);
             const userAddedBook: User = { 
                 user_id: user.user_id,
                 books: res
             };
-            
             setUser(userAddedBook);
+            console.log('\n\nuserAddedBook: \n\n', userAddedBook)
         } 
     }
 

@@ -83,7 +83,7 @@ export async function createBook(book: Book, user: User): Promise<any> {
   const r = book.bgColor[0];
   const g = book.bgColor[1];
   const b = book.bgColor[2];
-  const res = await fetch(`http://localhost:3000/api/?createBook=true&key=${key}&title=${title}&author=${author}&isbn=${isbn}&rating=${rating}&review=${review}&cover=${cover}&r=${r}&g=${g}&b=${b}&user_id=${user.user_id}`,
+  const res = await fetch(`http://localhost:3000/api/books?key=${key}&title=${title}&author=${author}&isbn=${isbn}&rating=${rating}&review=${review}&cover=${cover}&r=${r}&g=${g}&b=${b}&user_id=${user.user_id}`,
     { method: 'POST', cache: 'no-cache' });
   const data = await res.json();
   if (data.code !== 200) {
@@ -95,7 +95,7 @@ export async function createBook(book: Book, user: User): Promise<any> {
 }
 
 export async function deleteBook(book_id: number, user_id: number): Promise<any> {
-    const res = await fetch(`http://localhost:3000/api/?deleteBook=true&book_id=${book_id}&user_id=${user_id}`,
+    const res = await fetch(`http://localhost:3000/api/books?book_id=${book_id}&user_id=${user_id}`,
      { method: 'DELETE', cache: 'no-cache' });
     const data = await res.json();
     if (data.code !== 200) {
@@ -109,7 +109,7 @@ export async function updateReview(book: Book, user_id: number): Promise<any> {
     const book_id = book.id;
     const rating = book.rating;
     const review = book.review;
-    const res = await fetch(`http://localhost:3000/api/?updateReview=true&book_id=${book_id}&rating=${rating}&review=${review}&user_id=${user_id}`,
+    const res = await fetch(`http://localhost:3000/api/books?book_id=${book_id}&rating=${rating}&review=${review}&user_id=${user_id}`,
      { method: 'PUT', cache: 'no-cache' });
     const data = await res.json();
     if (data.code !== 200) {
