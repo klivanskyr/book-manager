@@ -28,23 +28,8 @@ async function Signup() {
             console.log(data.message);
             return;
         }
-
-        console.log('\n\nsignup result: ', res, 'signup data: ', data);
-
-        // const new_id = await createUser(username, email, password);
-        // if (!new_id) {
-        //     console.log('error, could not create user');
-        //     return; //TODO: handle error
-        // }
-
-        // const user = {
-        //     user_id: new_id,
-        //     books: []
-        // }
-
-        // setUser(user);
-        // console.log('created user:', user);
-        // router.push('/login');
+        
+        router.push('/login');
     }
 
     return (

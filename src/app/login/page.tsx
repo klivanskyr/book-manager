@@ -30,15 +30,15 @@ function Login() {
         return;
       }
 
-      console.log('login result: ', res, 'login data: ', data);
+      const books = await loadBooks(data.user_id);
+      
+      const user: User = {
+          user_id: data.user_id,
+          books: books
+      }
 
-      // const user: User = {
-      //     user_id: id,
-      //     books: res
-      // }
-
-      // setUser(user);
-      // router.push('/dashboard');
+      setUser(user);
+      router.push('/dashboard');
     }
 
   return (
