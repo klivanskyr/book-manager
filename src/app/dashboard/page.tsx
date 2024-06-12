@@ -13,12 +13,9 @@ function Dashboard(): ReactElement {
     const router = useRouter();
 
     function handleSignOut() {
-        console.log('signing out');
         setUser(null);
         router.push('/login');
     }
-
-    console.log('user:', user);
 
     return (
         <div>

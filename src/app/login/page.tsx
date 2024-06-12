@@ -12,8 +12,6 @@ function Login() {
 
     async function handleSubmit({ email, password }: { email: string, password: string }): Promise<void> {
 
-      console.log('email: ', email, 'password: ', password);
-      
       const res = await fetch('http://localhost:3000/api/auth/login', {
         method: 'POST',
         cache: 'no-cache',
@@ -26,7 +24,6 @@ function Login() {
       
       const data = await res.json();
       if (data.code !== 200) {
-        console.log(data.message);
         return;
       }
 

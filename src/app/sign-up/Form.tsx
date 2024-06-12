@@ -47,17 +47,7 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
             requiredErrorText: "Password is required",
             inputType: "password",
             AutoComplete: "password"
-        },
-        // {
-        //     name: "re-enter password",
-        //     title: "Re-eneter your password: ",
-        //     type: "text",
-        //     isRequired: true,
-        //     requiredErrorText: "Reentering your password is required",
-        //     inputType: "password",
-        //     AutoComplete: "password"
-        // }],
-        ],
+        }],
         showQuestionNumbers: false
     };
 
@@ -89,15 +79,7 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
         }
         complete();
     }
-    
-
-    // survey.onValueChanged.add(function (survey, options) {
-    //     survey.currentPage.hasErrors(true, false);
-    //     survey.currentPage.questions.forEach()
-    // })
-
-    survey.onServerValidateQuestions.add(await emailAlreadyInUse);
-    // survey.onValidateQuestion.add(passwordsMatch);
+    survey.onServerValidateQuestions.add(emailAlreadyInUse);
     
     return <Survey model={survey} />;
 }

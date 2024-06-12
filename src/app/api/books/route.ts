@@ -6,7 +6,6 @@ import { getBooks, postBook, putBook, deleteBook } from './helpers';
 export async function GET(req: NextRequest, res: NextResponse) {
     const { searchParams } = new URL(req.nextUrl);
     const params = Array.from(searchParams);
-    console.log(params);
 
     if (params.length === 0) {
         return NextResponse.json({ code: 400, message: "No parameters provided, requires user_id" });
@@ -42,7 +41,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         return NextResponse.json({ code: 200, bookId: id });
 
     } catch (error) {
-        console.log(error);
         return NextResponse.json({ code: 400, message: "Invalid request body" });
     }
 }
@@ -72,7 +70,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 export async function DELETE(req: NextRequest, res: NextResponse) {
     const { searchParams } = new URL(req.nextUrl);
     const params = Array.from(searchParams);
-    console.log(params);
 
     if (params.length === 0) {
         return NextResponse.json({ code: 400, message: "No parameters provided, requires book_id, user_id" });
