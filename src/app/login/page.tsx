@@ -11,24 +11,34 @@ function Login() {
     const router = useRouter();
 
     async function handleSubmit({ email, password }: { email: string, password: string }): Promise<void> {
-        //I DONT CHECK PASSWORDS YET
-        console.log('email:', email, 'password:', password);
-        const id = await getUserId(email);
-        if (!id) {
-            console.log('error, could not find id from email');
-            return; //TODO: handle error
-        }
 
-        const res = await loadBooks(id);
-        console.log('\n\nresults:', res);
+      console.log('email: ', email, 'password: ', password);
+      
+      const res = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      });
+      
+      const data = await res.json();
+      if (data.code !== 200) {
+        console.log(data.message);
+        return;
+      }
 
-        const user: User = {
-            user_id: id,
-            books: res
-        }
+      console.log('login result: ', res, 'login data: ', data);
 
-        setUser(user);
-        router.push('/dashboard');
+      // const user: User = {
+      //     user_id: id,
+      //     books: res
+      // }
+
+      // setUser(user);
+      // router.push('/dashboard');
     }
 
   return (
