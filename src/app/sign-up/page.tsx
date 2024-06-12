@@ -11,7 +11,7 @@ async function Signup() {
     const router = useRouter();
 
 
-    async function handleSubmit({ email, username, password, _ }: { email: string, username: string, password: string, _: string}) {
+    async function handleSubmit({ email, username, password }: { email: string, username: string, password: string }) {
         const res = await fetch('http://localhost:3000/api/auth/signup', {
             method: 'POST',
             cache: 'no-cache',
@@ -22,19 +22,17 @@ async function Signup() {
                 password: password
             })
         });
-
         const data = await res.json();
         if (data.code !== 200) {
-            console.log(data.message);
             return;
+        } else {
+            router.push('/login');
         }
-        
-        router.push('/login');
     }
 
     return (
         <div>
-            <Form handleSubmit={await handleSubmit}/>
+            <Form handleSubmit={handleSubmit}/>
         </div>
     )
 }

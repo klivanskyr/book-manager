@@ -48,7 +48,6 @@ export async function postBook(key: string, title: string, author: string, isbn:
     //if not, create book
     //create user_book
     //create review
-    console.log('in create book');
     const foundBook = await prisma.book.upsert({
     where: { key: key },
     update: {},
@@ -63,7 +62,6 @@ export async function postBook(key: string, title: string, author: string, isbn:
         b: b
     }
     });
-    console.log('found book', foundBook);
 
     await prisma.user_book.create({
     data: {
@@ -71,7 +69,6 @@ export async function postBook(key: string, title: string, author: string, isbn:
         bookId: foundBook.id
     }
     });
-    console.log('created user_book')
 
     await prisma.review.create({
     data: {
@@ -81,7 +78,6 @@ export async function postBook(key: string, title: string, author: string, isbn:
         review: review
     }
     });
-    console.log('created review');
 
     return foundBook.id;
 }
@@ -101,27 +97,22 @@ export async function deleteBook(book_id: number, user_id: number): Promise<void
     //delete review from review
     //check if that was the last reference to the book
     //if so, delete the book from books
-    console.log('\n\nHHHHHHHHHHHHHHHHHHHHHH\n\nin delete book')
     await prisma.user_book.delete({
         where: { bookId_userId: { bookId: book_id, userId: user_id } }
     });
-    console.log('deleted user_book');
     
     await prisma.review.delete({
         where: { bookId_userId: { bookId: book_id, userId: user_id } }
     });
-    console.log('deleted review')
     
     const bookRefCount = await prisma.user_book.count({
         where: { bookId: book_id }
     });
-    console.log('book ref count', bookRefCount);
     
     if (bookRefCount === 0) {
         await prisma.book.delete({
         where: { id: book_id }
         });
     }
-    console.log('deleted book if zero refs');
 }
 

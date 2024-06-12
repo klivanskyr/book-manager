@@ -4,7 +4,6 @@ import { getUser, postUser } from './helpers';
 export async function GET(req: NextRequest, res: NextResponse) {
     const { searchParams } = new URL(req.nextUrl);
     const params = Array.from(searchParams);
-    console.log(params);
 
     if (params.length === 0) {
         return NextResponse.json({ code: 400, message: "No parameters provided, requires email" });
