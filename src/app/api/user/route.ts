@@ -25,23 +25,23 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
-    try {
-        const body = await req.json();
-        const { email, username, password } = body;
+// export async function POST(req: NextRequest, res: NextResponse) {
+//     try {
+//         const body = await req.json();
+//         const { email, username, password } = body;
 
-        if (email === undefined || username === undefined || password === undefined) {
-            return NextResponse.json({ code: 400, message: "Missing parameters, requires email, username, password" });
-        }
+//         if (email === undefined || username === undefined || password === undefined) {
+//             return NextResponse.json({ code: 400, message: "Missing parameters, requires email, username, password" });
+//         }
 
-        const id = await postUser(username, email, password);
-        if (!id) {
-            return NextResponse.json({ code: 400, message: "User not created" });
-        }
+//         const id = await postUser(username, email, password);
+//         if (!id) {
+//             return NextResponse.json({ code: 400, message: "User not created" });
+//         }
 
-        return NextResponse.json({ code: 200, userId: id });
+//         return NextResponse.json({ code: 200, userId: id });
 
-    } catch (error) {
-        return NextResponse.json({ code: 400, message: "Invalid request body" });
-    }
-}
+//     } catch (error) {
+//         return NextResponse.json({ code: 400, message: "Invalid request body" });
+//     }
+// }

@@ -65,7 +65,6 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
     survey.applyTheme(PlainLight);
 
     survey.onComplete.add((result) => {
-        console.log('\n\nsurvery data: \n', survey);
         if (!survey.hasErrors()){
             handleSubmit(result.data);
             survey.clear(true, true);
