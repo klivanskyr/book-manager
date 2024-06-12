@@ -35,7 +35,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ code: 400, message: "Missing parameters, requires email, password" });
         }
 
-
         const apiRes: { token: string, id: number } | null = await login(email, password);
         
         if (!apiRes) {
