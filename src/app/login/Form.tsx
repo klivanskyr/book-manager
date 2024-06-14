@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactElement } from "react";
+import { ReactElement, useContext } from "react";
 import { useRouter } from 'next/navigation';
 
 import 'survey-core/defaultV2.css';
@@ -8,10 +8,11 @@ import { PlainLight } from "survey-core/themes/plain-light";
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 
-import { getUserId } from '@/app/types/UserContext'; 
+import { User, UserContext, getUserId, loadBooks } from '@/app/types/UserContext'; 
 
-export default function Form({ handleSubmit }: { handleSubmit: Function }): ReactElement {
+export default function Form(): ReactElement {
     const router = useRouter();
+    const { user, setUser } = useContext(UserContext);
 
     const surveyJson = {
         checkErrorsMode: "onComplete",
@@ -46,34 +47,68 @@ export default function Form({ handleSubmit }: { handleSubmit: Function }): Reac
     const survey = new Model(surveyJson);
     survey.applyTheme(PlainLight);
 
-    survey.onComplete.add((result) => {
-        handleSubmit(result.data);
-        survey.clear(true, true);
-    });
-
     survey.addNavigationItem({
         id: "sign-up-button",
         title: "Sign Up",
         action: (() => router.push('/sign-up'))
     });
 
-    async function validateEmail(survey: any, { data, errors, complete }: { data: any, errors: any, complete: Function}) {
+    async function validateEmailandPassword(survey: any, { data, errors, complete }: { data: any, errors: any, complete: Function}) {
         const email = data['email'];
-        if (!email) {
+        const password = data['password'];
+
+        if (!email || !password) {
             complete();
             return;
         }
         const id = await getUserId(email);
         if (!id) {
             errors['email'] = 'Email not found';
+            complete();
+            return;
         }
+
+        const res = await fetch('http://localhost:3000/api/auth/login', {
+            method: 'POST',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              password: password
+            })
+        });
+
+        const parsedRes = await res.json();
+
+        if (parsedRes.code != 200) {
+            console.log('was not 200, parsedRes.code: ', parsedRes.code)
+            errors['password'] = 'Incorrect password';
+            setUser(null);
+            complete();
+            return;
+        }
+
+        const books = await loadBooks(id);
+
+        const newUser: User = {
+            user_id: id,
+            books: books
+        }
+    
+        console.log(user, 'loaded');
+        setUser(newUser);
         complete();
+
+        router.push('/dashboard');
+        return; 
     }
 
-    survey.onServerValidateQuestions.add(validateEmail);
+    survey.onServerValidateQuestions.add(validateEmailandPassword);
+
+    survey.onComplete.add((result) => {
+        survey.clear(true, true);
+    });
 
 
-    
-  
   return <Survey model={survey} />;
 }

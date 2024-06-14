@@ -12,34 +12,14 @@ function Dashboard(): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const router = useRouter();
 
-    //fetches books on load
-    useEffect(() => {
-        const fetchData = async () => {
-            if (user === null) { 
-                router.push('/login');
-                return;
-            }
-            const res = await loadBooks(user.user_id);  
-            console.log('\n\nresults:', res);
-
-            const userUpdatedBooks: User = {
-                user_id: user.user_id,
-                books: res
-            };
-
-            setUser(userUpdatedBooks);
-        };
-
-        fetchData();
-    }, []);
-
     function handleSignOut() {
-        console.log('signing out');
         setUser(null);
         router.push('/login');
     }
 
-    console.log('user:', user);
+    if (!user) {
+        router.push('/login');
+    }
 
     return (
         <div>

@@ -48,7 +48,6 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
         const updatedBook = { ...foundBooks[i], selected: true, bgColor: [Math.min(r+75, 255), Math.min(g+75, 255), Math.min(b+75, 255)]};
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
         if (user) {  //IF STATEMENT ON USER
-            console.log('r,g,b,updatedBook: ', r, g, b, updatedBook);
             await createBook(updatedBook, user);
             const res = await loadBooks(user.user_id);
             const userAddedBook: User = { 
@@ -56,14 +55,12 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
                 books: res
             };
             setUser(userAddedBook);
-            console.log('\n\nuserAddedBook: \n\n', userAddedBook)
         } 
     }
 
     //handle removing book from modal
     async function handleClickRemove(i: number): Promise<void> {
         const updatedBook = { ...foundBooks[i], selected: false };
-        console.log('foundbook at i is: ', foundBooks[i])
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
         if (user) { //IF STATEMENT ON USER
             //Find book in user books where it will have an id.
