@@ -17,6 +17,10 @@ function Dashboard(): ReactElement {
         router.push('/login');
     }
 
+    if (!user) {
+        router.push('/login');
+    }
+
     return (
         <div>
             <SignoutButton handleClick={handleSignOut} />
