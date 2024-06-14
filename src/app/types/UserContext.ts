@@ -29,7 +29,6 @@ export async function createUser(username: string, password: string, email: stri
   });
   const data = await res.json();
   if (data.code !== 200) {
-    console.log(data.message);
     return null;
   }
   return data.userId;
@@ -42,7 +41,6 @@ export async function getUserId(email: string): Promise<number | null> {
   });
   const data = await res.json();
   if (data.code !== 200) {
-    console.log(data.message);
     return null;
   }
   
@@ -54,7 +52,6 @@ export async function loadBooks(user_id: number): Promise<Book[]> {
    { method: 'GET', cache: 'no-cache' });
   const data = await res.json();
   if (data.code !== 200) {
-      console.log(data.message);
       return [];
   }
 
@@ -82,7 +79,6 @@ export async function createBook(book: Book, user: User): Promise<any> {
 
   const data = await res.json();
   if (data.code !== 200) {
-    console.log(data.message);
     return null;
   }
   user.books = [...user.books, book];
@@ -97,7 +93,6 @@ export async function deleteBook(book_id: number, user_id: number): Promise<any>
 
   const data = await res.json();
   if (data.code !== 200) {
-    console.log(data.message);
     return null;
   }
   return data;
@@ -117,7 +112,6 @@ export async function updateReview(book: Book, user_id: number): Promise<any> {
     });
     const data = await res.json();
     if (data.code !== 200) {
-      console.log(data.message);
       return null;
     }
     return data;
