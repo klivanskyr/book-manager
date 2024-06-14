@@ -3,9 +3,7 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(req: NextRequest) {
     try {
-        console.log('before req.json()')
         const body = await req.json();
-        console.log('after req.json()', body)
         const { token } = body;
 
         if (!token) {

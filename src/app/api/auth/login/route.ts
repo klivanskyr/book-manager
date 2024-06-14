@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt';
 
 
 async function login(email: string, password: string): Promise<{ token: string, id: number } | null>{
-    console.log('trying to login');
     //pull the user
     const user = await prisma.user.findUnique({
         where: {

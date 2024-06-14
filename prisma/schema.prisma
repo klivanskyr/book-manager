@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
   username  String
   password  String
   email     String      @unique
@@ -18,7 +18,7 @@ model User {
 }
 
 model Book {
-  id        Int         @id @default(autoincrement())
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
   key       String      @unique
   title     String
   author    String
@@ -33,23 +33,25 @@ model Book {
 }
 
 model User_book {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  bookId    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  bookId    String   @db.ObjectId
   createdAt DateTime @default(now())
   Book      Book     @relation(fields: [bookId], references: [id])
   User      User     @relation(fields: [userId], references: [id])
+
   @@unique([bookId, userId])
 }
 
 model Review {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  bookId    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  bookId    String   @db.ObjectId
   rating    Int
   review    String   @default("")
   createdAt DateTime @default(now())
   book      Book     @relation(fields: [bookId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+
   @@unique([bookId, userId])
 }

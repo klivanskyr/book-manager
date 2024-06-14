@@ -81,7 +81,6 @@ export default function Form(): ReactElement {
         const parsedRes = await res.json();
 
         if (parsedRes.code != 200) {
-            console.log('was not 200, parsedRes.code: ', parsedRes.code)
             errors['password'] = 'Incorrect password';
             setUser(null);
             complete();
@@ -95,7 +94,6 @@ export default function Form(): ReactElement {
             books: books
         }
     
-        console.log(user, 'loaded');
         setUser(newUser);
         complete();
 
