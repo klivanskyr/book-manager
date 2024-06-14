@@ -5,11 +5,11 @@ import bcrypt from 'bcrypt';
 
 
 async function login(email: string, password: string): Promise<{ token: string, id: number } | null>{
-
+    console.log('trying to login');
     //pull the user
     const user = await prisma.user.findUnique({
         where: {
-            email: email,
+            email,
         }
     });
 
@@ -19,7 +19,7 @@ async function login(email: string, password: string): Promise<{ token: string, 
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        return { token: token, id: user.id }
+        return { token, id: user.id }
     }
 
     return null;
@@ -35,15 +35,27 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ code: 400, message: "Missing parameters, requires email, password" });
         }
 
-        const apiRes: { token: string, id: number } | null = await login(email, password);
-        
-        if (!apiRes) {
-            return NextResponse.json({ code: 400, message: "User not found" });
-        }
+        const user = await prisma.user.findUnique({
+            where: {
+                email,
+            }
+        });
 
-        const res = NextResponse.json({ code: 200, userId: apiRes.id });
-        res.cookies.set('token', apiRes.token);
-        return res;
+        if (!user) { return NextResponse.json({ code: 400, message: "User not found" }); }
+
+        if (await bcrypt.compare(password, user.password)) { //check if passwords match
+            const token = jwt.sign(
+                { userId: user.id },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+           
+            const res = NextResponse.json({ code: 200, userId: user.id });
+            res.cookies.set('token', token);
+            return res;
+        } else {
+            return NextResponse.json({ code: 400, message: "Invalid password" });
+        }
 
     } catch (error) {
         return NextResponse.json({ code: 400, message: "Invalid request body" });

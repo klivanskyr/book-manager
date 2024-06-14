@@ -1,31 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
+    const cookie = req.cookies.get('token');
 
-    if (!isAuthenticated(req)) {
+    if (!cookie) {
         const url = req.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url, { status: 302, statusText: 'Not Authenticated' })
     }
+
+    const token = cookie.value;
+
+    const res = await fetch('http://localhost:3000/api/auth/verify', {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+    });
+
+    const data = await res.json();
+
+    if (data.code !== 200) {
+        const url = req.nextUrl.clone()
+        url.pathname = '/login'
+        return NextResponse.redirect(url, { status: 302, statusText: 'Not Authenticated' })
+    }
+
+    return NextResponse.next()
 }
 
 export const config = { // What paths need authentication
     matcher: ['/api/auth/logout', '/api/books', '/dashboard', '/_next' ],
 }
-
-function isAuthenticated(req: NextRequest) {
-    const token = req.cookies.get('token');
-
-    if (!token) {
-        return false;
-    }
-
-    try {
-        jwt.verify(token, process.env.JWT_SECRET);
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
-
