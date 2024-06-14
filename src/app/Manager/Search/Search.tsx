@@ -55,7 +55,6 @@ export default function Search({ books }: { books: Book[] }): ReactElement {
 
     function handleError(message: string): void {
         if (message !== "") {
-            console.log('error:', error, 'visable?: ', errorVisable);
             setError(message);
             setErrorVisable(true);
             setQuery('');
@@ -66,7 +65,6 @@ export default function Search({ books }: { books: Book[] }): ReactElement {
     }
 
     function handleSubmit(): void {
-        console.log('bookselectvisable is now', bookSelectVisable);
         setButtonPressed(true);
         setBookSelectVisable(true);
     }
