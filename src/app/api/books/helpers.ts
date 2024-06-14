@@ -1,8 +1,9 @@
 import { Book } from '@/app/types/Book';
 import { prisma } from '@/../lib/prisma';
+import chalk from 'chalk';
 
-export async function getBooks(user_id: number): Promise<Book[]> {
-    const userWithBooks = await prisma.user.findFirst({
+export async function getBooks(user_id: string): Promise<Book[]> {
+    const userWithBooks = await prisma.user.findUnique({
         where: {
             id: user_id,
         },
@@ -40,28 +41,34 @@ export async function getBooks(user_id: number): Promise<Book[]> {
             selected: true //true because it is in the database
         };
     });
+    //console.log(chalk.red(`getBooks books: ${JSON.stringify(books)}`));
     return books;
 }   
 
-export async function postBook(key: string, title: string, author: string, isbn: string, rating: number, review: string, cover: string, r: number, g: number, b: number, user_id: number): Promise<number> {
+export async function postBook(key: string, title: string, author: string, isbn: string, rating: number, review: string, cover: string, r: number, g: number, b: number, user_id: string): Promise<string> {
     //check if book already exists using key
     //if not, create book
     //create user_book
     //create review
-    const foundBook = await prisma.book.upsert({
-    where: { key: key },
-    update: {},
-    create: {
-        key: key,
-        title: title,
-        author: author,
-        isbn: isbn,
-        cover: cover,
-        r: r,
-        g: g,
-        b: b
+    //console.log(chalk.red(`in postBook`));
+    let foundBook = await prisma.book.findUnique({ where: { key: key } });
+    //console.log(chalk.red(`after findUnique`)
+    if (!foundBook) {
+        //console.log(chalk.red(`Book not found, creating new book`));
+        foundBook = await prisma.book.create({
+            data: {
+                key: key,
+                title: title,
+                author: author,
+                isbn: isbn,
+                cover: cover,
+                r: r,
+                g: g,
+                b: b,
+            }
+        });
     }
-    });
+    //console.log(chalk.red('after create'))
 
     await prisma.user_book.create({
     data: {
@@ -78,11 +85,12 @@ export async function postBook(key: string, title: string, author: string, isbn:
         review: review
     }
     });
-
+    //console.log(chalk.red(`Posted book: ${JSON.stringify(foundBook)}`));
     return foundBook.id;
 }
 
-export async function putBook(book_id: number, rating: number, review: string, user_id: number): Promise<void> {
+export async function putBook(book_id: string, rating: number, review: string, user_id: string): Promise<void> {
+    //console.log(chalk.red(`in putBook`));
     await prisma.review.update({
     where: { bookId_userId: { bookId: book_id, userId: user_id } },
     data: {
@@ -90,9 +98,10 @@ export async function putBook(book_id: number, rating: number, review: string, u
         rating: rating
     }
     });
+    //console.log(chalk.red(`Posted Book : ${JSON.stringify(book_id)} ${JSON.stringify(rating)} ${JSON.stringify(review)} ${JSON.stringify(user_id)}`));
 }
 
-export async function deleteBook(book_id: number, user_id: number): Promise<void> {
+export async function deleteBook(book_id: string, user_id: string): Promise<void> {
     //delete book from user_book
     //delete review from review
     //check if that was the last reference to the book
@@ -114,5 +123,6 @@ export async function deleteBook(book_id: number, user_id: number): Promise<void
         where: { id: book_id }
         });
     }
+    //console.log(chalk.red(`Deleted Book : ${JSON.stringify(book_id)} ${JSON.stringify(user_id)}`));
 }
 
