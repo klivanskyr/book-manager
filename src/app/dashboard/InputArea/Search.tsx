@@ -14,7 +14,6 @@ export default function Search(): ReactElement {
 
     function handleError(message: string): void {
         if (message !== "") {
-            console.log('error:', error, 'visable?: ', errorVisable);
             setError(message);
             setErrorVisable(true);
             setQuery('');
