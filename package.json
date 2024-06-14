@@ -15,8 +15,10 @@
     "@prisma/client": "^5.15.0",
     "antd": "^5.17.4",
     "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
     "colorthief": "^2.4.0",
     "framer-motion": "^11.2.7",
+    "jsonwebtoken": "^9.0.2",
     "next": "14.2.3",
     "pg": "^8.12.0",
     "react": "^18",
@@ -29,6 +31,7 @@
     "survey-react-ui": "^1.11.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/pg": "^8.11.6",
     "@types/react": "^18",
