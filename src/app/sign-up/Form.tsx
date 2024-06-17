@@ -7,9 +7,8 @@ import 'survey-core/defaultV2.css';
 import { PlainLight } from "survey-core/themes/plain-light";
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
-import { FunctionFactory } from "survey-core";
 
-import { getUserId } from '@/app/types/UserContext'; 
+import { getUserByEmail } from "../db/db";
 
 export default async function Form({ handleSubmit }: { handleSubmit: Function }): Promise<ReactElement> {
     const router = useRouter();
@@ -73,8 +72,9 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
             complete();
             return;
         }
-        const id = await getUserId(email);
-        if (id) {
+        const ret = await getUserByEmail(email);
+        console.log('ret', ret);
+        if (ret) {
             errors['email'] = 'Email already in use. Please sign in or use a different email.';
         }
         complete();
