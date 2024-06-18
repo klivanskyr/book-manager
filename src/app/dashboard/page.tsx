@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactElement, useContext, useEffect } from 'react';
-import { User, UserContext, loadBooks } from '@/app/types/UserContext';
+import { UserContext } from '@/app/types/UserContext';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 

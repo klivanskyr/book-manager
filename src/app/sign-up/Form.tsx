@@ -9,7 +9,6 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 
 import { getUserByEmail } from "../db/db";
-import { m } from "framer-motion";
 
 export default async function Form({ handleSubmit }: { handleSubmit: Function }): Promise<ReactElement> {
     const router = useRouter();

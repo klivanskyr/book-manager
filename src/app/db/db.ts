@@ -1,7 +1,7 @@
 import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, onValue, DataSnapshot } from "firebase/database";
 import { genSalt, hash } from 'bcrypt-ts';
 
-import { auth, database } from '@/firebase/firebase';
+import { database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
 
 export async function createNewUser(uid: string, username: string, email: string, password: string | null) {

@@ -9,13 +9,13 @@ import { compare } from 'bcrypt-ts';
 import 'survey-core/defaultV2.css';
 import { PlainLight } from "survey-core/themes/plain-light";
 import { Model } from 'survey-core';
-import { Survey, SurveyQuestionMatrixDynamic } from 'survey-react-ui';
+import { Survey } from 'survey-react-ui';
 
 //local imports
 import { User, UserContext } from '@/app/types/UserContext'; 
 
 //Database
-import { ref, onValue, query, orderByChild, orderByValue, equalTo, get } from 'firebase/database';
+import { ref, onValue, query, orderByValue, equalTo, get } from 'firebase/database';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { database, auth } from "@/firebase/firebase";
 import { createNewUser, getUserByEmail, loadBooks } from "../db/db";

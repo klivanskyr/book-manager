@@ -9,7 +9,7 @@ import Review from './Review';
 import Stars  from '../Shelf/Stars'
 import { Book } from '@/app/types/Book';
 import { coverPlaceholder } from '@/assets'
-import { UserContext, User } from '@/app/types/UserContext'
+import { UserContext } from '@/app/types/UserContext'
 import { removeBookFromUser } from '@/app/db/db';
 
 

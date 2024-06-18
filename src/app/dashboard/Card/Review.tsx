@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useContext, ReactElement, useEffect } from 'react'
+import React, { useState, useContext, ReactElement } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
 import Stars from '../Shelf/Stars'
 import { Book } from '@/app/types/Book'
 import { updateUserBook } from '@/app/db/db';
-import { User, UserContext } from '@/app/types/UserContext';
+import { UserContext } from '@/app/types/UserContext';
 
 export default function Review({ active, book, handleReviewClose }: { active: boolean, book: Book, handleReviewClose: Function }): ReactElement {
 
