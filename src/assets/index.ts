@@ -1,0 +1,1 @@
+export { default as coverPlaceholder } from './coverPlaceholder.jpg';

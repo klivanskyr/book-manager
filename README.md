@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Project Title
+
+This is a React project built with [Next.js](https://nextjs.org/). 
 
 ## Getting Started
 
-First, run the development server:
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-```bash
+### Prerequisites
+
+- Node.js
+- npm
+
+### Installing
+
+First, clone the repository to your local machine:
+
+``` bash
+git clone <https://github.com/klivanskyr/book-manager.git>
+cd book-manager
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+├── @types/node@20.12.12
+├── @types/react-dom@18.3.0
+├── @types/react@18.3.3
+├── axios@1.7.2
+├── colorthief@2.4.0
+├── framer-motion@11.2.7
+├── next@14.2.3
+├── postcss@8.4.38
+├── react-dom@18.3.1
+├── react-icons@5.2.1
+├── react-loader-spinner@6.1.6
+├── react@18.3.1
+├── tailwindcss@3.4.3
+└── typescript@5.4.5
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### How to use
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The Book Inventory Manager allows the searching of books by their ISBN. By inputting an ISBN into the search bar and clicking search, the book will be added to your list of books. To remove a book for your list, click the red X in the top left of the book card. You can rate a book by clicking the star rating you want to give a book. 

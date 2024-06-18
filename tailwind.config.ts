@@ -1,3 +1,4 @@
+import { Urbanist } from "next/font/google";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -13,6 +14,18 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      screens: {
+        '1670': '1670px',
+        // => @media (min-width: 1670px) { ... }
+        '1023': '1023px',
+        // => @media (min-width: 1023px) { ... }
+        '1150': '1150px',
+        // => @media (min-width: 1150px) { ... }
+      },
+
+      fontFamily: {
+        Urbanist: ['Urbanist'],
+      }
     },
   },
   plugins: [],
