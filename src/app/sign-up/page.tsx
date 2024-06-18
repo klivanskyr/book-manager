@@ -17,7 +17,7 @@ async function Signup() {
         .then((userCredential) => {
             createNewUser(userCredential.user.uid, username, email, password) //Create user in database
             .then(() => {
-                console.log(`User ${username} added successfully`);
+                //console.log(`User ${username} added successfully`);
                 router.push('/login');
             })
             .catch((error) => {
@@ -25,7 +25,7 @@ async function Signup() {
             });
         })
         .catch((error) => {
-            console.log('Error creating auth user: ', error);
+            //console.log('Error creating auth user: ', error);
         });
     }
 

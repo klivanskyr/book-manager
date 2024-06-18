@@ -50,7 +50,7 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
         if (user) {  //IF STATEMENT ON USER
             await addBookToUser(updatedBook, user.user_id);
-            console.log('books');
+            //console.log('books');
         } 
     }
 

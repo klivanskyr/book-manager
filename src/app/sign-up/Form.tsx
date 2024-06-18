@@ -80,7 +80,7 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
             return;
         }
         const ret = await getUserByEmail(email);
-        console.log('ret', ret);
+        //console.log('ret', ret);
         if (ret) {
             errors['email'] = 'Email already in use. Please sign in or use a different email.';
         }

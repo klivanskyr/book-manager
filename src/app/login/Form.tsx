@@ -79,7 +79,7 @@ export default function Form(): ReactElement {
             .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (!credential) {
-                    console.log('Error signing in with Google: no credential');
+                    //console.log('Error signing in with Google: no credential');
                     return;
                 }
                 const authUser = result.user;
@@ -89,10 +89,10 @@ export default function Form(): ReactElement {
                 const userQuery = query(userRef, orderByValue(), equalTo(authUser.uid));
                 const snapshot = await get(userQuery);
 
-                console.log('snapshot', snapshot);
+                //console.log('snapshot', snapshot);
 
                 if (!snapshot.exists() && authUser.email) {
-                    console.log('creating new user in database', authUser.email);
+                    //console.log('creating new user in database', authUser.email);
                     await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, no password
                 } 
 
@@ -103,7 +103,7 @@ export default function Form(): ReactElement {
                         user_id: authUser.uid,
                         books
                 };
-                console.log('updated user', updatedUser);
+                //console.log('updated user', updatedUser);
                 setUser(updatedUser);
                 router.push('/dashboard');
                 return;
@@ -115,7 +115,7 @@ export default function Form(): ReactElement {
                 const errorMessage = error.message;
                 const email = error.email;
                 const credential = GoogleAuthProvider.credentialFromError(error);
-                console.log('Error signing in with Google: ', error);
+                //console.log('Error signing in with Google: ', error);
         });
     })});
 
@@ -141,7 +141,7 @@ export default function Form(): ReactElement {
         }
 
         if (await compare(password, userObj.password)) {
-            console.log('correct password');
+            //console.log('correct password');
 
             const userBooksRef = ref(database, `usersBooks/${userObj.id}`);
             onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
@@ -150,14 +150,14 @@ export default function Form(): ReactElement {
                     user_id: userObj.id,
                     books
                 };
-                console.log('updated user', updatedUser);
+                //console.log('updated user', updatedUser);
                 setUser(updatedUser);
             });
 
             //sign in user for auth
             signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                console.log('user signed in for auth');
+                //console.log('user signed in for auth');
             })
             .catch((error) => {
                 console.error('Error signing in user for auth: ', error);

@@ -69,10 +69,10 @@ export async function getUserByEmail(email: string) {
     const userData = snapshot.val();
     const userId = Object.keys(userData)[0]; // email is unique so only 1
 
-    console.log('got user', userId, userData[userId])
+    //console.log('got user', userId, userData[userId])
     return { id: userId, ...userData[userId] }
   } else {
-    console.log('no user found')
+    //console.log('no user found')
     return null;
   }
 }
@@ -87,7 +87,7 @@ export async function loadBooks(snapshot: DataSnapshot) {
   if (!snapshot.exists()) {return []}
 
   const bookReviews: [string, BookReview][] = Object.entries(snapshot.val());
-  console.log('bookReviews', bookReviews);
+  //console.log('bookReviews', bookReviews);
 
   let books = [];
   for (let [bookId, bookReviewObject] of bookReviews) {
@@ -113,7 +113,7 @@ export async function loadBooks(snapshot: DataSnapshot) {
     books.push(book);
   }
 
-  console.log("found books from firebase", books);
+  //console.log("found books from firebase", books);
   return books;
 }
 
