@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useContext, ReactElement} from 'react'
+import React, { useState, useContext, ReactElement, useEffect } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
@@ -30,6 +30,7 @@ export default function Review({ active, book, handleReviewClose }: { active: bo
     <Modal
       isOpen={active}
       onRequestClose={onRequestClose}
+      ariaHideApp={false}
       className="flex items-center justify-center h-auto outline-none"
       overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center "
     >

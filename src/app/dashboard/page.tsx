@@ -17,9 +17,12 @@ function Dashboard(): ReactElement {
         router.push('/login');
     }
 
-    if (!user) {
-        router.push('/login');
-    }
+    useEffect(() => {
+        if (!user) {
+            console.log("user is null, pushing to login")
+            router.push('/login');
+        }
+    }, [user]);
 
     return (
         <div>

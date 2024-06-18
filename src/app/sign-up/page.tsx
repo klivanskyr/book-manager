@@ -1,9 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 
 import { createNewUser } from '@/app/db/db';
-import Form from './Form'
+
+const Form = dynamic(() => import('./Form'), { ssr: false });
 
 async function Signup() {
     const router = useRouter();
