@@ -9,6 +9,7 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 
 import { getUserByEmail } from "../db/db";
+import { m } from "framer-motion";
 
 export default async function Form({ handleSubmit }: { handleSubmit: Function }): Promise<ReactElement> {
     const router = useRouter();
@@ -28,7 +29,7 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
             isRequired: true,
             requiredErrorText: "Email is required",
             validators: [
-            { type: "email", text: "Please enter a valid email"}
+                { type: "email", text: "Please enter a valid email"}
             ]
         },
         {
@@ -37,6 +38,9 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
             type: "text",
             isRequired: true,
             requiredErrorText: "Username is required",
+            validators: [
+                { type: "text", text: "Please enter a username", minLength: 3, maxLength: 35}
+            ]
         },
         {
             name: "password",
@@ -45,7 +49,10 @@ export default async function Form({ handleSubmit }: { handleSubmit: Function })
             isRequired: true,
             requiredErrorText: "Password is required",
             inputType: "password",
-            AutoComplete: "password"
+            AutoComplete: "password",
+            validators: [
+                { type: "text", text: "Please enter a password between 8 and 35 characters long", minLength: 8, maxLength: 35}
+            ]
         }],
         showQuestionNumbers: false
     };

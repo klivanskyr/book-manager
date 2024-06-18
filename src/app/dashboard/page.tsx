@@ -3,18 +3,26 @@
 import { ReactElement, useContext, useEffect } from 'react';
 import { User, UserContext, loadBooks } from '@/app/types/UserContext';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
 
 import Search from './InputArea';
 import Shelf from './Shelf';
 import SignoutButton from '../components/SignoutButton';
+import { auth } from '@/firebase/firebase';
 
 function Dashboard(): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const router = useRouter();
 
     function handleSignOut() {
-        setUser(null);
-        router.push('/login');
+        signOut(auth)
+        .then(() => {
+            setUser(null);
+            router.push('/login');
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     }
 
     useEffect(() => {

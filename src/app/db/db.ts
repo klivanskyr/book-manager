@@ -4,7 +4,7 @@ import { genSalt, hash } from 'bcrypt-ts';
 import { auth, database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
 
-export async function createNewUser(username: string, email: string, password: string) {
+export async function createNewUser(uid: string, username: string, email: string, password: string) {
 
   genSalt(10)
     .then((salt) => hash(password, salt))
@@ -17,9 +17,7 @@ export async function createNewUser(username: string, email: string, password: s
         createdAt: serverTimestamp(),
       };
 
-      const newUserKey = push(child(ref(database), 'users')).key;
-
-      return set(ref(database, `users/${newUserKey}`), userInfo);
+      return set(ref(database, `users/${uid}`), userInfo);
     });
 }
 

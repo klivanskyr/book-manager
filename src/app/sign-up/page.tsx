@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/firebase/firebase';
 
 import { createNewUser } from '@/app/db/db';
 
@@ -11,13 +13,19 @@ async function Signup() {
     const router = useRouter();
 
     async function handleSubmit({ email, username, password }: { email: string, username: string, password: string }) {
-        createNewUser(username, email, password)
-        .then(() => {
-            console.log(`User ${username} added successfully`);
-            router.push('/login');
+        createUserWithEmailAndPassword(auth, email, password) // Create user in Firebase Auth
+        .then((userCredential) => {
+            createNewUser(userCredential.user.uid, username, email, password) //Create user in database
+            .then(() => {
+                console.log(`User ${username} added successfully`);
+                router.push('/login');
+            })
+            .catch((error) => {
+                console.error('Error creating database user: ', error);
+            });
         })
         .catch((error) => {
-            console.error('Error adding review: ', error);
+            console.log('Error creating auth user: ', error);
         });
     }
 
