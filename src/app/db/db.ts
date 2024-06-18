@@ -4,9 +4,10 @@ import { genSalt, hash } from 'bcrypt-ts';
 import { auth, database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
 
-export async function createNewUser(uid: string, username: string, email: string, password: string) {
+export async function createNewUser(uid: string, username: string, email: string, password: string | null) {
 
-  genSalt(10)
+  if (password) {
+    genSalt(10)
     .then((salt) => hash(password, salt))
     .then((hashedPassword) => {
 
@@ -19,6 +20,16 @@ export async function createNewUser(uid: string, username: string, email: string
 
       return set(ref(database, `users/${uid}`), userInfo);
     });
+  } else {
+    const userInfo = {
+      username,
+      email,
+      password: null,
+      createdAt: serverTimestamp(),
+    };
+
+    return set(ref(database, `users/${uid}`), userInfo);
+  }
 }
 
 export async function createNewBook(key: string, title: string, author: string, isbn: string, coverUrl: string, r: number, g: number, b: number): Promise<string> {
@@ -105,20 +116,6 @@ export async function loadBooks(snapshot: DataSnapshot) {
   console.log("found books from firebase", books);
   return books;
 }
-
-// export async function getBooksByUserId(userId: string): Promise<Book[]> {
-//   return new Promise((resolve, reject) => {
-//     const userBooksRef = ref(database, `usersBooks/${userId}`);
-//     onValue(userBooksRef, async (userBooksSnapshot) => {
-//       try {
-//         const books = await updateBooks(userBooksSnapshot);
-//         resolve(books);
-//       } catch (error) {
-//         reject(error);
-//       }
-//     });
-//   });
-// }
 
 export async function addBookToUser(book: Book, userId: string) {
   //Check if book is in books

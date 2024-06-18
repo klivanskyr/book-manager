@@ -15,10 +15,10 @@ import { Survey, SurveyQuestionMatrixDynamic } from 'survey-react-ui';
 import { User, UserContext } from '@/app/types/UserContext'; 
 
 //Database
-import { ref, onValue } from 'firebase/database';
+import { ref, onValue, query, orderByChild, orderByValue, equalTo, get } from 'firebase/database';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { database, auth } from "@/firebase/firebase";
-import { getUserByEmail, loadBooks } from "../db/db";
+import { createNewUser, getUserByEmail, loadBooks } from "../db/db";
 
 
 export default function Form(): ReactElement {
@@ -76,20 +76,31 @@ export default function Form(): ReactElement {
         action: (() => {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
-            .then((result) => {
+            .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (!credential) {
                     console.log('Error signing in with Google: no credential');
                     return;
                 }
-                const token = credential.accessToken;
-                const user = result.user;
+                const authUser = result.user;
 
-                const userBooksRef = ref(database, `usersBooks/${user.uid}`);
-                onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
+                //create user in database if needed
+                const userRef = ref(database, `users`);
+                const userQuery = query(userRef, orderByValue(), equalTo(authUser.uid));
+                const snapshot = await get(userQuery);
+
+                console.log('snapshot', snapshot);
+
+                if (!snapshot.exists() && authUser.email) {
+                    console.log('creating new user in database', authUser.email);
+                    await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, no password
+                } 
+
+                const userBooksRef = ref(database, `usersBooks/${authUser.uid}`);
+                onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
                     const books = await loadBooks(userBooksSnapshot);
                     const updatedUser: User = {
-                        user_id: user.uid,
+                        user_id: authUser.uid,
                         books
                 };
                 console.log('updated user', updatedUser);
@@ -102,7 +113,7 @@ export default function Form(): ReactElement {
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                const email = error.customData.email;
+                const email = error.email;
                 const credential = GoogleAuthProvider.credentialFromError(error);
                 console.log('Error signing in with Google: ', error);
         });
@@ -119,6 +130,12 @@ export default function Form(): ReactElement {
         const userObj = await getUserByEmail(email);
         if (!userObj) {
             errors['email'] = 'Email not found';
+            complete();
+            return;
+        }
+
+        if (!userObj.password) {
+            errors['email'] = 'User signed in with Google. Please sign in with Google.';
             complete();
             return;
         }
