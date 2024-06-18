@@ -4,7 +4,7 @@ import { Book } from '../types/Book';
 import { coverPlaceholder } from '@/assets';
 
 //Book Search API REQUEST
-const baseBookUrl = 'http://openlibrary.org/search.json?isbn=';
+const baseBookUrl = 'https://openlibrary.org/search.json?isbn=';
 const baseCoverUrl = 'https://covers.openlibrary.org/b/olid/';
 
 //API call to get books to display to pick from
