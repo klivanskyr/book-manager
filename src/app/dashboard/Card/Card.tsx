@@ -9,7 +9,7 @@ import Review from './Review';
 import Stars  from '../Shelf/Stars'
 import { Book } from '@/app/types/Book';
 import { coverPlaceholder } from '@/assets'
-import { UserContext, User, loadBooks, updateReview, deleteBook } from '@/app/types/UserContext'
+import { UserContext, User } from '@/app/types/UserContext'
 
 
 export function Card({ book }: { book: Book }): ReactElement {
@@ -53,11 +53,13 @@ export function Card({ book }: { book: Book }): ReactElement {
         };
     }
 
+    console.log('book', book)
+
     return (
         <>
             <Review active={reviewVisable} book={book} handleReviewClose={handleReviewClose} handleRatingUpdate={handleRatingUpdate} /> 
             <motion.div 
-                style={{ backgroundColor: `rgb(${book.bgColor[0]}, ${book.bgColor[1]}, ${book.bgColor[2]})` }}
+                style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}
                 // ${book.bgLoaded ? 'opacity-100' : 'opacity-0'}
                 className={`select-none h-[375px] w-auto py-2 px-3 m-3 flex-col rounded-2xl shadow-lg cursor-pointer`}  
                 whileHover={{ scale: 1.05 }}

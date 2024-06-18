@@ -5,7 +5,8 @@ import { NextResponse } from 'next/server';
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
-import { UserContext, User, UserContextType, createBook, deleteBook, loadBooks } from '@/app/types/UserContext';
+import { UserContext, User, UserContextType } from '@/app/types/UserContext';
+import { addBookToUser, removeBookFromUser } from '@/app/db/db';
 import BookSelectGrid from './BookSelectGrid';
 import { queryOpenLibrary } from '@/app/utils/openlibrary';
 import { Book } from '@/app/types/Book';
@@ -45,16 +46,11 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
     //handle selecting book from modal
     async function handleClickAdd(i: number): Promise<void> {
         const [r, g, b] = await fetchDominantColor(foundBooks[i].coverImage);
-        const updatedBook = { ...foundBooks[i], selected: true, bgColor: [Math.min(r+75, 255), Math.min(g+75, 255), Math.min(b+75, 255)]};
+        const updatedBook = { ...foundBooks[i], selected: true, bgColor: {r: Math.min(r+75, 255), g: Math.min(g+75, 255), b: Math.min(b+75, 255)}};
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
         if (user) {  //IF STATEMENT ON USER
-            await createBook(updatedBook, user);
-            const res = await loadBooks(user.user_id);
-            const userAddedBook: User = { 
-                user_id: user.user_id,
-                books: res
-            };
-            setUser(userAddedBook);
+            await addBookToUser(updatedBook, user.user_id);
+            console.log('books');
         } 
     }
 
@@ -66,14 +62,7 @@ export default function BookSelect({ active, query, handleError, handleBookSelec
             //Find book in user books where it will have an id.
             const userBookRef = user.books.find((book) => book.key === foundBooks[i].key);
             if (!userBookRef) { return; } //Not possible to remove book that is not in user books
-            await deleteBook(userBookRef.id, user.user_id);
-            const res = await loadBooks(user.user_id); 
-            const userRemovedBook: User = { 
-                user_id: user.user_id,
-                books: res
-            };
-            
-            setUser(userRemovedBook);
+            await removeBookFromUser(userBookRef.id, user.user_id)
         };
     }
 

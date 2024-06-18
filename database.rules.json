@@ -3,6 +3,9 @@
     "users": {
       ".indexOn": "email"
     },
+    "books": {
+      ".indexOn": "key"
+    },
     ".read": true,
     ".write": true
   }

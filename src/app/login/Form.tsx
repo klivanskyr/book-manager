@@ -1,14 +1,24 @@
 'use client';
 
+//dependencies
 import { ReactElement, useContext } from "react";
 import { useRouter } from 'next/navigation';
+import { compare } from 'bcrypt-ts';
 
+//survey
 import 'survey-core/defaultV2.css';
 import { PlainLight } from "survey-core/themes/plain-light";
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 
-import { User, UserContext, getUserId, loadBooks } from '@/app/types/UserContext'; 
+//local imports
+import { User, UserContext } from '@/app/types/UserContext'; 
+
+//Database
+import { ref, onValue } from 'firebase/database';
+import { database } from "@/firebase/firebase";
+import { getUserByEmail, updateBooks } from "../db/db";
+
 
 export default function Form(): ReactElement {
     const router = useRouter();
@@ -61,44 +71,37 @@ export default function Form(): ReactElement {
             complete();
             return;
         }
-        const id = await getUserId(email);
-        if (!id) {
+        const userObj = await getUserByEmail(email);
+        if (!userObj) {
             errors['email'] = 'Email not found';
             complete();
             return;
         }
 
-        const res = await fetch('http://localhost:3000/api/auth/login', {
-            method: 'POST',
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: email,
-              password: password
-            })
-        });
+        if (await compare(password, userObj.password)) {
+            console.log('correct password');
 
-        const parsedRes = await res.json();
+            const userBooksRef = ref(database, `usersBooks/${userObj.id}`);
+            onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
+                const books = await updateBooks(userBooksSnapshot);
+                const updatedUser: User = {
+                    user_id: userObj.id,
+                    books
+                };
+                console.log('updated user', updatedUser);
+                setUser(updatedUser);
+            });
 
-        if (parsedRes.code != 200) {
+            complete();
+            router.push('/dashboard')
+            return;
+
+        } else {
             errors['password'] = 'Incorrect password';
             setUser(null);
             complete();
             return;
         }
-
-        const books = await loadBooks(id);
-
-        const newUser: User = {
-            user_id: id,
-            books: books
-        }
-    
-        setUser(newUser);
-        complete();
-
-        router.push('/dashboard');
-        return; 
     }
 
     survey.onServerValidateQuestions.add(validateEmailandPassword);
