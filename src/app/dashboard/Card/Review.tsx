@@ -1,21 +1,28 @@
 'use client';
 
-import React, { useState, ReactElement} from 'react'
+import React, { useState, useContext, ReactElement} from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
 import Stars from '../Shelf/Stars'
 import { Book } from '@/app/types/Book'
+import { updateUserBook } from '@/app/db/db';
+import { User, UserContext } from '@/app/types/UserContext';
 
-export default function Review({ active, book, handleReviewClose, handleRatingUpdate }: { active: boolean, book: Book, handleReviewClose: Function, handleRatingUpdate: Function }): ReactElement {
+export default function Review({ active, book, handleReviewClose }: { active: boolean, book: Book, handleReviewClose: Function }): ReactElement {
 
   const [review, setReview] = useState(book.review);
+  const { user, setUser } = useContext(UserContext);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setReview(e.target.value);
+  async function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    if (user) {
+      setReview(e.target.value);
+      const newBook = { ...book, review: review };
+      await updateUserBook(newBook, user.user_id);
+    }
   }
 
-  const onRequestClose = () => {
+  function onRequestClose() {
     handleReviewClose(review);
   }
 
@@ -35,7 +42,7 @@ export default function Review({ active, book, handleReviewClose, handleRatingUp
           value={review} 
           onChange={handleInputChange} 
         />
-        <Stars size={30} book={book} handleRatingUpdate={handleRatingUpdate} />
+        <Stars size={30} book={book} />
       </div>
     </Modal>
   )

@@ -74,7 +74,7 @@ type BookReview = {
   text: string,
 };
 
-export async function updateBooks(snapshot: DataSnapshot) {
+export async function loadBooks(snapshot: DataSnapshot) {
   if (!snapshot.exists()) {return []}
 
   const bookReviews: [string, BookReview][] = Object.entries(snapshot.val());
@@ -151,5 +151,11 @@ export async function removeBookFromUser(bookId: string, userId: string) {
     set(ref(database, `books/${bookId}`), null);
   } 
   return 
+}
+
+export async function updateUserBook(updatedBook: Book, userId: string) {
+  const userBookRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`);
+  set(userBookRef, { text: updatedBook.review, rating: updatedBook.rating });
+  return;
 }
 

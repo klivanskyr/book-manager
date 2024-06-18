@@ -17,7 +17,7 @@ import { User, UserContext } from '@/app/types/UserContext';
 //Database
 import { ref, onValue } from 'firebase/database';
 import { database } from "@/firebase/firebase";
-import { getUserByEmail, updateBooks } from "../db/db";
+import { getUserByEmail, loadBooks } from "../db/db";
 
 
 export default function Form(): ReactElement {
@@ -83,7 +83,7 @@ export default function Form(): ReactElement {
 
             const userBooksRef = ref(database, `usersBooks/${userObj.id}`);
             onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
-                const books = await updateBooks(userBooksSnapshot);
+                const books = await loadBooks(userBooksSnapshot);
                 const updatedUser: User = {
                     user_id: userObj.id,
                     books
