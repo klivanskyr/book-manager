@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.15.0",
+    "@vercel/speed-insights": "^1.0.12",
     "antd": "^5.17.4",
     "bcrypt-ts": "^5.0.2",
     "colorthief": "^2.4.0",
