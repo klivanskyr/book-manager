@@ -1,33 +1,32 @@
-'use client';
+'use client'
 
-import { ReactElement, useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/firebase/firebase';
 
-import Form from './Form'
-import { createUser, UserContext } from '@/app/types/UserContext';
+import { createNewUser } from '@/app/db/db';
+
+const Form = dynamic(() => import('./Form'), { ssr: false });
 
 async function Signup() {
-    const { user, setUser } = useContext(UserContext);
     const router = useRouter();
 
-
     async function handleSubmit({ email, username, password }: { email: string, username: string, password: string }) {
-        const res = await fetch('http://localhost:3000/api/auth/signup', {
-            method: 'POST',
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: username,
-                email: email,
-                password: password
+        createUserWithEmailAndPassword(auth, email, password) // Create user in Firebase Auth
+        .then((userCredential) => {
+            createNewUser(userCredential.user.uid, username, email, password) //Create user in database
+            .then(() => {
+                //console.log(`User ${username} added successfully`);
+                router.push('/login');
             })
+            .catch((error) => {
+                console.error('Error creating database user: ', error);
+            });
+        })
+        .catch((error) => {
+            //console.log('Error creating auth user: ', error);
         });
-        const data = await res.json();
-        if (data.code !== 200) {
-            return;
-        } else {
-            router.push('/login');
-        }
     }
 
     return (

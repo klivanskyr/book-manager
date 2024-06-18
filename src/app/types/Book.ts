@@ -7,7 +7,7 @@ export type Book = {
     rating: number
     isbn: string,
     coverImage: string,
-    bgColor: number[],
+    bgColor: {r: number, g: number, b: number},
     imgLoaded: boolean,
     selected: boolean,
 };

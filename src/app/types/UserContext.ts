@@ -4,7 +4,7 @@ import { ReactNode, useState, createContext } from 'react';
 import { Book } from './Book';
 
 export type User = {
-    user_id: number;
+    user_id: string;
     books: Book[];
   }
 

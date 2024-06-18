@@ -1,0 +1,1 @@
+declare module 'survey-core/themes/plain-light';

@@ -1,14 +1,25 @@
 'use client';
 
+//dependencies
 import { ReactElement, useContext } from "react";
 import { useRouter } from 'next/navigation';
+import { compare } from 'bcrypt-ts';
 
+//survey
 import 'survey-core/defaultV2.css';
 import { PlainLight } from "survey-core/themes/plain-light";
 import { Model } from 'survey-core';
-import { Survey } from 'survey-react-ui';
+import { Survey, SurveyQuestionMatrixDynamic } from 'survey-react-ui';
 
-import { User, UserContext, getUserId, loadBooks } from '@/app/types/UserContext'; 
+//local imports
+import { User, UserContext } from '@/app/types/UserContext'; 
+
+//Database
+import { ref, onValue, query, orderByChild, orderByValue, equalTo, get } from 'firebase/database';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { database, auth } from "@/firebase/firebase";
+import { createNewUser, getUserByEmail, loadBooks } from "../db/db";
+
 
 export default function Form(): ReactElement {
     const router = useRouter();
@@ -53,6 +64,61 @@ export default function Form(): ReactElement {
         action: (() => router.push('/sign-up'))
     });
 
+    survey.addNavigationItem({
+        id: "forgot-password",
+        title: "Forgot Password",
+        action: (() => router.push('/forgot-password'))
+    })
+
+    survey.addNavigationItem({
+        id: "sign-in with Google",
+        title: "Sign in with Google",
+        action: (() => {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider)
+            .then(async (result) => {
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                if (!credential) {
+                    //console.log('Error signing in with Google: no credential');
+                    return;
+                }
+                const authUser = result.user;
+
+                //create user in database if needed
+                const userRef = ref(database, `users`);
+                const userQuery = query(userRef, orderByValue(), equalTo(authUser.uid));
+                const snapshot = await get(userQuery);
+
+                //console.log('snapshot', snapshot);
+
+                if (!snapshot.exists() && authUser.email) {
+                    //console.log('creating new user in database', authUser.email);
+                    await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, no password
+                } 
+
+                const userBooksRef = ref(database, `usersBooks/${authUser.uid}`);
+                onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
+                    const books = await loadBooks(userBooksSnapshot);
+                    const updatedUser: User = {
+                        user_id: authUser.uid,
+                        books
+                };
+                //console.log('updated user', updatedUser);
+                setUser(updatedUser);
+                router.push('/dashboard');
+                return;
+            });
+                
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                const email = error.email;
+                const credential = GoogleAuthProvider.credentialFromError(error);
+                //console.log('Error signing in with Google: ', error);
+        });
+    })});
+
     async function validateEmailandPassword(survey: any, { data, errors, complete }: { data: any, errors: any, complete: Function}) {
         const email = data['email'];
         const password = data['password'];
@@ -61,44 +127,54 @@ export default function Form(): ReactElement {
             complete();
             return;
         }
-        const id = await getUserId(email);
-        if (!id) {
+        const userObj = await getUserByEmail(email);
+        if (!userObj) {
             errors['email'] = 'Email not found';
             complete();
             return;
         }
 
-        const res = await fetch('http://localhost:3000/api/auth/login', {
-            method: 'POST',
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: email,
-              password: password
+        if (!userObj.password) {
+            errors['email'] = 'User signed in with Google. Please sign in with Google.';
+            complete();
+            return;
+        }
+
+        if (await compare(password, userObj.password)) {
+            //console.log('correct password');
+
+            const userBooksRef = ref(database, `usersBooks/${userObj.id}`);
+            onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
+                const books = await loadBooks(userBooksSnapshot);
+                const updatedUser: User = {
+                    user_id: userObj.id,
+                    books
+                };
+                //console.log('updated user', updatedUser);
+                setUser(updatedUser);
+            });
+
+            //sign in user for auth
+            signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                //console.log('user signed in for auth');
             })
-        });
+            .catch((error) => {
+                console.error('Error signing in user for auth: ', error);
+                errors['email'] = 'Error signing in user';
+                complete();
+            });
 
-        const parsedRes = await res.json();
+            complete();
+            router.push('/dashboard')
+            return;
 
-        if (parsedRes.code != 200) {
+        } else {
             errors['password'] = 'Incorrect password';
             setUser(null);
             complete();
             return;
         }
-
-        const books = await loadBooks(id);
-
-        const newUser: User = {
-            user_id: id,
-            books: books
-        }
-    
-        setUser(newUser);
-        complete();
-
-        router.push('/dashboard');
-        return; 
     }
 
     survey.onServerValidateQuestions.add(validateEmailandPassword);
