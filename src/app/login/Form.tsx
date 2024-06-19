@@ -110,7 +110,7 @@ export default function Form(): ReactElement {
                 };
                 console.log('updated user', updatedUser);
                 setUser(updatedUser);
-                router.push('/dashboard');
+                router.push(`/dashboard/${updatedUser.user_id}`);
                 return;
             });
                 
@@ -162,17 +162,16 @@ export default function Form(): ReactElement {
             //sign in user for auth
             signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                //console.log('user signed in for auth');
+                complete();
+                router.push(`/dashboard/${userObj.id}`)
+                return;
             })
             .catch((error) => {
                 console.error('Error signing in user for auth: ', error);
                 errors['email'] = 'Error signing in user';
                 complete();
+                return;
             });
-
-            complete();
-            router.push('/dashboard')
-            return;
 
         } else {
             errors['password'] = 'Incorrect password';
