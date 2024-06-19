@@ -75,24 +75,29 @@ export default function Form(): ReactElement {
         title: "Sign in with Google",
         action: (() => {
             const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt: 'select_account',
+                display: 'popup'
+            });
             signInWithPopup(auth, provider)
             .then(async (result) => {
+                console.log('result', result);
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (!credential) {
-                    //console.log('Error signing in with Google: no credential');
+                    console.log('Error signing in with Google: no credential');
                     return;
                 }
                 const authUser = result.user;
 
                 //create user in database if needed
                 const userRef = ref(database, `users`);
-                const userQuery = query(userRef, orderByValue(), equalTo(authUser.uid));
+                const userQuery = query(userRef, orderByValue(),  equalTo(authUser.uid));
                 const snapshot = await get(userQuery);
 
-                //console.log('snapshot', snapshot);
+                console.log('snapshot', snapshot);
 
                 if (!snapshot.exists() && authUser.email) {
-                    //console.log('creating new user in database', authUser.email);
+                    console.log('creating new user in database', authUser.email);
                     await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, no password
                 } 
 
@@ -103,7 +108,7 @@ export default function Form(): ReactElement {
                         user_id: authUser.uid,
                         books
                 };
-                //console.log('updated user', updatedUser);
+                console.log('updated user', updatedUser);
                 setUser(updatedUser);
                 router.push('/dashboard');
                 return;
@@ -115,7 +120,7 @@ export default function Form(): ReactElement {
                 const errorMessage = error.message;
                 const email = error.email;
                 const credential = GoogleAuthProvider.credentialFromError(error);
-                //console.log('Error signing in with Google: ', error);
+                console.log('Error signing in with Google: ', error);
         });
     })});
 
