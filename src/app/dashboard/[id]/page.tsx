@@ -7,10 +7,10 @@ import { signOut } from 'firebase/auth';
 
 import Search from './InputArea';
 import Shelf from './Shelf';
-import SignoutButton from '../components/SignoutButton';
+import SignoutButton from '../../components/SignoutButton';
 import { auth } from '@/firebase/firebase';
 
-function Dashboard(): ReactElement {
+function Dashboard({ params }: { params: { id: string } }): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const router = useRouter();
 
