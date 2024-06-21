@@ -13,7 +13,7 @@ import { Button } from '@nextui-org/react';
 import { googleG } from '@/assets';
 import Image from 'next/image';
 
-export default function SignInWithGoogleButton({ className='', disabled = false }: { className: string, disabled?: boolean }) {
+export default function SignInWithGoogleButton({ className='', disabled = false }: { className?: string, disabled?: boolean }) {
     const { user, setUser } = useContext(UserContext);
     const router = useRouter();
 

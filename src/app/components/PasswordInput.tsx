@@ -6,7 +6,7 @@ import { Input, Button } from '@nextui-org/react';
 import { passwordEyeFull, passwordEyeSlashed } from '@/assets';
 import Image from 'next/image';
 
-export default function PasswordInput({ className='', disabled = false, value, setValue }: { className: string, disabled?: boolean, value: any, setValue: Function }) {
+export default function PasswordInput({ className='', disabled = false, value, setValue }: { className?: string, disabled?: boolean, value: any, setValue: Function }) {
     const [isVisable, setIsVisable] = useState(false);
 
     return (
