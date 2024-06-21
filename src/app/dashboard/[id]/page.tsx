@@ -7,7 +7,7 @@ import { signOut } from 'firebase/auth';
 
 import Search from './InputArea';
 import Shelf from './Shelf';
-import SignoutButton from '../../../components/SignoutButton';
+import { FormSubmitButton } from '@/app/components';
 import { auth } from '@/firebase/firebase';
 
 function Dashboard({ params }: { params: { id: string } }): ReactElement {
@@ -27,14 +27,14 @@ function Dashboard({ params }: { params: { id: string } }): ReactElement {
 
     useEffect(() => {
         if (!user) {
-            ////console.log("user is null, pushing to login")
+            // console.log("user is null, pushing to login")
             router.push('/login');
         }
     }, [user]);
 
     return (
         <div>
-            <SignoutButton handleClick={handleSignOut} />
+            <FormSubmitButton className='' onClick={handleSignOut} text='Sign Out' />
             <div className='flex flex-col items-center h-auto'>
                 {user ? <Search /> : null}
                 {user ? <Shelf /> : null}

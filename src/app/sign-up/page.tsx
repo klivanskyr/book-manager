@@ -17,8 +17,40 @@ export default function Signup() {
     const [error, setError] = useState<string>('');
     const router = useRouter();
 
-    const handleSubmit = async ({ email, username, password }: { email: string, username: string, password: string }) => {
+    function validateEmailandPassword(email: string, password: string): boolean {
+        if (!email || !password) {
+            setError('All fields are required');
+            return false;
+        }
+        if (password.length < 8) {
+            setError('Password must be at least 8 characters');
+            return false;
+        }
+        if (password.length > 35) {
+            setError('Password must be less than 35 characters');
+            return false;
+        }
+        if (username.length < 3) {
+            setError('Username must be at least 3 characters');
+            return false;
+        }
+        if (username.length > 35) {
+            setError('Username must be less than 35 characters');
+            return false;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+            setError('Please enter a valid email');
+            return false;
+        }
+        return true;
+    }
+
+    const handleSubmit = async () => {
         setIsLoading(true);
+        if (!validateEmailandPassword(email, password)) {
+            setIsLoading(false);
+            return;
+        }
         createUserWithEmailAndPassword(auth, email, password) // Create user in Firebase Auth
         .then((userCredential) => {
             createNewUser(userCredential.user.uid, username, email, password) //Create user in database
@@ -37,7 +69,7 @@ export default function Signup() {
             });
         })
         .catch((error) => {
-            setError('Error creating auth user');
+            setError('Email already has auth account');
             setIsLoading(false);
             setUsername('');
             setEmail('');
@@ -48,7 +80,7 @@ export default function Signup() {
     }
 
     function SubmitButton() {
-        const className = 'mt-4 mb-2 w-4/12';
+        const className = 'mt-4 mb-2 w-64';
         return (
             isLoading 
             ? <LoadingButton className={className} color="primary" isLoading={isLoading} /> 
