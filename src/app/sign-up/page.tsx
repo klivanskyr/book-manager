@@ -84,7 +84,7 @@ export default function Signup() {
         return (
             isLoading 
             ? <LoadingButton className={className} color="primary" isLoading={isLoading} /> 
-            : <FormSubmitButton className={className} disabled={isLoading} text='Sign Up' onSubmit={handleSubmit} />
+            : <FormSubmitButton className={className} disabled={isLoading} text='Sign Up' onClick={handleSubmit} />
         )
     }
     
