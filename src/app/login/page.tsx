@@ -7,7 +7,7 @@ import { onValue, ref } from 'firebase/database';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
-import { EmailInput, PasswordInput, FormSubmitButton, SignInWithGoogleButton, LoadingButton } from '@/app/components';
+import { EmailInput, PasswordInput, ActionButton, SignInWithGoogleButton, LoadingButton } from '@/app/components';
 import { getUserByEmail, loadBooks } from '../db';
 import { auth, database } from '@/firebase/firebase';
 import { User, UserContext } from '../types/UserContext';
@@ -104,7 +104,7 @@ export default function Login(): ReactElement {
     const className = 'mt-1 mb-2 w-64';
     return isLoading 
       ? <LoadingButton className={className} color="primary" isLoading={isLoading} /> 
-      : <FormSubmitButton className={className} disabled={isLoading} text='Sign In' onClick={handleSubmit} />
+      : <ActionButton className={className} disabled={isLoading} text='Sign In' onClick={handleSubmit} />
   }
 
   function ErrorElement() {

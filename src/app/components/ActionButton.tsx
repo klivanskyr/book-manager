@@ -1,8 +1,6 @@
-'use client';
-
 import { Button } from '@nextui-org/react';
 
-export default function FormSubmitButton({ className='', disabled = false, text, onClick }: { className: string, disabled?: boolean, text: string, onClick: Function }) {
+export default function ActionButton({ className='', disabled = false, text, onClick }: { className: string, disabled?: boolean, text: string, onClick: Function }) {
     return (
         <Button
             color='primary'

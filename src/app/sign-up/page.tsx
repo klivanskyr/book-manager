@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase/firebase';
 
 import { createNewUser } from '@/app/db/db';
-import { TextInput, EmailInput, Form, FormSubmitButton, LoadingButton, PasswordInput } from '@/app/components';
+import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput } from '@/app/components';
 import Link from 'next/link';
 
 export default function Signup() {
@@ -84,7 +84,7 @@ export default function Signup() {
         return (
             isLoading 
             ? <LoadingButton className={className} color="primary" isLoading={isLoading} /> 
-            : <FormSubmitButton className={className} disabled={isLoading} text='Sign Up' onClick={handleSubmit} />
+            : <ActionButton className={className} disabled={isLoading} text='Sign Up' onClick={handleSubmit} />
         )
     }
     
