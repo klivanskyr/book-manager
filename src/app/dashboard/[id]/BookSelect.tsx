@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Spinner, Card, CardHeader, CardBody, CardFooter, Image} from "@nextui-org/react";
 
 import { TextInput, ActionButton, ModalElement } from "@/app/components"
@@ -19,6 +19,13 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
+
+    //When user begins to write in search bar, clear error message
+    useEffect(() => {
+        if (text) {
+            setError('');
+        }
+    }, [text])
 
     const getNewBooks = async () => {
         const res = await queryOpenLibrary(text);
@@ -121,7 +128,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     }
 
     function Body() {
-        if (text === '' || !submitted) {
+        if (!submitted) {
             return (<></>)
         } else if (isLoading) {
             return (
