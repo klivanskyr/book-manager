@@ -28,53 +28,32 @@ export default function Login(): ReactElement {
       return;
     }
 
-    const userObj = await getUserByEmail(email);
-    if (!userObj) {
-        setError('User not found');
-        setIsLoading(false);
-        return;
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-cache',
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (data.code !== 200) {
+      setError(data.message);
+      setIsLoading(false);
+      return;
     }
 
-    if (!userObj.password) {
-        setError('User signed in with Google. Please sign in with Google.')
-        setIsLoading(false);
-        return;
-    }
-
-    if (await compare(password, userObj.password)) {
-        //console.log('correct password');
-
-        const userBooksRef = ref(database, `usersBooks/${userObj.id}`);
-        onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
-            const books = await loadBooks(userBooksSnapshot);
-            const updatedUser: User = {
-                user_id: userObj.id,
-                books
-            };
-            //console.log('updated user', updatedUser);
-            setUser(updatedUser);
-        });
-
-        //sign in user for auth
-        signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            setIsLoading(false);
-            router.push(`/dashboard/${userObj.id}`)
-            return;
-        })
-        .catch((error) => {
-            console.error('Error signing in user for auth: ', error);
-            setError('Error signing in user');
-            setIsLoading(false);
-            return;
-        });
-
-    } else {
-        setError('Incorrect password');
-        setIsLoading(false);
-        setUser(null);
-        return;
-    }
+    const userBooksRef = ref(database, `users/${data.userId}/books`);
+    onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
+      const books = await loadBooks(userBooksSnapshot);
+      const updatedUser: User = {
+          user_id: data.userId,
+          books
+      };
+      console.log('updated user', updatedUser);
+      setUser(updatedUser);
+      router.push(`/dashboard/${data.userId}`)
+    });
 }
 
   function emailIsValid(email: string) {
