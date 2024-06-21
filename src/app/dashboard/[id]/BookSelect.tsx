@@ -70,16 +70,13 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         setIsLoading(true);
         if (text === '') { return }
         await getNewBooks();
+        setText('');
         setIsLoading(false);
     }
 
     function displayBooks() {
         if (foundBooks.length === 0 && submitted) {
-            return (
-                <div className='flex justify-center'>
-                    <p>No books found</p>
-                </div>
-            )
+            return (<></>)
         } else {
             return(
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
@@ -117,7 +114,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     function Header() {
         return (
             <form className="flex w-full" onSubmit={undefined}>
-                <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by ISBN' value={text} setValue={setText} />
+                <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by ISBN' value={text} setValue={setText} error={error} />
                 <ActionButton className="w-8 h-16 rounded-l-none rounded-t-lg rounded-r-lg rounded-b-lg shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
             </form>
         )
