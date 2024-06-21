@@ -11,7 +11,7 @@ import { EmailInput, PasswordInput, FormSubmitButton, SignInWithGoogleButton, Lo
 import { getUserByEmail, loadBooks } from '../db';
 import { auth, database } from '@/firebase/firebase';
 import { User, UserContext } from '../types/UserContext';
-import Form from '../components/Form';
+import { Form } from '../components';
 
 export default function Login(): ReactElement {
   const { user, setUser } = useContext(UserContext);
@@ -99,10 +99,10 @@ export default function Login(): ReactElement {
       return
     }
   }
-
+  
   const SubmitButton = isLoading 
-    ? <LoadingButton className='my-1 w-4/12' color="primary" isLoading={isLoading} /> 
-    : <FormSubmitButton className='my-1 w-4/12' disabled={isLoading} text='Sign In' onSubmit={handleSubmit} />
+    ? <LoadingButton className='mt-1 mb-2 w-4/12' color="primary" isLoading={isLoading} /> 
+    : <FormSubmitButton className='mt-1 mb-2 w-4/12' disabled={isLoading} text='Sign In' onSubmit={handleSubmit} />
 
   const ErrorElement = error ? <div>{error}</div> : <></>
 
@@ -112,10 +112,10 @@ export default function Login(): ReactElement {
     <PasswordInput className="my-1.5 shadow-sm rounded-md" disabled={isLoading} value={password} setValue={setPassword} />,
     <Link href='#' className='px-2 pb-2 pt-6 text-blue-500 font-medium text-sm'>Forgot Password</Link>,
     SubmitButton,
-    <SignInWithGoogleButton className='bg-green-400 w-4/12' disabled={isLoading} />,
+    <SignInWithGoogleButton className='bg-green-400 w-4/12 mb-2' disabled={isLoading} />,
     ErrorElement,
-    <div className='py-5 text-center'> Dont have an account? <Link className='font-semibold text-lg text-blue-500' href='/signup'>Sign up</Link></div>
-  ]
+    <div className='py-5 text-center'> Dont have an account? <Link className='font-semibold text-lg text-blue-500' href='/sign-up'>Sign up</Link></div>
+  ];
 
   return (
     <Form elements={formElements} />

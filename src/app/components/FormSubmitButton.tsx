@@ -9,7 +9,7 @@ export default function FormSubmitButton({ className='', disabled = false, text,
             type='submit'
             className={className}
             size='lg'
-            onPress={() => onSubmit()}
+            onClick={(e) => onSubmit()}
             disabled={disabled}
         >
             {text}

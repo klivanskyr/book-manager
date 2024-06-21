@@ -18,9 +18,10 @@ export default function PasswordInput({ className='', disabled = false, value, s
             size='lg'
             endContent = {
                 <Button className='bg-transparent' isIconOnly onClick={() => setIsVisable(!isVisable)}>
-                    {isVisable 
+                    {/* If password is empty, dont show icon. Then allow switching between text and password */}
+                    {!value ? <></> : (isVisable
                     ? <Image src={passwordEyeSlashed} alt="Hide Password" height={30} width={30} /> 
-                    : <Image src={passwordEyeFull} alt="Show Password" height={30} width={30} />}
+                    : <Image src={passwordEyeFull} alt="Show Password" height={30} width={30} />)}
                 </Button>
             }
             type = {isVisable ? "text" : "password" }
