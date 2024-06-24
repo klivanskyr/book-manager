@@ -1,6 +1,6 @@
 'use client';
 
-import { Stars } from "@/app/components";
+import { FallBackImage, Stars } from "@/app/components";
 import { removeBookFromUser } from "@/app/db";
 import { Book } from "@/app/types/Book";
 import { UserContext } from "@/app/types/UserContext";
@@ -27,11 +27,10 @@ export default function BookCard ({ book }: { book: Book }) {
                 <CardHeader className="flex flex-col justify-start items-start w-full" onClick={() => setReviewActive(true)}>
                     <Button className='bg-transparent h-6' isIconOnly onClick={handleRemoveBook}><FaTimes /></Button>
                     <div className='w-full flex flex-row justify-center center-items' >
-                        <Image
+                        <FallBackImage
                             className='w-full flex flex-row justify-center items-center'
                             alt="Book Cover"
                             src={book.coverImage}
-                            fallbackSrc={coverPlaceholder.src}
                             width={140}
                             height={140}
                         />
