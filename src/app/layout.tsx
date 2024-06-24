@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
 import Header from "./Header";
 import { ParentProvider } from "./utils/ContextWrapper";
-
-const inter = Inter({ subsets: ["latin"] });
+import { NextUIProvider } from "@nextui-org/react";
 
 export const metadata: Metadata = {
   title: "Book Manager",
@@ -21,12 +19,13 @@ export default function RootLayout({
   
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <SpeedInsights />
-        <Header />
-        <ParentProvider>
-          {children}
-        </ParentProvider>
+        <NextUIProvider>
+          <ParentProvider>
+            {children}
+          </ParentProvider>
+        </NextUIProvider>
       </body>
     </html>
   );
