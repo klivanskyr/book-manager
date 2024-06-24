@@ -43,7 +43,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     }, []);
 
     function handleSignOut() {
-        const res = fetch(`${process.env.API_DOMAIN}/api/auth/logout`, {
+        const res = fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
             method: 'DELETE',
             cache: 'no-cache',
         });
