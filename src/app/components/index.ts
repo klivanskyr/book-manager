@@ -8,3 +8,4 @@ export { default as TextInput } from './TextInput';
 export { default as Navbar } from './Navbar';
 export { default as ModalElement } from './ModalElement';
 export { default as Stars } from './Stars';
+export { default as FallBackImage } from './FallBackImage';

@@ -3,13 +3,14 @@
 import { useState, useContext, useEffect } from "react";
 import { Spinner, Card, CardHeader, CardBody, CardFooter, Image} from "@nextui-org/react";
 
-import { TextInput, ActionButton, ModalElement } from "@/app/components"
+import { TextInput, ActionButton, ModalElement, FallBackImage } from "@/app/components"
 import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
 import { fetchDominantColor } from "@/app/utils/color";
 import { UserContext } from "@/app/types/UserContext";
 import { addBookToUser, removeBookFromUser } from "@/app/db";
 import { coverPlaceholder } from "@/assets";
+import NextImage from 'next/image';
 
 
 export default function BookSelect({ active, setActive }: { active: boolean, setActive: Function }) {
@@ -91,14 +92,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
                         return (
                             <Card key={book.key} className="m-2">
                                 <CardHeader className="flex justify-center mt-4">
-                                    <Image
-                                        alt="Book Cover"
-                                        className=''
-                                        src={book.coverImage}
-                                        fallbackSrc={coverPlaceholder.src}
-                                        height={150}
-                                        width={150}
-                                    />
+                                    <FallBackImage src={book.coverImage} alt="Book Cover" height={175} width={150} />
                                 </CardHeader>
                                 <CardBody className="text-center flex flex-col justify-center mt-2">
                                     <h1 className="text-lg font-medium">{book.title}</h1>
