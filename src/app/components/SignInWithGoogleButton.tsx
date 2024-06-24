@@ -25,10 +25,10 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
         });
         signInWithPopup(auth, provider)
             .then(async (result) => {
-                console.log('result', result);
+                //console.log('result', result);
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (!credential) {
-                    console.log('Error signing in with Google: no credential');
+                    //console.log('Error signing in with Google: no credential');
                     return;
                 }
                 const authUser = result.user;
@@ -38,10 +38,10 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
                 const userQuery = query(userRef, orderByValue(),  equalTo(authUser.uid));
                 const snapshot = await get(userQuery);
 
-                console.log('snapshot', snapshot);
+                //console.log('snapshot', snapshot);
 
                 if (!snapshot.exists() && authUser.email) {
-                    console.log('creating new user in database', authUser.email);
+                    //console.log('creating new user in database', authUser.email);
                     await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, no password
                 } 
 
@@ -52,7 +52,7 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
                         user_id: authUser.uid,
                         books
                 };
-                console.log('updated user', updatedUser);
+                //console.log('updated user', updatedUser);
                 setUser(updatedUser);
                 router.push(`/dashboard/${updatedUser.user_id}`);
                 return;
@@ -64,7 +64,7 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
                 const errorMessage = error.message;
                 const email = error.email;
                 const credential = GoogleAuthProvider.credentialFromError(error);
-                console.log('Error signing in with Google: ', error);
+                //console.log('Error signing in with Google: ', error);
             });
     }
 

@@ -81,7 +81,7 @@ export default function Login(): ReactElement {
     const userBooksRef = ref(database, `usersBooks/${data.userId}`);
     onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
       const books = await loadBooks(userBooksSnapshot);
-      console.log('books', books);
+      //console.log('books', books);
       const updatedUser: User = {
           user_id: data.userId,
           books
