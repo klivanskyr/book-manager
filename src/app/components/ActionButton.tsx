@@ -7,7 +7,7 @@ export default function ActionButton({ className='', disabled = false, text, onC
             type='submit'
             className={className}
             size='lg'
-            onClick={(e) => onClick()}
+            onClick={() => onClick()}
             disabled={disabled}
         >
             {text}

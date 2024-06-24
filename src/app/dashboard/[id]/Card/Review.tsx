@@ -4,7 +4,7 @@ import React, { useState, useContext, ReactElement } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import Modal from 'react-modal'
 
-import Stars from '../Shelf/Stars'
+import Stars from '../Stars'
 import { Book } from '@/app/types/Book'
 import { updateUserBook } from '@/app/db/db';
 import { UserContext } from '@/app/types/UserContext';

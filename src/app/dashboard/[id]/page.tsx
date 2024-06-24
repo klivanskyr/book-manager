@@ -1,14 +1,16 @@
 'use client';
 
 import { ReactElement, useContext, useEffect, useState } from 'react';
-import { UserContext } from '@/app/types/UserContext';
+import { User, UserContext } from '@/app/types/UserContext';
 import { useRouter } from 'next/navigation';
 
 import Shelf from './Shelf';
 import BookSelect from './BookSelect';
 import { signOut } from 'firebase/auth';
 import { Navbar, ActionButton } from "@/app/components";
-import { auth } from '@/firebase/firebase';
+import { auth, database } from '@/firebase/firebase';
+import { onValue, ref } from 'firebase/database';
+import { loadBooks } from '@/app/db';
 
 
 function Dashboard({ params }: { params: { id: string } }): ReactElement {
@@ -16,15 +18,35 @@ function Dashboard({ params }: { params: { id: string } }): ReactElement {
     const [modalActive, setModalActive] = useState(false);
     const router = useRouter();
 
+    /*
+        When redirected from login to dashboard, 
+        the user is null because they did not 'login' this session.
+        So we need to fetch their information
+    */
+    useEffect(() => {
+        const getUser = async () => {
+            if (!user) {
+                const userBooksRef = ref(database, `users/${params.id}/books`);
+                onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
+                    const books = await loadBooks(userBooksSnapshot);
+                const updatedUser: User = {
+                    user_id: params.id,
+                    books
+                };
+                console.log('updated user', updatedUser);
+                setUser(updatedUser);
+                });
+            }
+        }
 
-    // useEffect(() => {
-    //     if (!user) {
-    //         // console.log("user is null, pushing to login")
-    //         router.push('/login');
-    //     }
-    // }, [user]);
+        getUser();
+    }, []);
 
     function handleSignOut() {
+        const res = fetch('http://localhost:3000/api/auth/logout', {
+            method: 'DELETE',
+            cache: 'no-cache',
+        });
         signOut(auth)
         .then(() => {
             setUser(null);
@@ -33,10 +55,6 @@ function Dashboard({ params }: { params: { id: string } }): ReactElement {
         .catch((error) => {
             console.error(error);
         });
-    }
-
-    function handleModalClose() {
-        setModalActive(false);
     }
 
 

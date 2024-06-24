@@ -80,20 +80,20 @@ export default function Login(): ReactElement {
     }
 
     const userBooksRef = ref(database, `users/${data.userId}/books`);
-    onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
+    onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
+      console.log("Books updated");
       const books = await loadBooks(userBooksSnapshot);
       const updatedUser: User = {
           user_id: data.userId,
           books
       };
-      console.log('updated user', updatedUser);
       setUser(updatedUser);
       router.push(`/dashboard/${data.userId}`)
     });
   }
   
   function SubmitButton() {
-    const className = 'mt-1 mb-2 w-64';
+    const className = 'mt-1 mb-2 w-64 h-12';
     return isLoading 
       ? <LoadingButton className={className} color="primary" isLoading={isLoading} /> 
       : <ActionButton className={className} disabled={isLoading} text='Sign In' onClick={handleSubmit} />
@@ -105,7 +105,7 @@ export default function Login(): ReactElement {
     <PasswordInput className="my-1.5 shadow-sm rounded-md" disabled={isLoading} value={password} setValue={setPassword} error={passwordError} />,
     <Link href='#' className='px-2 pb-2 pt-6 text-blue-500 font-medium text-sm'>Forgot Password</Link>,
     <SubmitButton />,
-    <SignInWithGoogleButton className='bg-green-400 w-64 mb-2' disabled={isLoading} />,
+    <SignInWithGoogleButton className='bg-green-400 w-64 h-12 mb-2' disabled={isLoading} />,
     <div className='py-5 text-center'> Dont have an account? <Link className='font-semibold text-lg text-blue-500' href='/sign-up'>Sign up</Link></div>
   ];
 

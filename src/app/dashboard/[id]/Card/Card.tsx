@@ -6,7 +6,7 @@ import { FaTimes } from 'react-icons/fa'
 import { motion } from "framer-motion"
 
 import Review from './Review';
-import Stars  from '../Shelf/Stars'
+import Stars  from '../Stars'
 import { Book } from '@/app/types/Book';
 import { coverPlaceholder } from '@/assets'
 import { UserContext } from '@/app/types/UserContext'

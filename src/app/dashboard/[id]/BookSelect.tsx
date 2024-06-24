@@ -51,7 +51,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
 
     //handle selecting book from modal
     const handleClickAdd = async (i: number): Promise<void> => {
-        console.log('adding book', foundBooks[i])
+        console.log('adding book', foundBooks[i]);
         const [r, g, b] = await fetchDominantColor(foundBooks[i].coverImage);
         const updatedBook = { ...foundBooks[i], selected: true, bgColor: {r: Math.min(r+75, 255), g: Math.min(g+75, 255), b: Math.min(b+75, 255)}};
         setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
@@ -89,7 +89,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
                     {foundBooks.map((book: Book, i) => {
                         return (
-                            <Card key={book.id} className="m-2">
+                            <Card key={book.key} className="m-2">
                                 <CardHeader className="flex justify-center mt-4">
                                     <Image
                                         alt="Book Cover"
@@ -106,8 +106,8 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
                                 </CardBody>
                                 <CardFooter className="flex justify-center my-4">
                                     {book.selected
-                                        ? <ActionButton className='bg-red-600' text='Remove' onClick={() => handleClickAdd(i)} />
-                                        : <ActionButton className='bg-blue-600' text='Select' onClick={() => handleClickRemove(i)} />
+                                        ? <ActionButton className='bg-red-600' text='Remove' onClick={() => handleClickRemove(i)} />
+                                        : <ActionButton className='bg-blue-600' text='Select' onClick={() => handleClickAdd(i)} />
                                     }
                                 </CardFooter>
                             </Card>
