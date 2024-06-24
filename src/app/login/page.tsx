@@ -71,7 +71,6 @@ export default function Login(): ReactElement {
       cache: 'no-cache',
       body: JSON.stringify({ email, password })
     });
-    console.log('res', res);
     const data = await res.json();
     if (data.code !== 200) {
       setPasswordError(data.message);
@@ -79,10 +78,10 @@ export default function Login(): ReactElement {
       return;
     }
 
-    const userBooksRef = ref(database, `users/${data.userId}/books`);
+    const userBooksRef = ref(database, `usersBooks/${data.userId}`);
     onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
-      console.log("Books updated");
       const books = await loadBooks(userBooksSnapshot);
+      console.log('books', books);
       const updatedUser: User = {
           user_id: data.userId,
           books

@@ -4,7 +4,7 @@ import { ReactElement, useContext, useEffect, useState } from 'react';
 import { User, UserContext } from '@/app/types/UserContext';
 import { useRouter } from 'next/navigation';
 
-import Shelf from './Shelf';
+import Shelf from './Shelf/Shelf';
 import BookSelect from './BookSelect';
 import { signOut } from 'firebase/auth';
 import { Navbar, ActionButton } from "@/app/components";
@@ -13,7 +13,7 @@ import { onValue, ref } from 'firebase/database';
 import { loadBooks } from '@/app/db';
 
 
-function Dashboard({ params }: { params: { id: string } }): ReactElement {
+export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const [modalActive, setModalActive] = useState(false);
     const router = useRouter();
@@ -26,7 +26,7 @@ function Dashboard({ params }: { params: { id: string } }): ReactElement {
     useEffect(() => {
         const getUser = async () => {
             if (!user) {
-                const userBooksRef = ref(database, `users/${params.id}/books`);
+                const userBooksRef = ref(database, `usersBooks/${params.id}`);
                 onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
                     const books = await loadBooks(userBooksSnapshot);
                 const updatedUser: User = {
@@ -68,12 +68,10 @@ function Dashboard({ params }: { params: { id: string } }): ReactElement {
     ];
 
     return (
-        <div className='flex flex-col items-center h-auto'>
+        <div className='flex flex-col h-auto'>
             <BookSelect active={modalActive} setActive={setModalActive} />
-            <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-medium' leftElements={leftElements} rightElements={rightElements} />
+            <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
             <Shelf />
         </div>
     )
 }
-
-export default Dashboard;

@@ -7,3 +7,4 @@ export { default as Form } from './Form';
 export { default as TextInput } from './TextInput';
 export { default as Navbar } from './Navbar';
 export { default as ModalElement } from './ModalElement';
+export { default as Stars } from './Stars';

@@ -132,7 +132,9 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
             return (<></>)
         } else if (isLoading) {
             return (
-                <Spinner size="lg" label="Loading..." color='primary' />
+                <div className="w-full h-screen flex flex-row justify-center items-center">
+                    <Spinner size="lg" label="Loading..." color='primary' />
+                </div>
             )
         } else {
             return displayBooks();

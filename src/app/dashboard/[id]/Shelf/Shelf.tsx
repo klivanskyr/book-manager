@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useEffect, useContext, ReactElement } from 'react'
+import { useContext, useEffect, useState } from "react";
+import { Pagination } from "@nextui-org/react";
 
-import BookRow from './BookRow';
-import Arrows from './Arrows';
-import { UserContext, UserContextType } from '@/app/types/UserContext';
+import { UserContext } from "@/app/types/UserContext";
+import BookCard from "./BookCard";
 
-export default function Shelf ({ }: { }): ReactElement {
-    const { user, setUser } = useContext<UserContextType>(UserContext);
-    const [shelfIndex, setShelfIndex] = useState(0); //records which shelf is being viewed
-    const [numBooksOnShelf, setNumBooksOnShelf] = useState(5); //records number of books on shelf
-    const [numOfShelves, setNumOfShelves] = useState(1); //records number of shelves
-    const [isMobile, setIsMobile] = useState(false); //records if on mobile
+export default function Shelf() {
+    const { user, setUser } = useContext(UserContext);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
+    const [isMobile, setIsMobile] = useState(false);
 
     /*
     When window is shrunk, dynamically change the number of books on shelf
@@ -23,14 +22,14 @@ export default function Shelf ({ }: { }): ReactElement {
     ***very wide screens
     */
     useEffect(() => {
-        const handleResize = () => {
+        function handleResize() {
             if (window.innerWidth < 1023) {
                 setNumBooksOnShelf(8);
                 setIsMobile(true);
-            } else if (window.innerWidth < 1050) {
+            } else if (window.innerWidth < 1280) {
                 setNumBooksOnShelf(3);
                 setIsMobile(false);
-            } else if (window.innerWidth < 1680) {
+            } else if (window.innerWidth < 1536) {
                 setNumBooksOnShelf(4);
                 setIsMobile(false);
             } else {
@@ -43,28 +42,21 @@ export default function Shelf ({ }: { }): ReactElement {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
-    //updates number of shelves when books are added or removed
-    //If there are less books than the number of books on a shelf, there is only one shelf
-    useEffect(() => {
-        if (user) {
-            setNumOfShelves(Math.max(1, Math.ceil(user.books.length / numBooksOnShelf)));
-            if (shelfIndex >= numOfShelves) {
-                setShelfIndex(0);
-            }
-        }
-    }, [user, shelfIndex, numOfShelves]);
     
-    // handle shelf incrementing and decrementing
-    function handleClick(increment: number): void {
-        setShelfIndex((numOfShelves + shelfIndex + increment) % numOfShelves);
-    }
 
+    if (!user) { return <></> }
     return (
-        
-        <div className='w-1/2 lg:w-full h-auto scroll-smooth'>
-            <BookRow shelfIndex={shelfIndex} numBooksOnShelf={numBooksOnShelf} />
-            <Arrows isMobile={isMobile} numBooksOnShelf={numBooksOnShelf} handleClick={(handleClick)} />
+        <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
+            <div className="flex flex-col lg:flex-row justify-start items-center p-1 pb-4 lg:shadow-md rounded">
+                {user.books.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
+                    <div key={book.key}>
+                        <BookCard book={book} />
+                    </div>
+                ))}
+            </div>
+            {user.books.length > numBooksOnShelf && 
+                <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.books.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
+            }
         </div>
     )
 }
