@@ -2,14 +2,14 @@
 
 import { Image } from "@nextui-org/react";
 import NextImage from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 
-export default function FallBackImage({ src, alt, width, height }: { src: string, alt: string, width: number, height: number }) {
+export default function FallBackImage({ className='', src, alt, width, height }: { className?: string, src: string, alt: string, width: number, height: number }) {
     const [curSrc, setCurSrc] = useState(src);
 
     return (
         <Image
-            className="h-auto"
+            className={className}
             as={NextImage}
             src={src}
             alt={alt}

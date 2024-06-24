@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useContext } from 'react'
-import { FaStar } from 'react-icons/fa'
+import React, { useContext } from 'react';
+import { FaStar } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
-import { Book } from '@/app/types/Book'
-import { UserContext } from '@/app/types/UserContext'
-import { updateUserBook } from '@/app/db/db'
+import { Book } from '@/app/types/Book';
+import { UserContext } from '@/app/types/UserContext';
+import { updateUserBook } from '@/app/db/db';
 
 const Stars = ({ size, book }: { size: number, book: Book }) => {
   const { user, setUser } = useContext(UserContext);
@@ -24,6 +25,10 @@ const Stars = ({ size, book }: { size: number, book: Book }) => {
   return (
     <div className='flex flex-row justify-center text-center pb-2'>
         {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.1 }}
+          >
             <FaStar 
                 key={i} 
                 color={i < book.rating ? '#01af93' : '#bbbbbb'} 
@@ -31,6 +36,7 @@ const Stars = ({ size, book }: { size: number, book: Book }) => {
                 size={size}
                 className='mt-2'
             />
+          </motion.div>
         ))}
     </div>
   )

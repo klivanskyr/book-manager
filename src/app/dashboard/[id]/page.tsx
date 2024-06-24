@@ -33,7 +33,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
                     user_id: params.id,
                     books
                 };
-                console.log('updated user', updatedUser);
+                //console.log('updated user', updatedUser);
                 setUser(updatedUser);
                 });
             }

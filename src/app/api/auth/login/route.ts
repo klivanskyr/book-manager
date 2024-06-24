@@ -15,12 +15,12 @@ export async function POST(req: NextRequest) {
 
     const userObj = await getUserByEmail(email);
     if (!userObj) {
-        console.log("User not found", email)
+        //console.log("User not found", email)
         return NextResponse.json({ code: 404, message: "User not found" });
     }
 
     if (!userObj.password) {
-        console.log("User signed in with Google. Please sign in with Google.")
+        //console.log("User signed in with Google. Please sign in with Google.")
         return NextResponse.json({ code: 400, message: "User signed in with Google. Please sign in with Google." });
     }
 

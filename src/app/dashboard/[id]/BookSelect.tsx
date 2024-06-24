@@ -1,16 +1,13 @@
 'use client';
 
 import { useState, useContext, useEffect } from "react";
-import { Spinner, Card, CardHeader, CardBody, CardFooter, Image} from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 
-import { TextInput, ActionButton, ModalElement, FallBackImage } from "@/app/components"
+import { TextInput, ActionButton, ModalElement } from "@/app/components"
 import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
-import { fetchDominantColor } from "@/app/utils/color";
 import { UserContext } from "@/app/types/UserContext";
-import { addBookToUser, removeBookFromUser } from "@/app/db";
-import { coverPlaceholder } from "@/assets";
-import NextImage from 'next/image';
+import BookSelectCard from "./BookSelectCard";
 
 
 export default function BookSelect({ active, setActive }: { active: boolean, setActive: Function }) {
@@ -20,6 +17,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
+    const [buttonsDisabled, setButtonsDisabled] = useState(false);
 
     //When user begins to write in search bar, clear error message
     useEffect(() => {
@@ -50,29 +48,6 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         setFoundBooks(books);
     }
 
-    //handle selecting book from modal
-    const handleClickAdd = async (i: number): Promise<void> => {
-        console.log('adding book', foundBooks[i]);
-        const [r, g, b] = await fetchDominantColor(foundBooks[i].coverImage);
-        const updatedBook = { ...foundBooks[i], selected: true, bgColor: {r: Math.min(r+75, 255), g: Math.min(g+75, 255), b: Math.min(b+75, 255)}};
-        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        if (user) {
-            await addBookToUser(updatedBook, user.user_id);
-        } 
-    }
-
-    //handle removing book from modal
-    const handleClickRemove = async (i: number): Promise<void>  => {
-        const updatedBook = { ...foundBooks[i], selected: false };
-        setFoundBooks(foundBooks.map((book, index) => index === i ? updatedBook : book));
-        if (user) { //IF STATEMENT ON USER
-            //Find book in user books where it will have an id.
-            const userBookRef = user.books.find((book) => book.key === foundBooks[i].key);
-            if (!userBookRef) { return; } //Not possible to remove book that is not in user books
-            await removeBookFromUser(userBookRef.id, user.user_id)
-        };
-    }
-
     const handleClick = async () => {
         setSubmitted(true);
         setIsLoading(true);
@@ -82,31 +57,24 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         setIsLoading(false);
     }
 
+    function updateFoundBooks(updatedBook: Book) {
+        const updatedBooks = foundBooks.map((book) => {
+            if (book.key === updatedBook.key) {
+                return updatedBook;
+            } else {
+                return book;
+            }
+        });
+        setFoundBooks(updatedBooks);
+    }
+
     function displayBooks() {
         if (foundBooks.length === 0 && submitted) {
             return (<></>)
         } else {
             return(
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
-                    {foundBooks.map((book: Book, i) => {
-                        return (
-                            <Card key={book.key} className="m-2">
-                                <CardHeader className="flex justify-center mt-4">
-                                    <FallBackImage src={book.coverImage} alt="Book Cover" height={175} width={150} />
-                                </CardHeader>
-                                <CardBody className="text-center flex flex-col justify-center mt-2">
-                                    <h1 className="text-lg font-medium">{book.title}</h1>
-                                    <h2 className="text-lg"> {book.author}</h2>
-                                </CardBody>
-                                <CardFooter className="flex justify-center my-4">
-                                    {book.selected
-                                        ? <ActionButton className='bg-red-600' text='Remove' onClick={() => handleClickRemove(i)} />
-                                        : <ActionButton className='bg-blue-600' text='Select' onClick={() => handleClickAdd(i)} />
-                                    }
-                                </CardFooter>
-                            </Card>
-                        )})
-                    }
+                    {foundBooks.map((book: Book, i) => <BookSelectCard key={book.key} book={book} updateFoundBooks={updateFoundBooks}/>)}
                 </div>
             )
         }
