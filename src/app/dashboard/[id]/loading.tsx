@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 
 function loading(): ReactElement {
     return (
-        <div>loading dashboard...</div>
+        <div>loading dashboard</div>
     )
 }
 
