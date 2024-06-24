@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
 
         const token = cookie?.value;
 
-        const res = await fetch('/api/auth/verify', {
+        const res = await fetch(`${process.env.API_DOMAIN}/api/auth/verify`, {
             method: 'POST',
             cache: 'no-cache',
             headers: {
