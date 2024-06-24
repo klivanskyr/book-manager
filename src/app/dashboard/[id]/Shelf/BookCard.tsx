@@ -23,7 +23,7 @@ export default function BookCard ({ book }: { book: Book }) {
     return (
         <div>
             <Review active={reviewActive} book={book} setReviewActive={setReviewActive} />
-            <Card className="w-[380px] lg:w-[400px] xl:w-[340px] 2xl:w-[350px] h-[450px] m-2 hover:cursor-pointer" key={book.key} style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}>
+            <Card className="w-[360px] lg:w-[400px] xl:w-[340px] 2xl:w-[350px] h-[440px] m-2 hover:cursor-pointer" key={book.key} style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}>
                 <CardHeader className="flex flex-col justify-start items-start w-full" onClick={() => setReviewActive(true)}>
                     <Button className='bg-transparent h-6' isIconOnly onClick={handleRemoveBook}><FaTimes /></Button>
                     <div className='w-full flex flex-row justify-center center-items' >
