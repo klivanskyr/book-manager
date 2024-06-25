@@ -66,7 +66,7 @@ export default function Signup() {
             });
         })
         .catch((error) => {
-            setEmailError('Email already has auth account');
+            setEmailError('Email already assigned to account');
             setIsLoading(false);
             setUsername('');
             setEmail('');
