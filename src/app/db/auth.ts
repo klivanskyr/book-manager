@@ -5,6 +5,9 @@ export async function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
+    provider.setCustomParameters({
+        prompt: 'select_account'
+    });
     
     try {
         await signInWithRedirect(auth, provider);
