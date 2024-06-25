@@ -5,7 +5,7 @@ import { database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
 
 export async function createNewUser(uid: string, username: string, email: string, password: string | null) {
-
+  
   if (password) {
     genSalt(10)
     .then((salt) => hash(password, salt))
@@ -16,6 +16,7 @@ export async function createNewUser(uid: string, username: string, email: string
         email,
         password: hashedPassword,
         createdAt: serverTimestamp(),
+        loginMethod: 'email'
       };
 
       return set(ref(database, `users/${uid}`), userInfo);
@@ -26,6 +27,7 @@ export async function createNewUser(uid: string, username: string, email: string
       email,
       password: null,
       createdAt: serverTimestamp(),
+      loginMethod: 'google'
     };
 
     return set(ref(database, `users/${uid}`), userInfo);

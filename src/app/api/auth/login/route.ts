@@ -19,9 +19,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ code: 404, message: "User not found" });
     }
 
-    if (!userObj.password) {
-        //console.log("User signed in with Google. Please sign in with Google.")
-        return NextResponse.json({ code: 400, message: "User signed in with Google. Please sign in with Google." });
+    if (userObj.loginMethod === 'google') {
+        const token = jwt.sign(
+            { userId: userObj.id },
+            process.env.JWT_SECRET as string,
+            { expiresIn: "1h" }
+        );
+        const res = NextResponse.json({ code: 200, message: "Logged in", userId: userObj.id });
+        res.cookies.set('token', token);
+        return res;
     }
 
     if (await compare(password, userObj.password)) {
