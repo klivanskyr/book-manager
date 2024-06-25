@@ -25,21 +25,21 @@ export default function BookCard ({ book }: { book: Book }) {
             <Card className="w-auto h-[440px] m-2 hover:cursor-pointer" key={book.key} style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}>
                 <CardHeader className="flex flex-col justify-start items-start w-full" onClick={() => setReviewActive(true)}>
                     <Button className='bg-transparent h-6' isIconOnly onClick={handleRemoveBook}><FaTimes /></Button>
-                    <div className='w-full flex flex-row justify-center center-items' >
+                    <div className='w-full min-h-[200px] flex flex-row justify-center center-items' >
                         <FallBackImage
-                            className='w-full flex flex-row justify-center items-center'
+                            className='w-[130] flex flex-row justify-center items-center'
                             alt="Book Cover"
                             src={book.coverImage}
-                            width={140}
-                            height={140}
+                            width={130}
+                            height={200}
                         />
                     </div>
                 </CardHeader>
                 <CardBody className="text-center flex flex-col justify-center mt-2 overflow-hidden" onClick={() => setReviewActive(true)}>
-                    <h1 className="text-lg font-medium">{book.title}</h1>
-                    <h2 className="text-lg"> {book.author}</h2>
+                    <h1 className="text-lg font-medium mx-2">{book.title}</h1>
+                    <h2 className="text-lg mx-2"> {book.author}</h2>
                 </CardBody>
-                <CardFooter className="flex justify-center my-4">
+                <CardFooter className="flex justify-center -mt-4">
                     <Stars book={book} size={25} />
                 </CardFooter>
             </Card>

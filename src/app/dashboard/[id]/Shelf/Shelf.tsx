@@ -49,7 +49,7 @@ export default function Shelf() {
     return (
         <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
             <motion.div
-                className="flex flex-col lg:flex-row justify-start items-center w-11/12 p-1 pb-4 lg:shadow-md rounded"
+                className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4 lg:shadow-md rounded"
                 key={currentPage}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -57,7 +57,7 @@ export default function Shelf() {
             >
                 {user.books.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
                     <motion.div key={book.key}
-                        className='w-full'
+                        className='w-full min-w-[300px]'
                         whileHover={{ scale: 1.03 }}
                     >
                         <BookCard book={book} />
