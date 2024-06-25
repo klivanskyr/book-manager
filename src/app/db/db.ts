@@ -1,4 +1,4 @@
-import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, onValue, DataSnapshot } from "firebase/database";
+import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, DataSnapshot } from "firebase/database";
 import { genSalt, hash } from 'bcrypt-ts';
 
 import { database } from '@/firebase/firebase';

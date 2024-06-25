@@ -17,7 +17,7 @@ export async function queryOpenLibrary(query: string): Promise<NextResponse> {
         const res = await fetch(`${baseBookUrl}${query_hypenless}`);
         const data = await res.json();
         if (data.docs.length == 0){
-            return NextResponse.json({ code: 400, message: `No books found with ISBN ${query}.` });
+            return NextResponse.json({ code: 400, message: `No books found with ${query}.` });
         }
         
         const books: Book[] = data.docs
