@@ -85,9 +85,9 @@ export default function Signup() {
 
     const formElements = [
         <h1 className='pt-5 pb-8 text-2xl font-semibold'>Create an account</h1>,
-        <TextInput className="my-1.5 shadow-sm rounded-md" disabled={isLoading} label='Username' value={username} setValue={setUsername} error={usernameError} />,
-        <EmailInput className="my-1.5 shadow-sm rounded-md" disabled={isLoading} value={email} setValue={setEmail} error={emailError} />,
-        <PasswordInput className="my-1.5 shadow-sm rounded-md" disabled={isLoading} value={password} setValue={setPassword} error={passwordError} />,
+        <TextInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" radius='md' disabled={isLoading} label='Username' value={username} setValue={setUsername} error={usernameError} />,
+        <EmailInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={email} setValue={setEmail} error={emailError} />,
+        <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={password} setValue={setPassword} error={passwordError} />,
         <SubmitButton />,
         <div className='py-5 text-center'> Already have an account? <Link className='font-semibold text-lg text-blue-500' href='/login'>Sign In</Link></div>
     ];

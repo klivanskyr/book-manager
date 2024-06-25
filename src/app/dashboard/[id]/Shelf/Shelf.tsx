@@ -46,6 +46,17 @@ export default function Shelf() {
     
 
     if (!user) { return <></> }
+    if (user.books.length === 0) {
+        return (
+            <div className='flex flex-row justify-center items-center w-full h-full'>
+                <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
+                    <h1 className='text-xl mx-1' >Woah...</h1>
+                    <h1 className='text-xl mx-1' >looking a little empty here.</h1>
+                    <h1 className='text-xl mx-1' >Let's add a book!</h1>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
             <motion.div
