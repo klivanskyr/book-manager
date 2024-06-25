@@ -4,8 +4,7 @@ import { FallBackImage, Stars } from "@/app/components";
 import { removeBookFromUser } from "@/app/db";
 import { Book } from "@/app/types/Book";
 import { UserContext } from "@/app/types/UserContext";
-import { coverPlaceholder } from "@/assets";
-import { Button, Card, CardBody, CardFooter, CardHeader, Image } from "@nextui-org/react";
+import { Button, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
 import { useContext, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import Review from "./Review";
@@ -21,29 +20,29 @@ export default function BookCard ({ book }: { book: Book }) {
     }
 
     return (
-        <div>
+        <>
             <Review active={reviewActive} book={book} setReviewActive={setReviewActive} />
-            <Card className="w-[360px] lg:w-[400px] xl:w-[340px] 2xl:w-[350px] h-[440px] m-2 hover:cursor-pointer" key={book.key} style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}>
+            <Card className="w-auto h-[440px] m-2 hover:cursor-pointer" key={book.key} style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}>
                 <CardHeader className="flex flex-col justify-start items-start w-full" onClick={() => setReviewActive(true)}>
                     <Button className='bg-transparent h-6' isIconOnly onClick={handleRemoveBook}><FaTimes /></Button>
-                    <div className='w-full flex flex-row justify-center center-items' >
+                    <div className='w-full min-h-[200px] flex flex-row justify-center center-items' >
                         <FallBackImage
-                            className='w-full flex flex-row justify-center items-center'
+                            className='w-[130] flex flex-row justify-center items-center'
                             alt="Book Cover"
                             src={book.coverImage}
-                            width={140}
-                            height={140}
+                            width={130}
+                            height={200}
                         />
                     </div>
                 </CardHeader>
                 <CardBody className="text-center flex flex-col justify-center mt-2 overflow-hidden" onClick={() => setReviewActive(true)}>
-                    <h1 className="text-lg font-medium">{book.title}</h1>
-                    <h2 className="text-lg"> {book.author}</h2>
+                    <h1 className="text-lg font-medium mx-2">{book.title}</h1>
+                    <h2 className="text-lg mx-2"> {book.author}</h2>
                 </CardBody>
-                <CardFooter className="flex justify-center my-4">
+                <CardFooter className="flex justify-center -mt-4">
                     <Stars book={book} size={25} />
                 </CardFooter>
             </Card>
-        </div>
+        </>
     )
 }

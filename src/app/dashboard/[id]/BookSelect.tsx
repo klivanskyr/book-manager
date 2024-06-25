@@ -1,23 +1,20 @@
 'use client';
 
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Spinner } from "@nextui-org/react";
 
 import { TextInput, ActionButton, ModalElement } from "@/app/components"
 import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
-import { UserContext } from "@/app/types/UserContext";
 import BookSelectCard from "./BookSelectCard";
 
 
 export default function BookSelect({ active, setActive }: { active: boolean, setActive: Function }) {
-    const { user, setUser } = useContext(UserContext);
     const [text, setText] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
-    const [buttonsDisabled, setButtonsDisabled] = useState(false);
 
     //When user begins to write in search bar, clear error message
     useEffect(() => {
@@ -83,7 +80,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     function Header() {
         return (
             <form className="flex w-full" onSubmit={undefined}>
-                <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by ISBN' value={text} setValue={setText} error={error} />
+                <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by Title, Author or ISBN' value={text} setValue={setText} error={error} />
                 <ActionButton className="w-8 h-16 rounded-l-none rounded-t-lg rounded-r-lg rounded-b-lg shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
             </form>
         )
