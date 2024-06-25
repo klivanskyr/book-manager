@@ -24,17 +24,13 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
             getRedirectResult(auth)
             .then(async (result) => {
                 if (!result) {
-                    // console.log('No result', result);
                     return;
                 }
 
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (!credential) {
-                    // console.log('No credential');
                     return;
                 }
-
-                console.log('Sign in with Google successful');
 
                 const authUser = result.user.providerData[0];
                 //create user in database if needed
@@ -42,9 +38,7 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
                 const userQuery = query(userRef, orderByValue(),  equalTo(authUser.uid));
                 const snapshot = await get(userQuery);
                 
-                // console.log('authUser', authUser);
                 if (!snapshot.exists() && authUser.email) {
-                    //console.log('creating new user in database', authUser.email);
                     await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, null password
                 } 
 
@@ -55,7 +49,6 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
                         user_id: authUser.uid,
                         books
                 };
-                console.log('updated user', updatedUser);
                 setUser(updatedUser);
                 });
 
@@ -67,20 +60,16 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
                     },
                     body: JSON.stringify({ email: authUser.email, password: null })
                 });
-                // console.log('res', res);
 
                 const data = await res.json();
-                // console.log('data', data);
                 if (data.code !== 200) {
-                    console.log('Error creating JWT token:', data.message);
                     return;
                 } else { 
-                    console.log('JWT token created');
                     router.push(`/dashboard/${authUser.uid}`)
                 }
             })
             .catch((error) => {
-                console.log(error);
+                return;
             });
         }
 

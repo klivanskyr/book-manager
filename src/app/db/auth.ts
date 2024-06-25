@@ -8,17 +8,15 @@ export async function signInWithGoogle() {
     
     try {
         await signInWithRedirect(auth, provider);
-        console.log('Sign in with Google successful');
     } catch (error) {
-        console.log(error);
+        return;
     }
 }
 
 export async function signOut() {
     try {
         await auth.signOut();
-        console.log('Sign out successful');
     } catch (error) {
-        console.log(error);
+        return;
     }
 }

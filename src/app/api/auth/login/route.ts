@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
 
     const userObj = await getUserByEmail(email);
     if (!userObj) {
-        //console.log("User not found", email)
         return NextResponse.json({ code: 404, message: "User not found" });
     }
 
