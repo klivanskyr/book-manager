@@ -53,7 +53,6 @@ export default function Signup() {
         .then((userCredential) => {
             createNewUser(userCredential.user.uid, username, email, password) //Create user in database
             .then(() => {
-                ////console.log(`User ${username} added successfully`);
                 setIsLoading(false);
                 router.push('/login');
             })
@@ -72,8 +71,6 @@ export default function Signup() {
             setUsername('');
             setEmail('');
             setPassword('');
-            //console.log('Error creating auth user: ', error);
-
         });
     }
 

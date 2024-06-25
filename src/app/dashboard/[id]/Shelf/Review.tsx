@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useContext, ReactElement } from 'react'
-import { FaTimes } from 'react-icons/fa'
 import ModalElement from '@/app/components/ModalElement'
 
 import Stars from '@/app/components/Stars'
@@ -17,8 +16,9 @@ export default function Review({ active, book, setReviewActive }: { active: bool
 
   async function handleInputChange(e: any) {
     if (user) {
-      setReview(e.target.value);
-      const newBook = { ...book, review: review };
+      const updatedReview = e.target.value;
+      setReview(updatedReview);
+      const newBook = { ...book, review: updatedReview };
       await updateUserBook(newBook, user.user_id);
     }
   }

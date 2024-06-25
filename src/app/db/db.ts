@@ -1,11 +1,11 @@
-import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, onValue, DataSnapshot } from "firebase/database";
+import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, DataSnapshot } from "firebase/database";
 import { genSalt, hash } from 'bcrypt-ts';
 
 import { database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
 
 export async function createNewUser(uid: string, username: string, email: string, password: string | null) {
-
+  
   if (password) {
     genSalt(10)
     .then((salt) => hash(password, salt))
@@ -16,6 +16,7 @@ export async function createNewUser(uid: string, username: string, email: string
         email,
         password: hashedPassword,
         createdAt: serverTimestamp(),
+        loginMethod: 'email'
       };
 
       return set(ref(database, `users/${uid}`), userInfo);
@@ -26,6 +27,7 @@ export async function createNewUser(uid: string, username: string, email: string
       email,
       password: null,
       createdAt: serverTimestamp(),
+      loginMethod: 'google'
     };
 
     return set(ref(database, `users/${uid}`), userInfo);
@@ -69,10 +71,8 @@ export async function getUserByEmail(email: string) {
     const userData = snapshot.val();
     const userId = Object.keys(userData)[0]; // email is unique so only 1
 
-    ////console.log('got user', userId, userData[userId])
     return { id: userId, ...userData[userId] }
   } else {
-    ////console.log('no user found')
     return null;
   }
 }
@@ -87,7 +87,6 @@ export async function loadBooks(snapshot: DataSnapshot) {
   if (!snapshot.exists()) {return []}
 
   const bookReviews: [string, BookReview][] = Object.entries(snapshot.val());
-  ////console.log('bookReviews', bookReviews);
 
   let books = [];
   for (let [bookId, bookReviewObject] of bookReviews) {
@@ -113,7 +112,6 @@ export async function loadBooks(snapshot: DataSnapshot) {
     books.push(book);
   }
 
-  ////console.log("found books from firebase", books);
   return books;
 }
 
