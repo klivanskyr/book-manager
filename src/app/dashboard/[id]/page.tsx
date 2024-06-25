@@ -42,8 +42,8 @@ export default function Dashboard({ params }: { params: { id: string } }): React
         getUser();
     }, []);
 
-    function handleSignOut() {
-        const res = fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
+    const handleSignOut = async () => {
+        await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
             method: 'DELETE',
             cache: 'no-cache',
         });

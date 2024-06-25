@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useContext, ReactElement } from 'react'
-import { FaTimes } from 'react-icons/fa'
 import ModalElement from '@/app/components/ModalElement'
 
 import Stars from '@/app/components/Stars'
