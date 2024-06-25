@@ -1,10 +1,10 @@
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ref, onValue, query, orderByValue, equalTo, get } from 'firebase/database';
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { ref, onValue, query, orderByValue, equalTo, get, set } from 'firebase/database';
+import { GoogleAuthProvider, getRedirectResult } from "firebase/auth";
 import { database, auth } from "@/firebase/firebase";
 
 import { User, UserContext } from "@/app/types/UserContext";
@@ -12,37 +12,34 @@ import { createNewUser, loadBooks } from "@/app/db";
 import { Button } from '@nextui-org/react';
 import { googleG } from '@/assets';
 import Image from 'next/image';
+import { signInWithGoogle } from '../db/auth';
 
 export default function SignInWithGoogleButton({ className='', disabled = false }: { className?: string, disabled?: boolean }) {
     const { user, setUser } = useContext(UserContext);
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    function handlePress() {
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({
-            prompt: 'select_account',
-            display: 'popup'
-        });
-        signInWithPopup(auth, provider)
+    useEffect(() => {
+        const googleSignInResult = async () => {
+            getRedirectResult(auth)
             .then(async (result) => {
-                //console.log('result', result);
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                if (!credential) {
-                    //console.log('Error signing in with Google: no credential');
+                if (!result) {
                     return;
                 }
-                const authUser = result.user;
 
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                if (!credential) {
+                    return;
+                }
+
+                const authUser = result.user.providerData[0];
                 //create user in database if needed
                 const userRef = ref(database, `users`);
                 const userQuery = query(userRef, orderByValue(),  equalTo(authUser.uid));
                 const snapshot = await get(userQuery);
-
-                //console.log('snapshot', snapshot);
-
+                
                 if (!snapshot.exists() && authUser.email) {
-                    //console.log('creating new user in database', authUser.email);
-                    await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, no password
+                    await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, null password
                 } 
 
                 const userBooksRef = ref(database, `usersBooks/${authUser.uid}`);
@@ -52,20 +49,38 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
                         user_id: authUser.uid,
                         books
                 };
-                //console.log('updated user', updatedUser);
                 setUser(updatedUser);
-                router.push(`/dashboard/${updatedUser.user_id}`);
-                return;
-            });
-                
+                });
+
+                //create jwt token
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: authUser.email, password: null })
+                });
+
+                const data = await res.json();
+                if (data.code !== 200) {
+                    return;
+                } else { 
+                    router.push(`/dashboard/${authUser.uid}`)
+                }
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                const email = error.email;
-                const credential = GoogleAuthProvider.credentialFromError(error);
-                //console.log('Error signing in with Google: ', error);
+                return;
             });
+        }
+
+        googleSignInResult();
+        setIsLoading(false);
+
+    }, [router]);
+
+    const handlePress = async () => {
+        setIsLoading(true);
+        await signInWithGoogle();
     }
 
     return (
@@ -76,12 +91,9 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
             size='lg'
             onPress={() => handlePress()}
             disabled={disabled}
+            isLoading={isLoading}
         >
             Sign in with Google <Image src={googleG} alt='Google Icon' height={30} width={30} />
         </Button>
     )
-    
-
-
-
 }
