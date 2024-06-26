@@ -3,7 +3,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ref, onValue, query, orderByValue, equalTo, get, set } from 'firebase/database';
+import { ref, onValue, query, orderByValue, equalTo, get } from 'firebase/database';
 import { GoogleAuthProvider, getRedirectResult } from "firebase/auth";
 import { database, auth } from "@/firebase/firebase";
 
@@ -24,22 +24,31 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
             getRedirectResult(auth)
             .then(async (result) => {
                 if (!result) {
+                    console.log('No result from Google Sign In');
                     return;
                 }
 
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (!credential) {
+                    console.log('No credential from Google Sign In');
                     return;
                 }
 
                 const authUser = result.user.providerData[0];
+
                 //create user in database if needed
                 const userRef = ref(database, `users`);
                 const userQuery = query(userRef, orderByValue(),  equalTo(authUser.uid));
                 const snapshot = await get(userQuery);
                 
                 if (!snapshot.exists() && authUser.email) {
-                    await createNewUser(authUser.uid, authUser.displayName ? authUser.displayName : authUser.email, authUser.email, null); //set email to username, null password
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/sign-up`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username: authUser.displayName, email: authUser.email, uid: authUser.uid, createdWith: 'google' })
+                    });
                 } 
 
                 const userBooksRef = ref(database, `usersBooks/${authUser.uid}`);

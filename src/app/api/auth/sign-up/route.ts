@@ -8,38 +8,44 @@ type CreatedWith = 'email' | 'google';
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { username, email, password, createdWith }: { username: string, email: string, password: string, createdWith: CreatedWith } = body;
+        const { username, email, password, uid, createdWith }: { username: string, email: string, password: string, uid: string, createdWith: CreatedWith } = body;
 
-        if (!username || !email || !password || !createdWith) {
-            return NextResponse.json({ code: 400, message: 'Missing parameters, requires username, email, password, createdWith' });
+        if (!username || !email || !createdWith) { //password is not required for google sign-in
+            return NextResponse.json({ code: 400, message: 'Missing parameters, requires username, email, createdWith' });
         }
         
-        let uid = '';
         // Create user in Firebase Auth
         if (createdWith === 'email') {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                uid = userCredential.user.uid;
+
+                //Create user in database
+                const userInfo = {
+                    username: username,
+                    email: email,
+                    createdWith: createdWith,
+                    createdAt: serverTimestamp()
+                };
+
+                await set(ref(database, `users/${userCredential.user.uid}`), userInfo);
+                return NextResponse.json({ code: 200, message: 'success' });
+
             } catch (error) {
                 return NextResponse.json({ code: 500, message: `Error creating user: ${error}` });
             }
-        }
+        } else if (createdWith === 'google') {
+            //When loging in with google, the user is automatically created in in auth
 
-        //Create user in database
-        const userInfo = {
-            username: username,
-            email: email,
-            createdWith: createdWith,
-            createdAt: serverTimestamp()
-        };
+            //Create user in database
+            const userInfo = {
+                username: username,
+                email: email,
+                createdWith: createdWith,
+                createdAt: serverTimestamp()
+            };
 
-        if (uid) { //if uid was not set, there was an error creating the user
-            console.log('Creating user:', userInfo)
             await set(ref(database, `users/${uid}`), userInfo);
             return NextResponse.json({ code: 200, message: 'success' });
-        } else {
-            console.log('Error creating user: uid undefined');
-            return NextResponse.json({ code: 500, message: 'Error creating user: uid undefined' });
         }
 
     } catch (error) {
