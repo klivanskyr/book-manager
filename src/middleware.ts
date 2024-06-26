@@ -23,16 +23,7 @@ export async function middleware(req: NextRequest) {
             }
         });
 
-        if (!res.ok) {
-            console.error('Error fetching auth verification:', res.statusText);
-            return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
-        }
-
-        const data = await res.json().catch(err => {
-            console.error('Error parsing JSON:', err);
-            throw new Error('Invalid JSON response');
-        });
-
+        const data = await res.json();
         if (data.code !== 200 && req.nextUrl.pathname !== '/login') {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
