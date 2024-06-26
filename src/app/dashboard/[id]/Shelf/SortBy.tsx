@@ -1,7 +1,10 @@
+import { loadBooks } from "@/app/db";
+import { loadBook } from "@/app/db/db";
 import { UserContext } from "@/app/types/UserContext";
 import { database } from "@/firebase/firebase";
 import { Select, SelectItem } from "@nextui-org/react";
-import { onValue, orderByChild, orderByValue, query, ref } from "firebase/database";
+import { on } from "events";
+import { Query, child, limitToFirst, limitToLast, onValue, orderByChild, orderByKey, orderByValue, query, ref, startAt } from "firebase/database";
 import { useContext, useEffect, useState } from "react";
 
 const enum SortOptions {
@@ -30,17 +33,77 @@ export default function SortBy() {
         { key : SortOptions.AddedOldest, value: SortOptions.AddedOldest },
         { key : SortOptions.RatingHL, value: SortOptions.RatingHL },
         { key : SortOptions.RatingLH, value: SortOptions.RatingLH },
-        { key : SortOptions.ReviewLengthHL, value: SortOptions.ReviewLengthHL },
-        { key : SortOptions.ReviewLengthLH, value: SortOptions.ReviewLengthLH },
     ]
+
+    type Order = 'default' | 'reversed';
+    const orderBooksByChild = (child: string, order: Order) => {
+        if (!user) return;
+        if (order === 'default') {
+            const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToFirst(100)); //100 should be replaced with number of books on shelf
+            onValue(bookQuery, async (snapshot) => {
+                let childBookPromises: any[] = [];
+                snapshot.forEach((childSnapshot) => {
+                    childBookPromises.push(loadBook(childSnapshot));
+                });
+                const childBooks = await Promise.all(childBookPromises);
+                setUser({ ...user, books: childBooks })
+            });
+        } else {
+            const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToLast(100)); //100 should be replaced with number of books on shelf
+            onValue(bookQuery, async (snapshot) => {
+                let childBookPromises: any[] = [];
+                snapshot.forEach((childSnapshot) => {
+                    childBookPromises.push(loadBook(childSnapshot));
+                });
+                const childBooks = await Promise.all(childBookPromises);
+                setUser({ ...user, books: childBooks.reverse() });
+            });
+        } 
+    }
 
     useEffect(() => {
         if (!user) return;
-        console.log('Sorting by:', value);
-        if (value === SortOptions.TitleAZ) {
-            const titleAZref = query(ref(database, `usersBooks/${user.user_id}`), orderByChild('title'));
+        switch (value) {
+            case SortOptions.TitleAZ: {
+                orderBooksByChild('title', 'default');
+                break;
+            }
+            case SortOptions.TitleZA: {
+                orderBooksByChild('title', 'reversed');
+                break;
+            }
+            case SortOptions.AuthorAZ: {
+                orderBooksByChild('author', 'default');
+                break;
+            }
+
+            case SortOptions.AuthorZA: {
+                orderBooksByChild('title', 'reversed');
+                break;
+            }
+
+            case SortOptions.AddedNewest: {
+                orderBooksByChild('createdAt', 'default');
+                break;
+            }
+
+            case SortOptions.AddedOldest: {
+                orderBooksByChild('createdAt', 'reversed');
+                break;
+            }
+
+            case SortOptions.RatingLH: {
+                orderBooksByChild('rating', 'default');
+                break;
+            }
+
+            case SortOptions.RatingHL: {
+                orderBooksByChild('rating', 'reversed');
+                break;
+            }
         }
-    }, [user, value]);
+
+    }, [value]);
 
 
     

@@ -10,7 +10,7 @@ import { addBookToUser, removeBookFromUser } from "@/app/db";
 export default function BookSelectCard({ book, updateFoundBooks }: { book: Book, updateFoundBooks: Function }) {
     const { user, setUser } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
-
+    
     //handle selecting book from modal
     const handleClickAdd = async (): Promise<void> => {
         setIsLoading(true);

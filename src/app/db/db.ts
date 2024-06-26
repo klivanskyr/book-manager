@@ -54,6 +54,33 @@ type BookReview = {
   text: string,
 };
 
+export async function loadBook(snapshot: DataSnapshot) {
+  if (!snapshot.exists()) {return null}
+
+  const bookReview = snapshot.val();
+
+  const bookRef = ref(database, `books/${snapshot.key}`);
+  const bookSnapshot = await get(bookRef);
+
+  if (!bookSnapshot.exists()) {return null} //Book was under userbooks but not in books, handle error
+
+  const bookData = bookSnapshot.val();
+  const book: Book = {
+    id: snapshot.key as string,
+    key: bookData?.key,
+    title: bookData?.title,
+    author: bookData?.author,
+    review: bookReview.text,
+    rating: bookReview.rating,
+    isbn: bookData?.isbn,
+    coverImage: bookData?.coverUrl,
+    bgColor: {r: bookData?.bgColor?.r, g: bookData?.bgColor?.g, b: bookData?.bgColor?.b},
+    imgLoaded: false,
+    selected: true
+  }
+  return book;
+}
+
 export async function loadBooks(snapshot: DataSnapshot) {
   if (!snapshot.exists()) {return []}
 
@@ -118,8 +145,10 @@ export async function removeBookFromUser(bookId: string, userId: string) {
 }
 
 export async function updateUserBook(updatedBook: Book, userId: string) {
-  const userBookRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`);
-  set(userBookRef, { text: updatedBook.review, rating: updatedBook.rating });
+  const usersBooksRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`)
+  const snapshot = await get(usersBooksRef);
+  const val = snapshot.val();
+  set(usersBooksRef, { ...val, text: updatedBook.review, rating: updatedBook.rating });
   return;
 }
 

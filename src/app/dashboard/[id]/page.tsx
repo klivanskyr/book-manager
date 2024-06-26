@@ -24,23 +24,20 @@ export default function Dashboard({ params }: { params: { id: string } }): React
         the user is null because they did not 'login' this session.
         So we need to fetch their information
     */
-    // useEffect(() => {
-    //     const getUser = async () => {
-    //         if (!user) {
-    //             const userBooksRef = ref(database, `usersBooks/${params.id}`);
-    //             onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
-    //                 const books = await loadBooks(userBooksSnapshot);
-    //             const updatedUser: User = {
-    //                 user_id: params.id,
-    //                 books
-    //             };
-    //             setUser(updatedUser);
-    //             });
-    //         }
-    //     }
+    useEffect(() => {
+        const getUser = async () => {
+            if (!user || !user.user_id) {
+                const userBooksRef = ref(database, `usersBooks/${params.id}`);
+                const updatedUser: User = {
+                    user_id: params.id,
+                    books: null
+                };
+                setUser(updatedUser);
+            }
+        }
 
-    //     getUser();
-    // }, []);
+        getUser();
+    }, []);
 
     const handleSignOut = async () => {
         await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {

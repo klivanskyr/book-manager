@@ -29,7 +29,7 @@ export async function queryOpenLibrary(query: string): Promise<NextResponse> {
             author: entry.author_name[0],
             review: '',
             rating: 0,
-            isbn: query_hypenless,
+            isbn: entry.isbn[0],
             coverImage: entry.cover_edition_key ? `${baseCoverUrl}${entry.cover_edition_key}-M.jpg?default=false` : coverPlaceholder.src,
             bgColor: [127, 127, 127], //default
             selected: false,

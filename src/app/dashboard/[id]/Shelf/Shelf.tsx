@@ -45,28 +45,33 @@ export default function Shelf() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
     
-    if (!user) { return (<></>) }
-    if (user.books === null) {
-        return (
-        <div className='flex flex-row justify-center w-full h-full'>
-            <Spinner label='Loading...' size='lg' />
-        </div>
-        )
-    }
-    if (user.books.length === 0) {
-        return (
-            <div className='flex flex-row justify-center items-center w-full h-full'>
-                <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
-                    <h1 className='text-xl mx-1' >Woah...</h1>
-                    <h1 className='text-xl mx-1' >looking a little empty here.</h1>
-                    <h1 className='text-xl mx-1' >Let's add a book!</h1>
-                </div>
+   
+
+    function Body() {
+        console.log('User:', user)
+        if (!user) { 
+            console.log('No user', user);
+            return <h1>No User</h1> 
+        }
+        if (user.books === null) {
+            return (
+            <div className='flex flex-row justify-center w-full h-full'>
+                <Spinner label='Loading...' size='lg' />
             </div>
-        )
-    }
-    return (
-        <>
-            <SortBy />
+            )
+        }
+        if (user.books.length === 0) {
+            return (
+                <div className='flex flex-row justify-center items-center w-full h-full'>
+                    <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
+                        <h1 className='text-xl mx-1' >Woah...</h1>
+                        <h1 className='text-xl mx-1' >looking a little empty here.</h1>
+                        <h1 className='text-xl mx-1' >Let's add a book!</h1>
+                    </div>
+                </div>
+            )
+        }
+        return (
             <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
                 <motion.div
                     className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4 lg:shadow-md rounded"
@@ -88,6 +93,13 @@ export default function Shelf() {
                     <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.books.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
                 }
             </div>
+        )
+    }
+
+    return (
+        <>
+            <SortBy />
+            <Body />
         </>
     )
 }
