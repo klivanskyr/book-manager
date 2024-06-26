@@ -94,11 +94,11 @@ export async function addBookToUser(book: Book, userId: string) {
 
   if (bookSnapshot.exists()) {
     const bookId = Object.keys(bookSnapshot.val())[0];
-    set(ref(database, `usersBooks/${userId}/${bookId}`), { text: '', rating: 0, createdAt: serverTimestamp() }); //create review
+    set(ref(database, `usersBooks/${userId}/${bookId}`), { title: book.title, author: book.author, text: '', rating: 0, createdAt: serverTimestamp() }); //create review
 
   } else { //if not in books, add book to books and userBooks
     const newBookId = await createNewBook(book.key, book.title, book.author, book.isbn, book.coverImage, book.bgColor.r, book.bgColor.g, book.bgColor.b);
-    set(ref(database, `usersBooks/${userId}/${newBookId}`), { text: '', rating: 0, createdAt: serverTimestamp() }); //create review
+    set(ref(database, `usersBooks/${userId}/${newBookId}`), { title: book.title, author: book.author, text: '', rating: 0, createdAt: serverTimestamp() }); //create review
   }
 }
 

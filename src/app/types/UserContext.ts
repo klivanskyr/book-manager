@@ -5,7 +5,7 @@ import { Book } from './Book';
 
 export type User = {
     user_id: string;
-    books: Book[];
+    books: Book[] | null;
   }
 
 export type UserContextType = {

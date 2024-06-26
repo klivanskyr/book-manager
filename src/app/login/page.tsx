@@ -72,17 +72,20 @@ export default function Login(): ReactElement {
       return;
     }
 
-    const userBooksRef = ref(database, `usersBooks/${data.uid}`);
-    onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
-      const books = await loadBooks(userBooksSnapshot);
-      const updatedUser: User = {
-          user_id: data.uid,
-          books
-      };
-      setUser(updatedUser);
+    // const userBooksRef = ref(database, `usersBooks/${data.uid}`);
+    // onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
+    //   const books = await loadBooks(userBooksSnapshot);
+    //   const updatedUser: User = {
+    //       user_id: data.uid,
+    //       books
+    //   };
+
+      setUser({
+        user_id: data.uid,
+        books: null
+      });
       setIsLoading(false);
       router.push(`/dashboard/${data.uid}`);
-    });
   }
   
   function SubmitButton() {

@@ -1,11 +1,12 @@
 'use client';
 
 import { useContext, useEffect, useState } from "react";
-import { Pagination } from "@nextui-org/react";
+import { Pagination, Spinner } from "@nextui-org/react";
 import { motion } from 'framer-motion';
 
 import { UserContext } from "@/app/types/UserContext";
 import BookCard from "./BookCard";
+import SortBy from "./SortBy";
 
 export default function Shelf() {
     const { user, setUser } = useContext(UserContext);
@@ -44,8 +45,14 @@ export default function Shelf() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
     
-
-    if (!user) { return <></> }
+    if (!user) { return (<></>) }
+    if (user.books === null) {
+        return (
+        <div className='flex flex-row justify-center w-full h-full'>
+            <Spinner label='Loading...' size='lg' />
+        </div>
+        )
+    }
     if (user.books.length === 0) {
         return (
             <div className='flex flex-row justify-center items-center w-full h-full'>
@@ -58,26 +65,29 @@ export default function Shelf() {
         )
     }
     return (
-        <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
-            <motion.div
-                className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4 lg:shadow-md rounded"
-                key={currentPage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                {user.books.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
-                    <motion.div key={book.key}
-                        className='w-full min-w-[300px]'
-                        whileHover={{ scale: 1.03 }}
-                    >
-                        <BookCard book={book} />
-                    </motion.div>
-                ))}
-            </motion.div>
-            {user.books.length > numBooksOnShelf && 
-                <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.books.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
-            }
-        </div>
+        <>
+            <SortBy />
+            <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
+                <motion.div
+                    className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4 lg:shadow-md rounded"
+                    key={currentPage}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {user.books.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
+                        <motion.div key={book.key}
+                            className='w-full min-w-[300px]'
+                            whileHover={{ scale: 1.03 }}
+                        >
+                            <BookCard book={book} />
+                        </motion.div>
+                    ))}
+                </motion.div>
+                {user.books.length > numBooksOnShelf && 
+                    <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.books.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
+                }
+            </div>
+        </>
     )
 }
