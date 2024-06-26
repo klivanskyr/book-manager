@@ -80,6 +80,7 @@ export default function Login(): ReactElement {
           books
       };
       setUser(updatedUser);
+      setIsLoading(false);
       router.push(`/dashboard/${data.uid}`);
     });
   }
