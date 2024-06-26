@@ -30,7 +30,7 @@ export default function Login(): ReactElement {
     }
   }, [email, password]);
 
-  async function handleSubmit() {
+  const handleSubmit = async () => {
     setIsLoading(true);
     if (!email) {
       setIsLoading(false);
@@ -50,10 +50,6 @@ export default function Login(): ReactElement {
       return;
     }
 
-    await validateEmailandPassword(email, password);
-  }
-
-  const validateEmailandPassword = async (email: string, password: string) => {
     if (!email || !password) {
       setEmailError('All fields are required');
       setIsLoading(false);
@@ -66,8 +62,9 @@ export default function Login(): ReactElement {
         'Content-Type': 'application/json'
       },
       cache: 'no-cache',
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, createdWith: 'email' })
     });
+
     const data = await res.json();
     if (data.code !== 200) {
       setPasswordError(data.message);
@@ -75,15 +72,15 @@ export default function Login(): ReactElement {
       return;
     }
 
-    const userBooksRef = ref(database, `usersBooks/${data.userId}`);
+    const userBooksRef = ref(database, `usersBooks/${data.uid}`);
     onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
       const books = await loadBooks(userBooksSnapshot);
       const updatedUser: User = {
-          user_id: data.userId,
+          user_id: data.uid,
           books
       };
       setUser(updatedUser);
-      router.push(`/dashboard/${data.userId}`)
+      router.push(`/dashboard/${data.uid}`);
     });
   }
   

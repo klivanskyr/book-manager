@@ -1,44 +1,33 @@
-import { getUserByEmail } from "@/app/db";
-import { compare } from "bcrypt-ts";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/firebase";
+
+type CreatedWith = 'email' | 'google';
 
 export async function POST(req: NextRequest) {
-    if (!req.headers.get("content-type")?.includes("application/json")) { return NextResponse.json({ code: 400, message: "Requires JSON" }); }
+    try {
+        const body = await req.json();
+        const { email, password, createdWith }: { email: string, password: string, createdWith: CreatedWith }= body;
 
-    const body = await req.json();
-    const { email, password } = body;
+        if (email === undefined || password === undefined || createdWith === undefined) {
+            return NextResponse.json({ code: 400, message: "Missing parameters, requires email, password" });
+        }
 
-    if (email === undefined || password === undefined) {
-        return NextResponse.json({ code: 400, message: "Missing parameters, requires email, password" });
-    }
+        if (createdWith === 'email') {
+            signInWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
+                const token = await userCredential.user.getIdToken();
+                return NextResponse.json({ code: 200, message: 'User logged in', uid: userCredential.user.uid }).cookies.set('token', token);
+            })
+            .catch((error) => {
+                return NextResponse.json({ code: 400, message: error.message });
+            });
 
-    const userObj = await getUserByEmail(email);
-    if (!userObj) {
-        return NextResponse.json({ code: 404, message: "User not found" });
-    }
-
-    if (userObj.loginMethod === 'google') {
-        const token = jwt.sign(
-            { userId: userObj.id },
-            process.env.JWT_SECRET as string,
-            { expiresIn: "1h" }
-        );
-        const res = NextResponse.json({ code: 200, message: "Logged in", userId: userObj.id });
-        res.cookies.set('token', token);
-        return res;
-    }
-
-    if (await compare(password, userObj.password)) {
-        const token = jwt.sign(
-            { userId: userObj.id },
-            process.env.JWT_SECRET as string,
-            { expiresIn: "1h" }
-        );
-        const res = NextResponse.json({ code: 200, message: "Logged in", userId: userObj.id });
-        res.cookies.set('token', token);
-        return res;
-    } else {
-        return NextResponse.json({ code: 401, message: "Incorrect password" });
+        } else if (createdWith === 'google') {
+            return NextResponse.error() //NEED TO IMPLEMENT
+        }
+    
+    } catch (error) {
+        return NextResponse.error();
     }
 }
