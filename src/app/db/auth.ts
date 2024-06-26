@@ -1,7 +1,7 @@
 import { auth } from "@/firebase/firebase";
 import { GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 
-export async function signInWithGoogle() {
+export function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
@@ -10,8 +10,10 @@ export async function signInWithGoogle() {
     });
     
     try {
-        await signInWithRedirect(auth, provider);
+        console.log('Signing in with Google, HERE');
+        signInWithRedirect(auth, provider);
     } catch (error) {
+        console.error('Error signing in with Google:', error);
         return;
     }
 }
