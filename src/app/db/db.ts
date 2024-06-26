@@ -1,38 +1,9 @@
 import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, DataSnapshot } from "firebase/database";
-import { genSalt, hash } from 'bcrypt-ts';
 
 import { database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
 
-export async function createNewUser(uid: string, username: string, email: string, password: string | null) {
-  
-  if (password) {
-    genSalt(10)
-    .then((salt) => hash(password, salt))
-    .then((hashedPassword) => {
-
-      const userInfo = {
-        username,
-        email,
-        password: hashedPassword,
-        createdAt: serverTimestamp(),
-        loginMethod: 'email'
-      };
-
-      return set(ref(database, `users/${uid}`), userInfo);
-    });
-  } else {
-    const userInfo = {
-      username,
-      email,
-      password: null,
-      createdAt: serverTimestamp(),
-      loginMethod: 'google'
-    };
-
-    return set(ref(database, `users/${uid}`), userInfo);
-  }
-}
+type CreatedWith = 'email' | 'google';
 
 export async function createNewBook(key: string, title: string, author: string, isbn: string, coverUrl: string, r: number, g: number, b: number): Promise<string> {
   const bookInfo = {

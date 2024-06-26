@@ -8,7 +8,7 @@ import { GoogleAuthProvider, getRedirectResult } from "firebase/auth";
 import { database, auth } from "@/firebase/firebase";
 
 import { User, UserContext } from "@/app/types/UserContext";
-import { createNewUser, loadBooks } from "@/app/db";
+import { loadBooks } from "@/app/db";
 import { Button } from '@nextui-org/react';
 import { googleG } from '@/assets';
 import Image from 'next/image';
