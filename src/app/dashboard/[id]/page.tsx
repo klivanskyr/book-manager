@@ -58,7 +58,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
 
 
     const leftElements = [
-        <h1 className="ml-4 font-Urbanist font-medium text-lg">Book Manager</h1>,
+        <h1 className="mx-4 font-medium text-lg text-center">Book Manager</h1>,
     ];
 
     const rightElements = [
@@ -67,7 +67,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     ];
 
     return (
-        <div className='flex flex-col h-auto'>
+        <div className='flex flex-col h-screen'>
             <BookSelect active={modalActive} setActive={setModalActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
             <Shelf />
