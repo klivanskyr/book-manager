@@ -6,9 +6,9 @@ import { motion } from 'framer-motion';
 
 import { UserContext } from "@/app/types/UserContext";
 import BookCard from "./BookCard";
-import SortBy from "./SortBy";
+import { Book } from "@/app/types/Book";
 
-export default function Shelf() {
+export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
     const { user, setUser } = useContext(UserContext);
     const [currentPage, setCurrentPage] = useState(1);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
@@ -48,9 +48,7 @@ export default function Shelf() {
    
 
     function Body() {
-        console.log('User:', user)
         if (!user) { 
-            console.log('No user', user);
             return <h1>No User</h1> 
         }
         if (user.books === null) {
@@ -62,13 +60,24 @@ export default function Shelf() {
         }
         if (user.books.length === 0) {
             return (
-                <div className='flex flex-row justify-center items-center w-full h-full'>
+                <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                     <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
                         <h1 className='text-xl mx-1' >Woah...</h1>
                         <h1 className='text-xl mx-1' >looking a little empty here.</h1>
                         <h1 className='text-xl mx-1' >Let's add a book!</h1>
                     </div>
-                </div>
+                </motion.div>
+            )
+        }
+        if (user.books.length > 0 && shownBooks.length === 0) {
+            return (
+                <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                    <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
+                        <h1 className='text-xl mx-1' >Woah...</h1>
+                        <h1 className='text-xl mx-1' >looking a little empty here.</h1>
+                        <h1 className='text-xl mx-1' >I think you may have filtered just a little too much.</h1>
+                    </div>
+                </motion.div>
             )
         }
         return (
@@ -80,7 +89,7 @@ export default function Shelf() {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
                 >
-                    {user.books.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
+                    {shownBooks.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
                         <motion.div key={book.key}
                             className='w-full min-w-[300px]'
                             whileHover={{ scale: 1.03 }}
@@ -89,17 +98,14 @@ export default function Shelf() {
                         </motion.div>
                     ))}
                 </motion.div>
-                {user.books.length > numBooksOnShelf && 
-                    <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.books.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
+                {shownBooks.length > numBooksOnShelf && 
+                    <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(shownBooks.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
                 }
             </div>
         )
     }
 
     return (
-        <>
-            <SortBy />
-            <Body />
-        </>
+        <Body />
     )
 }

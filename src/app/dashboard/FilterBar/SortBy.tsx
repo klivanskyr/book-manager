@@ -1,9 +1,7 @@
-import { loadBooks } from "@/app/db";
 import { loadBook } from "@/app/db/db";
 import { UserContext } from "@/app/types/UserContext";
 import { database } from "@/firebase/firebase";
 import { Select, SelectItem } from "@nextui-org/react";
-import { on } from "events";
 import { Query, child, limitToFirst, limitToLast, onValue, orderByChild, orderByKey, orderByValue, query, ref, startAt } from "firebase/database";
 import { useContext, useEffect, useState } from "react";
 
@@ -37,7 +35,7 @@ export default function SortBy() {
 
     type Order = 'default' | 'reversed';
     const orderBooksByChild = (child: string, order: Order) => {
-        if (!user) return;
+        if (!user || !user.user_id ) return;
         if (order === 'default') {
             const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToFirst(100)); //100 should be replaced with number of books on shelf
             onValue(bookQuery, async (snapshot) => {
