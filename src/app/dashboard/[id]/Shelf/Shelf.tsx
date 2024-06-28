@@ -46,7 +46,7 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
     }, []);
     
    
-
+    console.log('User:', user, 'Shown Books: ', shownBooks);
     function Body() {
         if (!user) { 
             return <h1>No User</h1> 

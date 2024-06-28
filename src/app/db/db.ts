@@ -1,4 +1,4 @@
-import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, DataSnapshot } from "firebase/database";
+import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, DataSnapshot, update } from "firebase/database";
 
 import { database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
@@ -148,7 +148,11 @@ export async function updateUserBook(updatedBook: Book, userId: string) {
   const usersBooksRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`)
   const snapshot = await get(usersBooksRef);
   const val = snapshot.val();
-  set(usersBooksRef, { ...val, text: updatedBook.review, rating: updatedBook.rating });
+  const updates: { [key: string]: any } = {};
+  updates[`/usersBooks/${userId}/${updatedBook.id}/rating`] = updatedBook.rating;
+  updates[`/usersBooks/${userId}/${updatedBook.id}/text`] = updatedBook.review;
+  console.log(updates);
+  update(usersBooksRef, updates);
   return;
 }
 

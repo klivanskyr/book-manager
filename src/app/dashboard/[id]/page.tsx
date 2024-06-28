@@ -9,14 +9,16 @@ import BookSelect from './BookSelect';
 import { signOut } from 'firebase/auth';
 import { Navbar, ActionButton } from "@/app/components";
 import { auth, database } from '@/firebase/firebase';
-import { ref } from 'firebase/database';
+import { get, ref } from 'firebase/database';
 import FilterBar from '../FilterBar/FiliterBar';
+import { Book } from '@/app/types/Book';
+import { loadBooks } from '@/app/db';
 
 
 export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const [modalActive, setModalActive] = useState(false);
-    const [shownBooks, setShownBooks] = useState([]);
+    const [shownBooks, setShownBooks] = useState<Book[]>([]);
     const router = useRouter();
 
     /*
@@ -26,13 +28,17 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     */
     useEffect(() => {
         const getUser = async () => {
-            if (!user || !user.user_id) {
+            if (!user || !user.user_id || !user.books) {
+                console.log('Fetching User');
                 const userBooksRef = ref(database, `usersBooks/${params.id}`);
+                const snapshot = await get(userBooksRef);
+                const books = await loadBooks(snapshot);
                 const updatedUser: User = {
                     user_id: params.id,
-                    books: user ? user.books : null
+                    books: books
                 };
                 setUser(updatedUser);
+                // setShownBooks(updatedUser.books);
             }
         }
 
