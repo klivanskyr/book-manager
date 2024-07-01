@@ -15,7 +15,7 @@ export default function BookSelectCard({ book, updateFoundBooks }: { book: Book,
     const handleClickAdd = async (): Promise<void> => {
         setIsLoading(true);
         const [r, g, b] = await fetchDominantColor(book.coverImage);
-        const updatedBook = { ...book, selected: true, bgColor: {r: Math.min(r+75, 255), g: Math.min(g+75, 255), b: Math.min(b+75, 255)}};
+        const updatedBook = { ...book, selected: true, bgColor: {r: Math.min(r+50, 255), g: Math.min(g+50, 255), b: Math.min(b+50, 255)}};
         updateFoundBooks(updatedBook);
         if (user) {
             await addBookToUser(updatedBook, user.user_id);

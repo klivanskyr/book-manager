@@ -45,6 +45,8 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
             return { ...book, selected: currentBook?.selected || false}
         });
 
+        console.log('books', books);
+
         setFoundBooks(books);
     }
 

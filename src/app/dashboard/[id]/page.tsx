@@ -12,6 +12,7 @@ import { auth, database } from '@/firebase/firebase';
 import { onValue, ref } from 'firebase/database';
 import FilterBar from './FilterBar/FiliterBar';
 import { loadBooks } from '@/app/db';
+import TEST from './TEST';
 
 
 export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
@@ -74,7 +75,8 @@ export default function Dashboard({ params }: { params: { id: string } }): React
             <BookSelect active={modalActive} setActive={setModalActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
             <FilterBar />
-            <Shelf />
+            {/* <Shelf /> */}
+            <TEST />
         </div>
     )
 }

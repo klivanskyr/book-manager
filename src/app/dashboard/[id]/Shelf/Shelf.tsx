@@ -95,8 +95,8 @@ function Shelf() {
             )
         }
         return (
-            <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
-                <div className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4 lg:shadow-md rounded" >
+            <div className="w-full flex flex-col rounded-md items-center">
+                <div className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4" >
                     {user.shownBooks.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
                         <motion.div key={book.key}
                             className='w-full min-w-[300px]'
