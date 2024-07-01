@@ -7,18 +7,17 @@ import Stars from '@/app/components/Stars'
 import { Book } from '@/app/types/Book'
 import { updateUserBook } from '@/app/db/db';
 import { UserContext } from '@/app/types/UserContext';
-import { Textarea } from '@nextui-org/react';
+import { Button, Textarea } from '@nextui-org/react';
 
 export default function Review({ active, book, setReviewActive }: { active: boolean, book: Book, setReviewActive: Function }): ReactElement {
 
-  const [review, setReview] = useState(book.review);
+  const [review, setReview] = useState({ rating: book.rating, text: book.review });
   const { user, setUser } = useContext(UserContext);
 
-  async function handleInputChange(e: any) {
+  async function handleSubmit(e: any) {
     if (user) {
-      const updatedReview = e.target.value;
-      setReview(updatedReview);
-      const newBook = { ...book, review: updatedReview };
+      const newBook = { ...book, review: review.text, rating: review.rating };
+      console.log(newBook);
       await updateUserBook(newBook, user.user_id);
     }
   }
@@ -35,7 +34,7 @@ export default function Review({ active, book, setReviewActive }: { active: bool
   function Body() {
     return (
       <div>
-        <Textarea size='lg' variant='bordered' placeholder='Input review here' value={review} onChange={(e) => handleInputChange(e)} />
+        <Textarea size='lg' variant='bordered' placeholder='Input review here' value={review.text} onChange={(e) => setReview({ ...review, text: e.target.value })} />
       </div>
     )
 
@@ -43,9 +42,10 @@ export default function Review({ active, book, setReviewActive }: { active: bool
 
   function Footer() {
     return (
-      <div>
-        <Stars size={30} book={book} />
-      </div>
+      <form className='flex flex-col items-center justify-center'>
+        <Stars size={30} book={{ ...book, rating: review.rating, review: review.text }} />
+        <Button className='mt-4 bg-blue-600 text-white font-medium' type='submit' onPress={handleSubmit}>Submit Review</Button>
+      </form>
     )
   }
 

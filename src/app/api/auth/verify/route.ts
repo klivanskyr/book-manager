@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
         if (!res) {
             return NextResponse.json({ code: 401, message: "Invalid token" });
         } else {
-            return NextResponse.json({ code: 200, message: "Valid token" });
+            return NextResponse.json({ code: 200, message: "Valid token", uid: res.uid });
         }
 
     } catch (error) {

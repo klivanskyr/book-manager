@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-    console.log('Middleware:', req.nextUrl.pathname);
+    //console.log('Middleware:', req.nextUrl.pathname);
     try {
         const cookie = req.cookies.get('token');
 
@@ -33,10 +33,10 @@ export async function middleware(req: NextRequest) {
         }
 
         if (req.nextUrl.pathname === '/login') {
-            return NextResponse.redirect(new URL(`/dashboard/${data.jwt.userId}`, req.nextUrl), { status: 302 });
+            return NextResponse.redirect(new URL(`/dashboard/${data.uid}`, req.nextUrl), { status: 302 });
         }
 
-        if (req.nextUrl.pathname.startsWith('/dashboard') && req.nextUrl.pathname !== `/dashboard/${data.jwt.userId}`) {
+        if (req.nextUrl.pathname.startsWith('/dashboard') && req.nextUrl.pathname !== `/dashboard/${data.uid}`) {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
 

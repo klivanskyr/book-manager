@@ -1,4 +1,4 @@
-import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, DataSnapshot } from "firebase/database";
+import { ref, push, child, set, serverTimestamp, query, orderByChild, equalTo, get, DataSnapshot, update } from "firebase/database";
 
 import { database } from '@/firebase/firebase';
 import { Book } from '@/app/types/Book';
@@ -54,6 +54,33 @@ type BookReview = {
   text: string,
 };
 
+export async function loadBook(snapshot: DataSnapshot) {
+  if (!snapshot.exists()) {return null}
+
+  const bookReview = snapshot.val();
+
+  const bookRef = ref(database, `books/${snapshot.key}`);
+  const bookSnapshot = await get(bookRef);
+
+  if (!bookSnapshot.exists()) {return null} //Book was under userbooks but not in books, handle error
+
+  const bookData = bookSnapshot.val();
+  const book: Book = {
+    id: snapshot.key as string,
+    key: bookData?.key,
+    title: bookData?.title,
+    author: bookData?.author,
+    review: bookReview.text,
+    rating: bookReview.rating,
+    isbn: bookData?.isbn,
+    coverImage: bookData?.coverUrl,
+    bgColor: {r: bookData?.bgColor?.r, g: bookData?.bgColor?.g, b: bookData?.bgColor?.b},
+    imgLoaded: false,
+    selected: true
+  }
+  return book;
+}
+
 export async function loadBooks(snapshot: DataSnapshot) {
   if (!snapshot.exists()) {return []}
 
@@ -94,11 +121,11 @@ export async function addBookToUser(book: Book, userId: string) {
 
   if (bookSnapshot.exists()) {
     const bookId = Object.keys(bookSnapshot.val())[0];
-    set(ref(database, `usersBooks/${userId}/${bookId}`), { text: '', rating: 0, createdAt: serverTimestamp() }); //create review
+    set(ref(database, `usersBooks/${userId}/${bookId}`), { title: book.title, author: book.author, text: '', rating: 0, createdAt: serverTimestamp() }); //create review
 
   } else { //if not in books, add book to books and userBooks
     const newBookId = await createNewBook(book.key, book.title, book.author, book.isbn, book.coverImage, book.bgColor.r, book.bgColor.g, book.bgColor.b);
-    set(ref(database, `usersBooks/${userId}/${newBookId}`), { text: '', rating: 0, createdAt: serverTimestamp() }); //create review
+    set(ref(database, `usersBooks/${userId}/${newBookId}`), { title: book.title, author: book.author, text: '', rating: 0, createdAt: serverTimestamp() }); //create review
   }
 }
 
@@ -118,8 +145,24 @@ export async function removeBookFromUser(bookId: string, userId: string) {
 }
 
 export async function updateUserBook(updatedBook: Book, userId: string) {
-  const userBookRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`);
-  set(userBookRef, { text: updatedBook.review, rating: updatedBook.rating });
-  return;
+  try {
+    const usersBooksRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`);
+    const snapshot = await get(usersBooksRef);
+    
+    if (snapshot.exists()) {
+      const updates: { [key: string]: any } = {};
+      updates[`rating`] = updatedBook.rating;
+      updates[`text`] = updatedBook.review;
+      //console.log('updates', updates);
+      
+      await update(usersBooksRef, updates);
+      //console.log('Update successful');
+      
+    } else {
+      //console.log('No data available at the specified path');
+    }
+  } catch (error) {
+    console.error('Error updating user book:', error);
+  }
 }
 

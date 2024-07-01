@@ -10,7 +10,7 @@ import { addBookToUser, removeBookFromUser } from "@/app/db";
 export default function BookSelectCard({ book, updateFoundBooks }: { book: Book, updateFoundBooks: Function }) {
     const { user, setUser } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
-
+    
     //handle selecting book from modal
     const handleClickAdd = async (): Promise<void> => {
         setIsLoading(true);
@@ -26,7 +26,7 @@ export default function BookSelectCard({ book, updateFoundBooks }: { book: Book,
     //handle removing book from modal
     const handleClickRemove = async (): Promise<void>  => {
         setIsLoading(true);
-        if (user) {
+        if (user && user.books) {
             //Find book in user books where it will have an id.
             const usersBooksRef = user.books.find((userBook) => userBook.key === book.key);
             if (!usersBooksRef) { return; } //Not possible to remove book that is not in user books

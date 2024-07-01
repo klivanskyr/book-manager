@@ -2,13 +2,10 @@
 
 import { useState, useContext, ReactElement, useEffect } from 'react';
 import Link from 'next/link';
-import { onValue, ref } from 'firebase/database';
 import { useRouter } from 'next/navigation';
 
 import { EmailInput, PasswordInput, ActionButton, SignInWithGoogleButton, LoadingButton } from '@/app/components';
-import { loadBooks } from '../db';
-import { database } from '@/firebase/firebase';
-import { User, UserContext } from '../types/UserContext';
+import { UserContext } from '../types/UserContext';
 import { Form } from '../components';
 import emailIsValid from '../utils/emailIsValid';
 
@@ -72,16 +69,12 @@ export default function Login(): ReactElement {
       return;
     }
 
-    const userBooksRef = ref(database, `usersBooks/${data.uid}`);
-    onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updates
-      const books = await loadBooks(userBooksSnapshot);
-      const updatedUser: User = {
-          user_id: data.uid,
-          books
-      };
-      setUser(updatedUser);
+      setUser({
+        user_id: data.uid,
+        books: user ? user.books : null
+      });
+      setIsLoading(false);
       router.push(`/dashboard/${data.uid}`);
-    });
   }
   
   function SubmitButton() {

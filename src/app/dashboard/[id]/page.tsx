@@ -10,6 +10,7 @@ import { signOut } from 'firebase/auth';
 import { Navbar, ActionButton } from "@/app/components";
 import { auth, database } from '@/firebase/firebase';
 import { onValue, ref } from 'firebase/database';
+import FilterBar from './FilterBar/FiliterBar';
 import { loadBooks } from '@/app/db';
 
 
@@ -25,21 +26,23 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     */
     useEffect(() => {
         const getUser = async () => {
-            if (!user) {
+            if (!user || !user.user_id || !user.books) {
+                //console.log('Fetching User');
                 const userBooksRef = ref(database, `usersBooks/${params.id}`);
-                onValue(userBooksRef, async (userBooksSnapshot) => { //listens for realtime updata
-                    const books = await loadBooks(userBooksSnapshot);
-                const updatedUser: User = {
-                    user_id: params.id,
-                    books
-                };
-                setUser(updatedUser);
+                onValue(userBooksRef, async (snapshot) => {
+                    const books = await loadBooks(snapshot);
+                    const updatedUser: User = {
+                        user_id: params.id,
+                        books: books,
+                        shownBooks: user?.shownBooks || []
+                    };
+                    setUser(updatedUser);
                 });
             }
         }
 
         getUser();
-    }, []);
+    }, [user, user?.books]);
 
     const handleSignOut = async () => {
         await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
@@ -70,6 +73,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
         <div className='flex flex-col h-screen'>
             <BookSelect active={modalActive} setActive={setModalActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
+            <FilterBar />
             <Shelf />
         </div>
     )
