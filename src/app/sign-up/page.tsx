@@ -53,16 +53,18 @@ export default function Signup() {
         const data = await res.json();
         setIsLoading(false);
         if (data.code !== 200) {
-            console.error('Error creating user:', data.message);
+            const errorMessage = data.message;
             setInput({ username: '', email: '', password: '' })
-            setError('Error creating database user');
+            if (errorMessage.code === 'auth/email-already-in-use') {
+                setError('Email already in use');
+                return;
+            }
+            setError(errorMessage.code);
             return;
         } else {
             router.push('/login');
         }
     }
-
-    console.log('error: ', error); 
 
     function SubmitButton() {
         const className = 'mt-4 mb-2 w-64';
