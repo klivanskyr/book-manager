@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, memo } from "react";
 import { Pagination, Spinner } from "@nextui-org/react";
 import { motion } from 'framer-motion';
 
@@ -8,11 +8,12 @@ import { UserContext } from "@/app/types/UserContext";
 import BookCard from "./BookCard";
 import { Book } from "@/app/types/Book";
 
-export default function Shelf() {
+function Shelf() {
     const { user, setUser } = useContext(UserContext);
     const [currentPage, setCurrentPage] = useState(1);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
     const [isMobile, setIsMobile] = useState(false);
+    const [isPageChange, setIsPageChange] = useState(false);
 
     /*
     When window is shrunk, dynamically change the number of books on shelf
@@ -44,6 +45,21 @@ export default function Shelf() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    useEffect(() => {
+        if (isPageChange) {
+            const timeout = setTimeout(() => {
+                setIsPageChange(false);
+            }, 500);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [currentPage]);
+
+    function handlePageChange(page: number) {
+        setIsPageChange(true);
+        setCurrentPage(page);
+    }
     
     function Body() {
         if (!user) { 
@@ -73,31 +89,26 @@ export default function Shelf() {
                     <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
                         <h1 className='text-xl mx-1' >Woah...</h1>
                         <h1 className='text-xl mx-1' >looking a little empty here.</h1>
-                        <h1 className='text-xl mx-1' >I think you may have filtered just a little too much.</h1>
+                        <h1 className='text-xl mx-1' >I think you may have filtered a little too much.</h1>
                     </div>
                 </motion.div>
             )
         }
         return (
             <div className="w-full flex flex-col mt-4 lg:mt-24 rounded-md items-center">
-                <motion.div
-                    className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4 lg:shadow-md rounded"
-                    key={currentPage}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                >
+                <div className="flex flex-col lg:flex-row justify-start items-center w-auto p-1 pb-4 lg:shadow-md rounded" >
                     {user.shownBooks.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
                         <motion.div key={book.key}
                             className='w-full min-w-[300px]'
-                            whileHover={{ scale: 1.03 }}
+                            initial={{ scale: 0.97 }}
+                            whileHover={{ scale: 1 }}
                         >
                             <BookCard book={book} />
                         </motion.div>
                     ))}
-                </motion.div>
+                </div>
                 {user.shownBooks.length > numBooksOnShelf && 
-                    <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.shownBooks.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
+                    <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.shownBooks.length / numBooksOnShelf)} page={currentPage} onChange={handlePageChange} />
                 }
             </div>
         )
@@ -107,3 +118,5 @@ export default function Shelf() {
         <Body />
     )
 }
+
+export default memo(Shelf);

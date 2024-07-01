@@ -5,11 +5,12 @@ import { removeBookFromUser } from "@/app/db";
 import { Book } from "@/app/types/Book";
 import { UserContext } from "@/app/types/UserContext";
 import { Button, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
-import { useContext, useState } from "react";
+import { useContext, useState, memo } from "react";
 import { FaTimes } from "react-icons/fa";
 import Review from "./Review";
 
-export default function BookCard ({ book }: { book: Book }) {
+function BookCard ({ book }: { book: Book }) {
+    console.log('Rendering Book Card for ' + book.title);
     const { user, setUser } = useContext(UserContext);
     const [reviewActive, setReviewActive] = useState(false);
     
@@ -22,7 +23,7 @@ export default function BookCard ({ book }: { book: Book }) {
     return (
         <>
             <Review active={reviewActive} book={book} setReviewActive={setReviewActive} />
-            <Card className="w-auto h-[440px] m-2 hover:cursor-pointer" key={book.key} style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}>
+            <Card className="w-auto h-[440px] m-0.5 hover:cursor-pointer" key={book.key} style={{ backgroundColor: `rgb(${book.bgColor.r}, ${book.bgColor.g}, ${book.bgColor.b})` }}>
                 <CardHeader className="flex flex-col justify-start items-start w-full" onClick={() => setReviewActive(true)}>
                     <Button className='bg-transparent h-6' isIconOnly onClick={handleRemoveBook}><FaTimes /></Button>
                     <div className='w-full min-h-[200px] flex flex-row justify-center center-items' >
@@ -46,3 +47,5 @@ export default function BookCard ({ book }: { book: Book }) {
         </>
     )
 }
+
+export default memo(BookCard);
