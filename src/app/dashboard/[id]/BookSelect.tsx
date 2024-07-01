@@ -1,15 +1,17 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Spinner } from "@nextui-org/react";
 
 import { TextInput, ActionButton, ModalElement } from "@/app/components"
 import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
 import BookSelectCard from "./BookSelectCard";
+import { UserContext } from "@/app/types/UserContext";
 
 
 export default function BookSelect({ active, setActive }: { active: boolean, setActive: Function }) {
+    const { user, setUser } = useContext(UserContext);
     const [text, setText] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -38,8 +40,9 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
             current book so the reviews and rating is preserved
         */
         const books = data.books.map((book: Book) => {
-            const currentBook = foundBooks.find(curBook => curBook.key == book.key);
-            return currentBook ? currentBook : book;
+            const currentBook = user?.books?.find(curBook => curBook.key == book.key);
+            console.log('found', currentBook)
+            return { ...book, selected: currentBook?.selected || false}
         });
 
         setFoundBooks(books);

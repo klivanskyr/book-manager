@@ -83,7 +83,7 @@ function Shelf() {
                 </motion.div>
             )
         }
-        if (user.books.length > 0 && user.shownBooks.length === 0) {
+        if (user.books.length > 0 && user?.shownBooks?.length === 0) {
             return (
                 <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                     <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
