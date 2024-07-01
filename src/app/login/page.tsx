@@ -12,44 +12,21 @@ import emailIsValid from '../utils/emailIsValid';
 export default function Login(): ReactElement {
   const { user, setUser } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [emailError, setEmailError] = useState<string>('');
-  const [passwordError, setPasswordError] = useState<string>('');
+  const [input, setInput] = useState({ email: '', password: '' });
+  const [error, setError] = useState<string>('');
   const router = useRouter();
-
-  useEffect(() => {
-    if (email) {
-      setEmailError('');
-    }
-    if (password) {
-      setPasswordError('');
-    }
-  }, [email, password]);
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    if (!email) {
+    if (!input.email || !input.password) {
       setIsLoading(false);
-      setEmailError('Email is required');
-      return;
-    }
-    if (!password) {
-      setIsLoading(false);
-      setPasswordError('Password is required');
-      return;
-    }
-    if (!emailIsValid(email)) {
-      setIsLoading(false);
-      setEmailError('Invalid email');
-      setEmail('');
-      setPassword('');
+      setError('All fields are required');
       return;
     }
 
-    if (!email || !password) {
-      setEmailError('All fields are required');
+    if (!emailIsValid(input.email)) {
       setIsLoading(false);
+      setError('Invalid email');
       return;
     }
 
@@ -59,19 +36,20 @@ export default function Login(): ReactElement {
         'Content-Type': 'application/json'
       },
       cache: 'no-cache',
-      body: JSON.stringify({ email, password, createdWith: 'email' })
+      body: JSON.stringify({ ...input, createdWith: 'email' })
     });
 
     const data = await res.json();
     if (data.code !== 200) {
-      setPasswordError(data.message);
+      setError(data.message);
       setIsLoading(false);
       return;
     }
 
       setUser({
         user_id: data.uid,
-        books: user ? user.books : null
+        books: user ? user.books : null,
+        shownBooks: []
       });
       setIsLoading(false);
       router.push(`/dashboard/${data.uid}`);
@@ -86,8 +64,8 @@ export default function Login(): ReactElement {
 
   const formElements = [
     <h1 className='pt-5 pb-16 text-2xl font-semibold'>Sign in to your account</h1>,
-    <EmailInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={email} setValue={setEmail} error={emailError} />,
-    <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={password} setValue={setPassword} error={passwordError} />,
+    <EmailInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={input.email} setValue={(newValue: string) => setInput({ ...input, email: newValue })} />,
+    <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={input.password} setValue={(newValue: string) => setInput({ ...input, email: newValue })} />,
     <Link href='/reset' className='px-2 pb-2 pt-6 text-blue-500 font-medium text-sm'>Forgot Password</Link>,
     <SubmitButton />,
     <SignInWithGoogleButton className='bg-green-400 w-64 h-12 mb-2' disabled={isLoading} />,

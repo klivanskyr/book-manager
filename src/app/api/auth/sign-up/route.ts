@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
         const { username, email, password, uid, createdWith }: { username: string, email: string, password: string, uid: string, createdWith: CreatedWith } = body;
 
         if (!username || !email || !createdWith) { //password is not required for google sign-in
-            return NextResponse.json({ code: 400, message: 'Missing parameters, requires username, email, createdWith' });
+            return NextResponse.json({ status: 400, message: 'Missing parameters, requires username, email, createdWith' });
         }
         
         // Create user in Firebase Auth
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
                 };
 
                 await set(ref(database, `users/${userCredential.user.uid}`), userInfo);
-                return NextResponse.json({ code: 200, message: 'success' });
+                return NextResponse.json({ message: 'success' }, { status: 200 });
 
             } catch (error) {
-                return NextResponse.json({ code: 500, message: `Error creating user: ${error}` });
+                return NextResponse.json({ message: error }, { status: 500 });
             }
         } else if (createdWith === 'google') {
             //When loging in with google, the user is automatically created in in auth
@@ -45,10 +45,10 @@ export async function POST(req: NextRequest) {
             };
 
             await set(ref(database, `users/${uid}`), userInfo);
-            return NextResponse.json({ code: 200, message: 'success' });
+            return NextResponse.json({ message: 'success' }, { status: 200 });
         }
 
     } catch (error) {
-        return NextResponse.error();
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }
