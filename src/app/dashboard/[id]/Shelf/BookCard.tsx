@@ -10,7 +10,6 @@ import { FaTimes } from "react-icons/fa";
 import Review from "./Review";
 
 function BookCard ({ book }: { book: Book }) {
-    console.log('Rendering Book Card for ' + book.title);
     const { user, setUser } = useContext(UserContext);
     const [reviewActive, setReviewActive] = useState(false);
     
