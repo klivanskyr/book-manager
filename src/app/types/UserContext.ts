@@ -6,6 +6,7 @@ import { Book } from './Book';
 export type User = {
     user_id: string;
     books: Book[] | null;
+    shownBooks: Book[];
   }
 
 export type UserContextType = {

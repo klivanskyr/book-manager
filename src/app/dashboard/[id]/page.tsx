@@ -9,16 +9,14 @@ import BookSelect from './BookSelect';
 import { signOut } from 'firebase/auth';
 import { Navbar, ActionButton } from "@/app/components";
 import { auth, database } from '@/firebase/firebase';
-import { get, onValue, ref } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import FilterBar from './FilterBar/FiliterBar';
-import { Book } from '@/app/types/Book';
 import { loadBooks } from '@/app/db';
 
 
 export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const [modalActive, setModalActive] = useState(false);
-    const [shownBooks, setShownBooks] = useState<Book[]>([]);
     const router = useRouter();
 
     /*
@@ -35,7 +33,8 @@ export default function Dashboard({ params }: { params: { id: string } }): React
                     const books = await loadBooks(snapshot);
                     const updatedUser: User = {
                         user_id: params.id,
-                        books: books
+                        books: books,
+                        shownBooks: user?.shownBooks || []
                     };
                     setUser(updatedUser);
                 });
@@ -74,8 +73,8 @@ export default function Dashboard({ params }: { params: { id: string } }): React
         <div className='flex flex-col h-screen'>
             <BookSelect active={modalActive} setActive={setModalActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
-            <FilterBar shownBooks={shownBooks} setShownBooks={setShownBooks} />
-            <Shelf shownBooks={shownBooks} />
+            <FilterBar />
+            <Shelf />
         </div>
     )
 }

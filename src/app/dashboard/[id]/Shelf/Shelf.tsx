@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useState, memo } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Pagination, Spinner } from "@nextui-org/react";
 import { motion } from 'framer-motion';
 
@@ -8,7 +8,7 @@ import { UserContext } from "@/app/types/UserContext";
 import BookCard from "./BookCard";
 import { Book } from "@/app/types/Book";
 
-export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
+export default function Shelf() {
     const { user, setUser } = useContext(UserContext);
     const [currentPage, setCurrentPage] = useState(1);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
@@ -45,8 +45,6 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
     
-   
-    //console.log('User:', user, 'Shown Books: ', shownBooks);
     function Body() {
         if (!user) { 
             return <h1>No User</h1> 
@@ -69,7 +67,7 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
                 </motion.div>
             )
         }
-        if (user.books.length > 0 && shownBooks.length === 0) {
+        if (user.books.length > 0 && user.shownBooks.length === 0) {
             return (
                 <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                     <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
@@ -89,7 +87,7 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.2 }}
                 >
-                    {shownBooks.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
+                    {user.shownBooks.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
                         <motion.div key={book.key}
                             className='w-full min-w-[300px]'
                             whileHover={{ scale: 1.03 }}
@@ -98,8 +96,8 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
                         </motion.div>
                     ))}
                 </motion.div>
-                {shownBooks.length > numBooksOnShelf && 
-                    <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(shownBooks.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
+                {user.shownBooks.length > numBooksOnShelf && 
+                    <Pagination className='flex flex-row justify-center mt-2' size='lg' loop isCompact showShadow showControls total={Math.ceil(user.shownBooks.length / numBooksOnShelf)} page={currentPage} onChange={(page) => setCurrentPage(page)} />
                 }
             </div>
         )
