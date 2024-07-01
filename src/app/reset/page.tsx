@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ActionButton, EmailInput, Form, LoadingButton } from "@/app/components";
 import { Link } from '@nextui-org/react';
 import emailIsValid from '@/app/utils/emailIsValid';
-import { confirmPasswordReset, sendPasswordResetEmail } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/firebase/firebase';
 import { getUserByEmail } from '../db';
 
@@ -16,23 +16,6 @@ export default function Reset() {
     const [success, setSuccess] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const router = useRouter();
-
-
-    const passwordReset = async () => {
-        sendPasswordResetEmail(auth, email)
-        .then(() => {
-            setIsLoading(false);
-            setSuccess('Password reset email sent. Redirecting to login page in 5 seconds');
-            setTimeout(() => {
-                router.push('/login');
-            }, 5000);
-        })
-        .catch((error) => {
-            setError(error.message);
-            setEmail('');
-            setIsLoading(false);
-        });
-    }
 
     const handleSubmit = async () => {
         setIsLoading(true);
@@ -58,7 +41,19 @@ export default function Reset() {
             return;
         }
 
-        await passwordReset();
+        sendPasswordResetEmail(auth, email)
+        .then(() => {
+            setIsLoading(false);
+            setSuccess('Password reset email sent. Redirecting to login page in 5 seconds');
+            setTimeout(() => {
+                router.push('/login');
+            }, 5000);
+        })
+        .catch((error) => {
+            setError(error.message);
+            setEmail('');
+            setIsLoading(false);
+        });
     }
 
     function SubmitButton() {
