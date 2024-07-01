@@ -8,45 +8,35 @@ import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput
 
 export default function Signup() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [username, setUsername] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [emailError, setEmailError] = useState<string>('');
-    const [usernameError, setUsernameError] = useState<string>('');
-    const [passwordError, setPasswordError] = useState<string>('');
+    const [input, setInput] = useState({ username: '', email: '', password: '' });
+    const [error, setError] = useState<string>('');
     const router = useRouter();
 
-    useEffect(() => {
-        setUsernameError('');
-        setEmailError('');
-        setPasswordError('');
-    }, [email, password, username])
-    
     function validateInputs(): boolean {
-        if (password.length < 8) {
-            setPasswordError('Password must be at least 8 characters');
+        if (input.password.length < 8) {
+            setError('Password must be at least 8 characters');
             return false;
         }
-        if (password.length > 35) {
-            setPasswordError('Password must be less than 35 characters');
+        if (input.password.length > 35) {
+            setError('Password must be less than 35 characters');
             return false;
         }
-        if (username.length < 3) {
-            setUsernameError('Username must be at least 3 characters');
+        if (input.username.length < 3) {
+            setError('Username must be at least 3 characters');
             return false;
         }
-        if (username.length > 35) {
-            setUsernameError('Username must be less than 35 characters');
+        if (input.username.length > 35) {
+            setError('Username must be less than 35 characters');
             return false;
         }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-            setEmailError('Please enter a valid email');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)){
+            setError('Please enter a valid email');
             return false;
         }
         return true;
     }
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e: any) => {
         setIsLoading(true);
         if (!validateInputs()) {
             setIsLoading(false);
@@ -58,24 +48,21 @@ export default function Signup() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, email, password, createdWith: 'email' })
+            body: JSON.stringify({ ...input, createdWith: 'email' })
         });
         const data = await res.json();
         setIsLoading(false);
         if (data.code !== 200) {
             console.error('Error creating user:', data.message);
-            setUsername('');
-            setEmail('');
-            setPassword('');
-            setEmailError('Error creating database user');
+            setInput({ username: '', email: '', password: '' })
+            setError('Error creating database user');
             return;
         } else {
-            //console.log('User created successfully');
             router.push('/login');
         }
-
-        
     }
+
+    console.log('error: ', error); 
 
     function SubmitButton() {
         const className = 'mt-4 mb-2 w-64';
@@ -88,10 +75,11 @@ export default function Signup() {
 
     const formElements = [
         <h1 className='pt-5 pb-8 text-2xl font-semibold'>Create an account</h1>,
-        <TextInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" radius='md' disabled={isLoading} label='Username' value={username} setValue={setUsername} error={usernameError} />,
-        <EmailInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={email} setValue={setEmail} error={emailError} />,
-        <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={password} setValue={setPassword} error={passwordError} />,
+        <TextInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" radius='md' disabled={isLoading} label='Username' value={input.username} setValue={(newValue: string) => setInput({ ...input, username: newValue })} />,
+        <EmailInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={input.email} setValue={(newValue: string) => setInput({ ...input, email: newValue })}  />,
+        <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={input.password} setValue={(newValue: string) => setInput({ ...input, password: newValue })} />,
         <SubmitButton />,
+        <h2 className={`m-2 text-red-600 font-light text-xl ${error ? 'opacity-100' : 'opacity-0'}`} >{error}</h2>,
         <div className='py-5 text-center'> Already have an account? <Link className='font-semibold text-lg text-blue-500' href='/login'>Sign In</Link></div>
     ];
 
