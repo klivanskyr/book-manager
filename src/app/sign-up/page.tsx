@@ -70,7 +70,7 @@ export default function Signup() {
             setEmailError('Error creating database user');
             return;
         } else {
-            console.log('User created successfully');
+            //console.log('User created successfully');
             router.push('/login');
         }
 

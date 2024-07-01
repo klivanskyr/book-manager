@@ -22,7 +22,7 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
     useEffect(() => {
         getRedirectResult(auth)
         .then(async (result) => {
-            console.log('Result:', result);
+            //console.log('Result:', result);
         })
         .catch((error) => {
             console.error('Error signing in with Google:', error);
@@ -32,7 +32,7 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
 
     const handlePress = async () => {
         setIsLoading(true);
-        console.log('Signing in with Google')
+        //console.log('Signing in with Google')
         await signInWithGoogle();
     }
 
@@ -54,7 +54,7 @@ export default function SignInWithGoogleButton({ className='', disabled = false 
 /*
             .then(async (result) => {
                 if (!result) {
-                    console.log('No result from Google Sign In');
+                    //console.log('No result from Google Sign In');
                     return;
                 }
 

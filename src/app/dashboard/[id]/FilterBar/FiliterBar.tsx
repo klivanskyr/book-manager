@@ -7,7 +7,7 @@ import { Slider } from "@nextui-org/react";
 import { UserContext } from "@/app/types/UserContext";
 import { Book } from "@/app/types/Book";
 
-export default function FilterBar({ setShownBooks }: { setShownBooks: Function }) {
+export default function FilterBar({ shownBooks, setShownBooks }: { shownBooks: Book[], setShownBooks: Function }) {
     const { user, setUser } = useContext(UserContext);
     const [titleFilter, setTitleFilter] = useState<string>('');
     const [authorFilter, setAuthorFilter] = useState<string>('');
@@ -17,7 +17,6 @@ export default function FilterBar({ setShownBooks }: { setShownBooks: Function }
 
     //client side filtering of books because firebase does not support multiple where clauses
     useEffect(() => {
-        console.log('Filtering books');
         if (user && user.books) {
             setIsLoading(true);
             let newBooks: Book[] = [];
@@ -26,10 +25,13 @@ export default function FilterBar({ setShownBooks }: { setShownBooks: Function }
                     newBooks.push(book);
                 }
             });
-            setShownBooks(newBooks);
+            if (JSON.stringify(newBooks) != JSON.stringify(shownBooks)) { //only update if the books are different
+                //console.log('updating books');
+                setShownBooks(newBooks);
+            }
             setIsLoading(false);
         }
-    }, [titleFilter, authorFilter, ratingFilter]);
+    }, [titleFilter, authorFilter, ratingFilter, user?.books, shownBooks]);
 
     const leftElements = [
         <TextInput className='h-13 w-[250px] pr-2' label='Title' value={titleFilter} setValue={setTitleFilter} disabled={isLoading} />,

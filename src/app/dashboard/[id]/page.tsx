@@ -9,8 +9,8 @@ import BookSelect from './BookSelect';
 import { signOut } from 'firebase/auth';
 import { Navbar, ActionButton } from "@/app/components";
 import { auth, database } from '@/firebase/firebase';
-import { get, ref } from 'firebase/database';
-import FilterBar from '../FilterBar/FiliterBar';
+import { get, onValue, ref } from 'firebase/database';
+import FilterBar from './FilterBar/FiliterBar';
 import { Book } from '@/app/types/Book';
 import { loadBooks } from '@/app/db';
 
@@ -29,21 +29,21 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     useEffect(() => {
         const getUser = async () => {
             if (!user || !user.user_id || !user.books) {
-                console.log('Fetching User');
+                //console.log('Fetching User');
                 const userBooksRef = ref(database, `usersBooks/${params.id}`);
-                const snapshot = await get(userBooksRef);
-                const books = await loadBooks(snapshot);
-                const updatedUser: User = {
-                    user_id: params.id,
-                    books: books
-                };
-                setUser(updatedUser);
-                // setShownBooks(updatedUser.books);
+                onValue(userBooksRef, async (snapshot) => {
+                    const books = await loadBooks(snapshot);
+                    const updatedUser: User = {
+                        user_id: params.id,
+                        books: books
+                    };
+                    setUser(updatedUser);
+                });
             }
         }
 
         getUser();
-    }, []);
+    }, [user, user?.books]);
 
     const handleSignOut = async () => {
         await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
@@ -74,7 +74,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
         <div className='flex flex-col h-screen'>
             <BookSelect active={modalActive} setActive={setModalActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
-            <FilterBar setShownBooks={setShownBooks} />
+            <FilterBar shownBooks={shownBooks} setShownBooks={setShownBooks} />
             <Shelf shownBooks={shownBooks} />
         </div>
     )

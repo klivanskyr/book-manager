@@ -10,7 +10,7 @@ export function signInWithGoogle() {
     });
     
     try {
-        console.log('Signing in with Google, HERE');
+        //console.log('Signing in with Google, HERE');
         signInWithRedirect(auth, provider);
     } catch (error) {
         console.error('Error signing in with Google:', error);

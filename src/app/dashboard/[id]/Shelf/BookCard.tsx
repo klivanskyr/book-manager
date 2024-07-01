@@ -12,7 +12,7 @@ import Review from "./Review";
 export default function BookCard ({ book }: { book: Book }) {
     const { user, setUser } = useContext(UserContext);
     const [reviewActive, setReviewActive] = useState(false);
-
+    
     function handleRemoveBook() {
         if (user) {
             removeBookFromUser(book.id, user.user_id);

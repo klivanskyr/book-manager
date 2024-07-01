@@ -145,14 +145,24 @@ export async function removeBookFromUser(bookId: string, userId: string) {
 }
 
 export async function updateUserBook(updatedBook: Book, userId: string) {
-  const usersBooksRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`)
-  const snapshot = await get(usersBooksRef);
-  const val = snapshot.val();
-  const updates: { [key: string]: any } = {};
-  updates[`/usersBooks/${userId}/${updatedBook.id}/rating`] = updatedBook.rating;
-  updates[`/usersBooks/${userId}/${updatedBook.id}/text`] = updatedBook.review;
-  console.log(updates);
-  update(usersBooksRef, updates);
-  return;
+  try {
+    const usersBooksRef = ref(database, `usersBooks/${userId}/${updatedBook.id}`);
+    const snapshot = await get(usersBooksRef);
+    
+    if (snapshot.exists()) {
+      const updates: { [key: string]: any } = {};
+      updates[`rating`] = updatedBook.rating;
+      updates[`text`] = updatedBook.review;
+      //console.log('updates', updates);
+      
+      await update(usersBooksRef, updates);
+      //console.log('Update successful');
+      
+    } else {
+      //console.log('No data available at the specified path');
+    }
+  } catch (error) {
+    console.error('Error updating user book:', error);
+  }
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, memo } from "react";
 import { Pagination, Spinner } from "@nextui-org/react";
 import { motion } from 'framer-motion';
 
@@ -46,7 +46,7 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
     }, []);
     
    
-    console.log('User:', user, 'Shown Books: ', shownBooks);
+    //console.log('User:', user, 'Shown Books: ', shownBooks);
     function Body() {
         if (!user) { 
             return <h1>No User</h1> 
@@ -60,7 +60,7 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
         }
         if (user.books.length === 0) {
             return (
-                <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                     <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
                         <h1 className='text-xl mx-1' >Woah...</h1>
                         <h1 className='text-xl mx-1' >looking a little empty here.</h1>
@@ -71,7 +71,7 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
         }
         if (user.books.length > 0 && shownBooks.length === 0) {
             return (
-                <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                <motion.div className='flex flex-row justify-center items-center w-full h-full' initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                     <div className='flex flex-col lg:flex-row justify-center items-center shadow-small p-6' >
                         <h1 className='text-xl mx-1' >Woah...</h1>
                         <h1 className='text-xl mx-1' >looking a little empty here.</h1>
@@ -87,7 +87,7 @@ export default function Shelf({ shownBooks }: { shownBooks: Book[] }) {
                     key={currentPage}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.2 }}
                 >
                     {shownBooks.slice(numBooksOnShelf*(currentPage - 1), numBooksOnShelf*(currentPage - 1) + numBooksOnShelf).map(book => (
                         <motion.div key={book.key}
