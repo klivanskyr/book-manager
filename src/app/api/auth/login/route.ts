@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/firebase";
+import { auth } from "@/firebase/firestore";
 
 type CreatedWith = 'email' | 'google';
 

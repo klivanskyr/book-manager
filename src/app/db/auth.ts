@@ -1,4 +1,4 @@
-import { auth } from "@/firebase/firebase";
+import { auth } from "@/firebase/firestore";
 import { GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 
 export function signInWithGoogle() {

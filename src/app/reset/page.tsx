@@ -7,7 +7,7 @@ import { ActionButton, EmailInput, Form, LoadingButton } from "@/app/components"
 import { Link } from '@nextui-org/react';
 import emailIsValid from '@/app/utils/emailIsValid';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '@/firebase/firebase';
+import { auth } from '@/firebase/firestore';
 import { getUserByEmail } from '../db';
 
 export default function Reset() {

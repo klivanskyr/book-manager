@@ -6,7 +6,7 @@ export type Book = {
     review: string,
     rating: number
     isbn: string,
-    coverImage: string,
+    coverUrl: string,
     bgColor: {r: number, g: number, b: number},
     imgLoaded: boolean,
     selected: boolean,

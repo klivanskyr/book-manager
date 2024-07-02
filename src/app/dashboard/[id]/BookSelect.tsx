@@ -113,18 +113,18 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     }
     return (
         <ModalElement 
-        classNames={{ 
-            base: "y-10",
-            body: "min-h-[500px]",
-            header: "shadow-small",
-            footer: "shadow-small",
-            closeButton: 'hidden'
-        }}
-        size='5xl'
-        active={active} 
-        Header={Header()} 
-        Body={Body()} 
-        Footer={Footer()} 
+            classNames={{ 
+                base: "y-10",
+                body: "min-h-[500px]",
+                header: "shadow-small",
+                footer: "shadow-small",
+                closeButton: 'hidden'
+            }}
+            size='5xl'
+            active={active} 
+            Header={Header()} 
+            Body={Body()} 
+            Footer={Footer()} 
         />
     )
 }

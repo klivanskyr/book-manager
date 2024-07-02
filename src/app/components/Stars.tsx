@@ -6,21 +6,20 @@ import { motion } from 'framer-motion';
 
 import { Book } from '@/app/types/Book';
 import { UserContext } from '@/app/types/UserContext';
-import { updateUserBook } from '@/app/db/db';
+import { updateUserBook } from '@/firebase/firestore';
 
-const Stars = ({ size, book }: { size: number, book: Book }) => {
+export default function Stars({ size, book }: { size: number, book: Book }) {
   const { user, setUser } = useContext(UserContext);
 
-   // Update star/rating amount
-   async function handleRatingUpdate(book: Book, starIndex: number): Promise<void> {
-    if (user && book.rating === starIndex + 1) {
-      const newBook = { ...book, rating: 0 };
+  // Update star/rating amount
+  async function handleRatingUpdate(book: Book, starIndex: number): Promise<void> {
+    if (user && user.books) {
+      const isResetRating = book.rating === starIndex + 1; // Reset rating if the same star is clicked
+      const newBook = { ...book, rating: isResetRating ? 0 : starIndex + 1 };
       await updateUserBook(newBook, user.user_id);
-    } else if (user) {
-      const newBook = { ...book, rating: starIndex + 1 };
-      await updateUserBook(newBook, user.user_id);
+      setUser({ ...user, books: user.books.map(b => b.id === book.id ? newBook : b) });
     }
-};
+  }
 
   return (
     <div className='flex flex-row justify-center text-center pb-2'>
@@ -41,5 +40,3 @@ const Stars = ({ size, book }: { size: number, book: Book }) => {
     </div>
   )
 }
-
-export default Stars

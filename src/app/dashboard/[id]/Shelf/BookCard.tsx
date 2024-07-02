@@ -1,7 +1,7 @@
 'use client';
 
 import { FallBackImage, Stars } from "@/app/components";
-import { removeBookFromUser } from "@/app/db";
+import { getBooks, removeBookFromUser } from "@/firebase/firestore";
 import { Book } from "@/app/types/Book";
 import { UserContext } from "@/app/types/UserContext";
 import { Button, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
@@ -13,9 +13,10 @@ function BookCard ({ book }: { book: Book }) {
     const { user, setUser } = useContext(UserContext);
     const [reviewActive, setReviewActive] = useState(false);
     
-    function handleRemoveBook() {
+    const handleRemoveBook = async () => {
         if (user) {
-            removeBookFromUser(book.id, user.user_id);
+            await removeBookFromUser(book, user.user_id);
+            await setUser({ ...user, books: await getBooks(user.user_id) });
         }
     }
 
@@ -29,7 +30,7 @@ function BookCard ({ book }: { book: Book }) {
                         <FallBackImage
                             className='w-[130] flex flex-row justify-center items-center'
                             alt="Book Cover"
-                            src={book.coverImage}
+                            src={book.coverUrl}
                             width={130}
                             height={200}
                         />

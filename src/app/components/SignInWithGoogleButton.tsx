@@ -3,9 +3,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ref, onValue, query, orderByValue, equalTo, get } from 'firebase/database';
 import { getRedirectResult } from "firebase/auth";
-import { database, auth } from "@/firebase/firebase";
+import { auth } from "@/firebase/firestore";
 
 import { User, UserContext } from "@/app/types/UserContext";
 import { loadBooks } from "@/app/db";

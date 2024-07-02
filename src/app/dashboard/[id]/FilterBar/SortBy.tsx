@@ -1,8 +1,5 @@
-import { loadBook } from "@/app/db/db";
 import { UserContext } from "@/app/types/UserContext";
-import { database } from "@/firebase/firebase";
 import { Select, SelectItem } from "@nextui-org/react";
-import { Query, child, limitToFirst, limitToLast, onValue, orderByChild, orderByKey, orderByValue, query, ref, startAt } from "firebase/database";
 import { useContext, useEffect, useState } from "react";
 
 const enum SortOptions {
@@ -33,83 +30,90 @@ export default function SortBy() {
         { key : SortOptions.RatingLH, value: SortOptions.RatingLH },
     ]
 
-    type Order = 'default' | 'reversed';
-    const orderBooksByChild = (child: string, order: Order) => {
-        if (!user || !user.user_id ) return;
-        if (order === 'default') {
-            const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToFirst(100)); //100 should be replaced with number of books on shelf
-            onValue(bookQuery, async (snapshot) => {
-                let childBookPromises: any[] = [];
-                snapshot.forEach((childSnapshot) => {
-                    childBookPromises.push(loadBook(childSnapshot));
-                });
-                const childBooks = await Promise.all(childBookPromises);
-                setUser({ ...user, books: childBooks })
-            });
-        } else {
-            const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToLast(100)); //100 should be replaced with number of books on shelf
-            onValue(bookQuery, async (snapshot) => {
-                let childBookPromises: any[] = [];
-                snapshot.forEach((childSnapshot) => {
-                    childBookPromises.push(loadBook(childSnapshot));
-                });
-                const childBooks = await Promise.all(childBookPromises);
-                setUser({ ...user, books: childBooks.reverse() });
-            });
-        } 
-    }
+    return (
+        <div>
+            Sort By
+        </div>
+    )
+}
 
-    useEffect(() => {
-        if (!user) return;
-        switch (value) {
-            case SortOptions.TitleAZ: {
-                orderBooksByChild('title', 'default');
-                break;
-            }
-            case SortOptions.TitleZA: {
-                orderBooksByChild('title', 'reversed');
-                break;
-            }
-            case SortOptions.AuthorAZ: {
-                orderBooksByChild('author', 'default');
-                break;
-            }
+//     type Order = 'default' | 'reversed';
+//     const orderBooksByChild = (child: string, order: Order) => {
+//         if (!user || !user.user_id ) return;
+//         if (order === 'default') {
+//             const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToFirst(100)); //100 should be replaced with number of books on shelf
+//             onValue(bookQuery, async (snapshot) => {
+//                 let childBookPromises: any[] = [];
+//                 snapshot.forEach((childSnapshot) => {
+//                     childBookPromises.push(loadBook(childSnapshot));
+//                 });
+//                 const childBooks = await Promise.all(childBookPromises);
+//                 setUser({ ...user, books: childBooks })
+//             });
+//         } else {
+//             const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToLast(100)); //100 should be replaced with number of books on shelf
+//             onValue(bookQuery, async (snapshot) => {
+//                 let childBookPromises: any[] = [];
+//                 snapshot.forEach((childSnapshot) => {
+//                     childBookPromises.push(loadBook(childSnapshot));
+//                 });
+//                 const childBooks = await Promise.all(childBookPromises);
+//                 setUser({ ...user, books: childBooks.reverse() });
+//             });
+//         } 
+//     }
 
-            case SortOptions.AuthorZA: {
-                orderBooksByChild('title', 'reversed');
-                break;
-            }
+//     useEffect(() => {
+//         if (!user) return;
+//         switch (value) {
+//             case SortOptions.TitleAZ: {
+//                 orderBooksByChild('title', 'default');
+//                 break;
+//             }
+//             case SortOptions.TitleZA: {
+//                 orderBooksByChild('title', 'reversed');
+//                 break;
+//             }
+//             case SortOptions.AuthorAZ: {
+//                 orderBooksByChild('author', 'default');
+//                 break;
+//             }
 
-            case SortOptions.AddedNewest: {
-                orderBooksByChild('createdAt', 'default');
-                break;
-            }
+//             case SortOptions.AuthorZA: {
+//                 orderBooksByChild('title', 'reversed');
+//                 break;
+//             }
 
-            case SortOptions.AddedOldest: {
-                orderBooksByChild('createdAt', 'reversed');
-                break;
-            }
+//             case SortOptions.AddedNewest: {
+//                 orderBooksByChild('createdAt', 'default');
+//                 break;
+//             }
 
-            case SortOptions.RatingLH: {
-                orderBooksByChild('rating', 'default');
-                break;
-            }
+//             case SortOptions.AddedOldest: {
+//                 orderBooksByChild('createdAt', 'reversed');
+//                 break;
+//             }
 
-            case SortOptions.RatingHL: {
-                orderBooksByChild('rating', 'reversed');
-                break;
-            }
-        }
+//             case SortOptions.RatingLH: {
+//                 orderBooksByChild('rating', 'default');
+//                 break;
+//             }
 
-    }, [value]);
+//             case SortOptions.RatingHL: {
+//                 orderBooksByChild('rating', 'reversed');
+//                 break;
+//             }
+//         }
+
+//     }, [value]);
 
 
     
-    return (
-        <Select className='w-52' label="Sort By" selectedKeys={[value]} onChange={(e: any) => setValue(e.target.value)} >
-            {sortOptions.map((option) => (
-                <SelectItem key={option.key}>{option.value}</SelectItem>
-            ))}
-        </Select>
-    )
-}
+//     return (
+//         <Select className='w-52' label="Sort By" selectedKeys={[value]} onChange={(e: any) => setValue(e.target.value)} >
+//             {sortOptions.map((option) => (
+//                 <SelectItem key={option.key}>{option.value}</SelectItem>
+//             ))}
+//         </Select>
+//     )
+// }

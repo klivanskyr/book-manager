@@ -3,15 +3,12 @@
 import { ReactElement, useContext, useEffect, useState } from 'react';
 import { User, UserContext } from '@/app/types/UserContext';
 import { useRouter } from 'next/navigation';
-
-import Shelf from './Shelf/Shelf';
-import BookSelect from './BookSelect';
 import { signOut } from 'firebase/auth';
+
+import BookSelect from './BookSelect';
 import { Navbar, ActionButton } from "@/app/components";
-import { auth, database } from '@/firebase/firebase';
-import { onValue, ref } from 'firebase/database';
+import { auth, getBooks } from '@/firebase/firestore';
 import FilterBar from './FilterBar/FiliterBar';
-import { loadBooks } from '@/app/db';
 import TEST from './TEST';
 
 
@@ -28,22 +25,23 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     useEffect(() => {
         const getUser = async () => {
             if (!user || !user.user_id || !user.books) {
-                //console.log('Fetching User');
-                const userBooksRef = ref(database, `usersBooks/${params.id}`);
-                onValue(userBooksRef, async (snapshot) => {
-                    const books = await loadBooks(snapshot);
-                    const updatedUser: User = {
-                        user_id: params.id,
-                        books: books,
-                        shownBooks: user?.shownBooks || []
-                    };
-                    setUser(updatedUser);
+                console.log('fetching user books');
+                const books = await getBooks(params.id);
+                console.log('books', books);
+                if (!books) {
+                    router.push('/login');
+                    return;
+                }
+                setUser({
+                    user_id: params.id,
+                    books: books,
+                    shownBooks: []
                 });
             }
         }
 
         getUser();
-    }, [user, user?.books]);
+    }, [user]);
 
     const handleSignOut = async () => {
         await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
