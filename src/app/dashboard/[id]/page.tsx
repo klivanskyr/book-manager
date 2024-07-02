@@ -7,9 +7,9 @@ import { signOut } from 'firebase/auth';
 
 import BookSelect from './BookSelect';
 import { Navbar, ActionButton } from "@/app/components";
-import { auth, getBooks } from '@/firebase/firestore';
+import { auth, getShelves } from '@/firebase/firestore';
 import FilterBar from './FilterBar/FiliterBar';
-import TEST from './TEST';
+import Shelves from './Shelves/Shelves';
 
 
 export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
@@ -25,16 +25,15 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     */
     useEffect(() => {
         const getUser = async () => {
-            if (!user || !user.user_id || !user.books) {
-                const books = await getBooks(params.id);
-                if (!books) {
+            if (!user) {
+                const shelves = await getShelves(params.id);
+                if (shelves === null) {
                     router.push('/login');
                     return;
                 }
                 setUser({
-                    user_id: params.id,
-                    books: books,
-                    shownBooks: []
+                    userId: params.id,
+                    shelves,
                 });
             }
         }
@@ -69,11 +68,10 @@ export default function Dashboard({ params }: { params: { id: string } }): React
 
     return (
         <div className='flex flex-col h-screen'>
-            <BookSelect active={modalActive} setActive={setModalActive} />
+            {/* <BookSelect active={modalActive} setActive={setModalActive} /> */}
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
-            <FilterBar isLoading={isLoading} setIsLoading={setIsLoading} />
-            {/* <Shelf /> */}
-            <TEST isLoading={isLoading} setIsLoading={setIsLoading} />
+            {/* <FilterBar isLoading={isLoading} setIsLoading={setIsLoading} /> */}
+            <Shelves isLoading={isLoading} setIsLoading={setIsLoading} />
         </div>
     )
 }

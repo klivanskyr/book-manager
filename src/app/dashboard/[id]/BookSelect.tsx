@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useContext } from "react";
-import { Spinner } from "@nextui-org/react";
+import { useState, useContext } from "react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
 
 import { TextInput, ActionButton, ModalElement } from "@/app/components"
 import { queryOpenLibrary } from "@/app/utils/openlibrary";
@@ -17,13 +17,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
-
-    //When user begins to write in search bar, clear error message
-    useEffect(() => {
-        if (text) {
-            setError('');
-        }
-    }, [text])
+    const [selectedShelves, setSelectedShelves] = useState<string[]>([]);
 
     const getNewBooks = async () => {
         const res = await queryOpenLibrary(text);
@@ -79,11 +73,32 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     }
 
     function Header() {
+
+        const userShelves = user.shelves;
+
         return (
-            <form className="flex w-full" onSubmit={undefined}>
-                <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by Title, Author or ISBN' value={text} setValue={setText} error={error} />
-                <ActionButton className="w-8 h-16 rounded-l-none rounded-t-lg rounded-r-lg rounded-b-lg shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
-            </form>
+            <div className='w-full flex flex-row justify-between items-center'>
+                <form className="flex w-1/2" onSubmit={undefined}>
+                    <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by Title, Author or ISBN' value={text} setValue={setText} error={error} />
+                    <ActionButton className="w-8 h-16 rounded-l-none rounded-t-lg rounded-r-lg rounded-b-lg shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
+                </form>
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button color='primary' className='w-[150px] h-12 rounded-lg shadow-small bg-blue-600 text-white text-medium'>Select Shelves</Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                        variant="flat"
+                        closeOnSelect={false}
+                        selectionMode="multiple"
+                        selectedKeys={selectedShelves}
+                        onSelectionChange={(keys) => setSelectedShelves(Array.from(keys) as string[])}
+                    >
+                        {userShelves.map((shelf, i) => (
+                            <DropdownItem key={shelf.value}>{shelf.name}</DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </Dropdown>
+            </div>
         )
     }
 

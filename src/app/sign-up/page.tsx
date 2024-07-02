@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput } from '@/app/components';
+import { Button } from '@nextui-org/react';
+import { addBookToUserShelf, getShelves } from '@/firebase/firestore';
 
 export default function Signup() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -82,7 +84,7 @@ export default function Signup() {
         <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={input.password} setValue={(newValue: string) => setInput({ ...input, password: newValue })} />,
         <SubmitButton />,
         <h2 className={`m-2 text-red-600 font-light text-xl ${error ? 'opacity-100' : 'opacity-0'}`} >{error}</h2>,
-        <div className='py-5 text-center'> Already have an account? <Link className='font-semibold text-lg text-blue-500' href='/login'>Sign In</Link></div>
+        <div className='py-5 text-center'> Already have an account? <Link className='font-semibold text-lg text-blue-500' href='/login'>Sign In</Link></div>,
     ];
 
     return (
