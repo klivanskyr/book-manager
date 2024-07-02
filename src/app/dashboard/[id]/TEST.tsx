@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem, Avatar } from "@nextui-org/react";
+import { Accordion, AccordionItem, Image } from "@nextui-org/react";
 import Shelf from "./Shelf/Shelf";
 import { bookIcon } from "@/assets";
 
@@ -7,8 +7,8 @@ export default function TEST({ isLoading, setIsLoading }: { isLoading: boolean, 
         <div className="mx-2">
             <Accordion className='' variant="splitted">
                 <AccordionItem key='1' title='All Books' startContent={
-                    <Avatar 
-                        className="p-1.5 bg-slate-50 border border-slate-200 rounded-full"
+                    <Image 
+                        className="p-1.5 w-[50px] h-[50px] bg-slate-50 border border-slate-200 rounded-full"
                         radius="lg"
                         src={bookIcon.src}
                     />
