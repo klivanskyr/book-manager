@@ -2,7 +2,7 @@ import { Accordion, AccordionItem, Avatar } from "@nextui-org/react";
 import Shelf from "./Shelf/Shelf";
 import { bookIcon } from "@/assets";
 
-export default function TEST() {
+export default function TEST({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
     return (
         <div className="mx-2">
             <Accordion className='' variant="splitted">
@@ -13,7 +13,7 @@ export default function TEST() {
                         src={bookIcon.src}
                     />
                 }>
-                    <Shelf />
+                    <Shelf isLoading={isLoading} setIsLoading={setIsLoading} />
                 </AccordionItem>
             </Accordion>
         </div>

@@ -8,7 +8,7 @@ import { UserContext } from "@/app/types/UserContext";
 import BookCard from "./BookCard";
 import { Book } from "@/app/types/Book";
 
-function Shelf() {
+function Shelf({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
     const { user, setUser } = useContext(UserContext);
     const [currentPage, setCurrentPage] = useState(1);
     const [numBooksOnShelf, setNumBooksOnShelf] = useState(5);
@@ -65,10 +65,10 @@ function Shelf() {
         if (!user) { 
             return <h1>No User</h1> 
         }
-        if (user.books === null) {
+        if (isLoading || user.books === null) {
             return (
             <div className='flex flex-row justify-center w-full h-full'>
-                <Spinner label='Loading...' size='lg' />
+                <Spinner className='w-[450px] h-[450px]' label='Loading...' size='lg' />
             </div>
             )
         }

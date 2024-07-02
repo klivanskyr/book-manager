@@ -7,15 +7,14 @@ import { Slider } from "@nextui-org/react";
 import { UserContext } from "@/app/types/UserContext";
 import { Book } from "@/app/types/Book";
 
-export default function FilterBar() {
+export default function FilterBar({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
     const { user, setUser } = useContext(UserContext);
     const [titleFilter, setTitleFilter] = useState<string>('');
     const [authorFilter, setAuthorFilter] = useState<string>('');
     const [ratingFilter, setRatingFilter] = useState<[number, number]>([0, 5]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
 
 
-    //client side filtering of books because firebase does not support multiple where clauses
+    //client side filtering of books because firestore does not support where clauses on different fields at once
     useEffect(() => {
         if (user && user.books) {
             setIsLoading(true);
@@ -39,7 +38,7 @@ export default function FilterBar() {
     ]
 
     const rightElements = [
-        <SortBy />
+        <SortBy isLoading={isLoading} setIsLoading={setIsLoading} />
     ]
 
     return (

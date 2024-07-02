@@ -15,6 +15,7 @@ import TEST from './TEST';
 export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const [modalActive, setModalActive] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
     /*
@@ -70,9 +71,9 @@ export default function Dashboard({ params }: { params: { id: string } }): React
         <div className='flex flex-col h-screen'>
             <BookSelect active={modalActive} setActive={setModalActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
-            <FilterBar />
+            <FilterBar isLoading={isLoading} setIsLoading={setIsLoading} />
             {/* <Shelf /> */}
-            <TEST />
+            <TEST isLoading={isLoading} setIsLoading={setIsLoading} />
         </div>
     )
 }

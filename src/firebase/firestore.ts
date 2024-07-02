@@ -2,7 +2,7 @@
 import { Book } from "@/app/types/Book";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where, orderBy } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -47,16 +47,27 @@ export async function createNewUser(userId: string, username: string, email: str
   }
 }
 
-export async function getBooks(userId: string): Promise<Book[] | null> {
+interface Sort {
+  field?: string,
+  direction?: 'asc' | 'desc'
+}
+export async function getBooks(userId: string, sort: Sort={}): Promise<Book[] | null> {
   try {
     //get book ids from user
     const userBooks = await getDocs(collection(db, 'users', userId, 'books'));
-
     const bookIds = userBooks.docs.map(doc => doc.id);
 
     //get review data from book ids
     const userBooksQuery = query(collection(db, 'userBooks', userId, 'books'), where(documentId(), 'in', bookIds));
     const userBooksDocs = await getDocs(userBooksQuery);
+    let reviewsMap = new Map(); //create kv-pair map for reviews
+    userBooksDocs.forEach(doc => {
+      const reviewData = doc.data();
+      reviewsMap.set(doc.id, {
+        review: reviewData.review,
+        rating: reviewData.rating
+      });
+    });
 
     if (userBooksDocs.empty) { 
       console.log('No books found', bookIds, userBooksDocs);
@@ -64,19 +75,27 @@ export async function getBooks(userId: string): Promise<Book[] | null> {
     };
 
     //get book data from book ids
-    const booksQuery = query(collection(db, 'books'), where(documentId(), 'in', bookIds));
+    let booksQuery = query(collection(db, 'books'), where(documentId(), 'in', bookIds));
+    if (sort.field && sort.direction) {
+      if (sort.field === 'rating') {
+
+      } else {
+        booksQuery = query(booksQuery, orderBy(sort.field, sort.direction));
+      }
+    }
     const booksDocs = await getDocs(booksQuery);
 
     let books: Book[] = [];
     booksDocs.forEach(doc => {
+      const reviewInfo = reviewsMap.get(doc.id) || { review: '', rating: 0 } ;
       const bookData = doc.data();
       books.push({
         id: doc.id,
         key: bookData.key,
         title: bookData.title,
         author: bookData.author,
-        review: '', //NEED TO CHANGE
-        rating: 0, //NEED TO CHANGE
+        review: reviewInfo.review,
+        rating: reviewInfo.rating,
         isbn: bookData.isbn,
         coverUrl: bookData.coverUrl,
         bgColor: bookData.bgColor,
@@ -161,4 +180,15 @@ export async function updateUserBook(book: Book, userId: string) {
     isGlobalReview: false,
     lastUpdated: Timestamp.now()
   });
+}
+
+export async function getUserIdByEmail(email: string) {
+  const usersQuery = query(collection(db, 'users'), where('email', '==', email));
+  const usersDocs = await getDocs(usersQuery);
+
+  if (usersDocs.empty) {
+    return null;
+  }
+
+  return usersDocs.docs[0].id;
 }

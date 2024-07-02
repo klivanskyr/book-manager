@@ -1,10 +1,10 @@
 'use client'; 
 
-import { useState, useContext, ReactElement, useEffect } from 'react';
+import { useState, useContext, ReactElement } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { EmailInput, PasswordInput, ActionButton, SignInWithGoogleButton, LoadingButton } from '@/app/components';
+import { EmailInput, PasswordInput, ActionButton, LoadingButton } from '@/app/components';
 import { UserContext } from '../types/UserContext';
 import { Form } from '../components';
 import emailIsValid from '../utils/emailIsValid';
@@ -68,7 +68,7 @@ export default function Login(): ReactElement {
     <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={input.password} setValue={(newValue: string) => setInput({ ...input, password: newValue })} />,
     <Link href='/reset' className='px-2 pb-2 pt-6 text-blue-500 font-medium text-sm'>Forgot Password</Link>,
     <SubmitButton />,
-    <SignInWithGoogleButton className='bg-green-400 w-64 h-12 mb-2' disabled={isLoading} />,
+    // <SignInWithGoogleButton className='bg-green-400 w-64 h-12 mb-2' disabled={isLoading} />,
     <div className='py-5 text-center'> Dont have an account? <Link className='font-semibold text-lg text-blue-500' href='/sign-up'>Sign up</Link></div>
   ];
 

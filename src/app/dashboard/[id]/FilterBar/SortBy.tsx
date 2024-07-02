@@ -1,6 +1,8 @@
+import { getBooks } from "@/firebase/firestore";
 import { UserContext } from "@/app/types/UserContext";
 import { Select, SelectItem } from "@nextui-org/react";
 import { useContext, useEffect, useState } from "react";
+import { Book } from "@/app/types/Book";
 
 const enum SortOptions {
     TitleAZ = 'Title A to Z',
@@ -15,7 +17,7 @@ const enum SortOptions {
     ReviewLengthLH = 'Review Length Low to High',
 }
 
-export default function SortBy() {
+export default function SortBy({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
     const { user, setUser } = useContext(UserContext);
     const [value, setValue] = useState(SortOptions.TitleAZ);
 
@@ -30,90 +32,71 @@ export default function SortBy() {
         { key : SortOptions.RatingLH, value: SortOptions.RatingLH },
     ]
 
-    return (
-        <div>
-            Sort By
-        </div>
-    )
-}
+    type Order = 'default' | 'reversed';
+   
+    useEffect(() => {
+        if (!user) return;
+        const sort = async () => {
+            setIsLoading(true);
+            switch (value) {
+                case SortOptions.TitleAZ: {
+                    setUser({ ...user, books: await getBooks(user.user_id, { field: 'title', direction: 'asc' }) as []});
+                    setIsLoading(false);
+                    break;
+                }
+                case SortOptions.TitleZA: {
+                    setUser({ ...user, books: await getBooks(user.user_id, { field: 'title', direction: 'desc' }) as []});
+                    setIsLoading(false);
+                    break;
+                }
+                case SortOptions.AuthorAZ: {
+                    setUser({ ...user, books: await getBooks(user.user_id, { field: 'author', direction: 'asc' }) as []});
+                    setIsLoading(false);
+                    break;
+                }
+                case SortOptions.AuthorZA: {
+                    setUser({ ...user, books: await getBooks(user.user_id, { field: 'author', direction: 'desc' }) as []});
+                    setIsLoading(false);
+                    break;
+                }
+                case SortOptions.AddedNewest: {
+                    setUser({ ...user, books: await getBooks(user.user_id, { field: 'createdAt', direction: 'desc' }) as []});
+                    setIsLoading(false);
+                    break;
+                }
+                case SortOptions.AddedOldest: {
+                    setUser({ ...user, books: await getBooks(user.user_id, { field: 'createdAt', direction: 'asc' }) as []});
+                    setIsLoading(false);
+                    break;
+                }
+                case SortOptions.RatingLH: {
+                    const books: Book[] = await getBooks(user.user_id) as [];
+                    books.sort((book1, book2) => book1.rating - book2.rating);
+                    setUser({ ...user, books });
+                    setIsLoading(false);
+                    break;
+                }
+                case SortOptions.RatingHL: {
+                    const books: Book[] = await getBooks(user.user_id) as [];
+                    books.sort((book1, book2) => book2.rating - book1.rating);
+                    setUser({ ...user, books });
+                    setIsLoading(false);
+                    break;
+                }
+            }
+        }
 
-//     type Order = 'default' | 'reversed';
-//     const orderBooksByChild = (child: string, order: Order) => {
-//         if (!user || !user.user_id ) return;
-//         if (order === 'default') {
-//             const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToFirst(100)); //100 should be replaced with number of books on shelf
-//             onValue(bookQuery, async (snapshot) => {
-//                 let childBookPromises: any[] = [];
-//                 snapshot.forEach((childSnapshot) => {
-//                     childBookPromises.push(loadBook(childSnapshot));
-//                 });
-//                 const childBooks = await Promise.all(childBookPromises);
-//                 setUser({ ...user, books: childBooks })
-//             });
-//         } else {
-//             const bookQuery = query(ref(database, `usersBooks/${user.user_id}`), orderByChild(child), limitToLast(100)); //100 should be replaced with number of books on shelf
-//             onValue(bookQuery, async (snapshot) => {
-//                 let childBookPromises: any[] = [];
-//                 snapshot.forEach((childSnapshot) => {
-//                     childBookPromises.push(loadBook(childSnapshot));
-//                 });
-//                 const childBooks = await Promise.all(childBookPromises);
-//                 setUser({ ...user, books: childBooks.reverse() });
-//             });
-//         } 
-//     }
+        sort();
 
-//     useEffect(() => {
-//         if (!user) return;
-//         switch (value) {
-//             case SortOptions.TitleAZ: {
-//                 orderBooksByChild('title', 'default');
-//                 break;
-//             }
-//             case SortOptions.TitleZA: {
-//                 orderBooksByChild('title', 'reversed');
-//                 break;
-//             }
-//             case SortOptions.AuthorAZ: {
-//                 orderBooksByChild('author', 'default');
-//                 break;
-//             }
-
-//             case SortOptions.AuthorZA: {
-//                 orderBooksByChild('title', 'reversed');
-//                 break;
-//             }
-
-//             case SortOptions.AddedNewest: {
-//                 orderBooksByChild('createdAt', 'default');
-//                 break;
-//             }
-
-//             case SortOptions.AddedOldest: {
-//                 orderBooksByChild('createdAt', 'reversed');
-//                 break;
-//             }
-
-//             case SortOptions.RatingLH: {
-//                 orderBooksByChild('rating', 'default');
-//                 break;
-//             }
-
-//             case SortOptions.RatingHL: {
-//                 orderBooksByChild('rating', 'reversed');
-//                 break;
-//             }
-//         }
-
-//     }, [value]);
+    }, [value]);
 
 
     
-//     return (
-//         <Select className='w-52' label="Sort By" selectedKeys={[value]} onChange={(e: any) => setValue(e.target.value)} >
-//             {sortOptions.map((option) => (
-//                 <SelectItem key={option.key}>{option.value}</SelectItem>
-//             ))}
-//         </Select>
-//     )
-// }
+    return (
+        <Select className='w-52' label="Sort By" selectedKeys={[value]} onChange={(e: any) => setValue(e.target.value)} >
+            {sortOptions.map((option) => (
+                <SelectItem key={option.key}>{option.value}</SelectItem>
+            ))}
+        </Select>
+    )
+}
