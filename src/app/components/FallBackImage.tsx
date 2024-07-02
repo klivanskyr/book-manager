@@ -9,6 +9,7 @@ export default function FallBackImage({ className='', src, alt, width, height }:
 
     return (
         <Image
+            priority={true}
             className={className}
             as={NextImage}
             src={src}

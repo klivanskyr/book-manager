@@ -5,7 +5,7 @@ import ModalElement from '@/app/components/ModalElement'
 
 import Stars from '@/app/components/Stars'
 import { Book } from '@/app/types/Book'
-import { updateUserBook } from '@/app/db/db';
+import { updateUserBook } from '@/firebase/firestore'
 import { UserContext } from '@/app/types/UserContext';
 import { Button, Textarea } from '@nextui-org/react';
 
@@ -17,7 +17,6 @@ export default function Review({ active, book, setReviewActive }: { active: bool
   async function handleSubmit(e: any) {
     if (user) {
       const newBook = { ...book, review: review.text, rating: review.rating };
-      console.log(newBook);
       await updateUserBook(newBook, user.user_id);
     }
   }

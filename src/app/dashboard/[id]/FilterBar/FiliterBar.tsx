@@ -26,7 +26,6 @@ export default function FilterBar() {
                 }
             });
             if (JSON.stringify(newBooks) != JSON.stringify(user.shownBooks)) { //only update if the books are different
-                //console.log('updating books');
                 setUser({ ...user, shownBooks: newBooks });
             }
             setIsLoading(false);

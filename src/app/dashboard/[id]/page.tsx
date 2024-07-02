@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactElement, useContext, useEffect, useState } from 'react';
-import { User, UserContext } from '@/app/types/UserContext';
+import { UserContext } from '@/app/types/UserContext';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 
@@ -25,9 +25,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     useEffect(() => {
         const getUser = async () => {
             if (!user || !user.user_id || !user.books) {
-                console.log('fetching user books');
                 const books = await getBooks(params.id);
-                console.log('books', books);
                 if (!books) {
                     router.push('/login');
                     return;

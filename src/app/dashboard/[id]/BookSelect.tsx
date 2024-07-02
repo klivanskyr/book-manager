@@ -41,12 +41,8 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         */
         const books = data.books.map((book: Book) => {
             const currentBook = user?.books?.find(curBook => curBook.key == book.key);
-            console.log('found', currentBook)
             return { ...book, selected: currentBook?.selected || false}
         });
-
-        console.log('books', books);
-
         setFoundBooks(books);
     }
 

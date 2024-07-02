@@ -16,13 +16,11 @@ export async function queryOpenLibrary(query: string): Promise<NextResponse> {
     const query_with_pluses = query.replace(/ /g, '+');
     try {
         const fetchUrl = `${baseBookUrl}${query_with_pluses}${params}`;
-        console.log('fetching: ', fetchUrl);
         const res = await fetch(fetchUrl);
         const data = await res.json();
         if (data.docs.length == 0){
             return NextResponse.json({ code: 400, message: `No books found with ${query}.` });
         }
-        console.log('');
         const books: Book[] = data.docs
         .filter((entry: any) => entry.title && entry.author_name && entry.author_name[0]) //filter out null entries
         .map((entry: any) => ({
