@@ -12,7 +12,7 @@ export type Column = {
 }
 export default function TableElement({ rows, columns }: { rows: Row[], columns: Column[] }) {
     return (
-      <Table>
+      <Table aria-label="Table" >
         <TableHeader columns={columns}>
           {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
         </TableHeader>

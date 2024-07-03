@@ -1,14 +1,15 @@
-import { Accordion, AccordionItem, Image, Spinner } from "@nextui-org/react";
+import { Accordion, AccordionItem, Image, Link, Spinner } from "@nextui-org/react";
 import { bookIcon } from "@/assets";
 import { UserContext } from "@/app/types/UserContext";
 import { useContext } from "react";
 import { Table, Row, Column } from "@/app/components";
 import { Book } from "@/app/types/Book";
+import { Shelf } from "@/app/types/Shelf";
 
 export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
     const { user, setUser } = useContext(UserContext);
 
-    function BookTable({ books }: { books: Book[] }) {
+    function BookTable({ shelf }: { shelf: Shelf }) {
       const columns: Column[] = [
         {
           key: 'title',
@@ -28,9 +29,9 @@ export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolea
         }
       ]
 
-      const rows: Row[] = books.map((book) => (
+      const rows: Row[] = shelf.books.map((book, i) => (
         {
-          key: book.id,
+          key: `${i}`,
           title: book.title,
           author: book.author,
           isbn: book.isbn,
@@ -43,7 +44,7 @@ export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolea
       )
     }
 
-    if (!user || isLoading) {
+    if (!user || !user.shelves || isLoading) {
         return (
             <div className="flex justify-center items-center h-[500px]">
                 <Spinner className='' size='lg' />
@@ -51,7 +52,7 @@ export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolea
         );
     }
     return (
-        <div className="mx-2">
+        <div className="mx-2 my-4">
           <Accordion className='' variant="splitted">
             {user.shelves.map((shelf) => (
               <AccordionItem key={shelf.shelfId} title={shelf.name} startContent={
@@ -61,7 +62,10 @@ export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolea
                   src={bookIcon.src}
                 />
               }>
-                <BookTable books={shelf.books} />
+                <BookTable shelf={shelf} />
+                <div className="my-4 w-full flex flex-row justify-center items-center">
+                  <Link href={`/dashboard/${user.userId}/shelf/${shelf.shelfId}`} className="text-white bg-blue-600 shadow-md rounded-full border py-[10px] px-[15px] ">View Shelf Details</Link>
+                </div>
               </AccordionItem>
             ))}
           </Accordion>

@@ -38,6 +38,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
             }
         }
 
+        console.log('User', user);
         getUser();
     }, [user]);
 
@@ -68,7 +69,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
 
     return (
         <div className='flex flex-col h-screen'>
-            {/* <BookSelect active={modalActive} setActive={setModalActive} /> */}
+            <BookSelect active={modalActive} setActive={setModalActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
             {/* <FilterBar isLoading={isLoading} setIsLoading={setIsLoading} /> */}
             <Shelves isLoading={isLoading} setIsLoading={setIsLoading} />

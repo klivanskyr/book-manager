@@ -40,14 +40,10 @@ export default function BookSelectCard({ book, updateFoundBooks }: { book: Book,
     }
 
     function CurrentButton() {
-        if (book.selected && isLoading) {
-            return <LoadingButton className='bg-red-600'  color='danger' isLoading={isLoading} />
-        } else if (!book.selected && isLoading) {
+        if (isLoading) {
             return <LoadingButton className='bg-blue-600' color='primary' isLoading={isLoading} />
-        } else if (book.selected && !isLoading) {
-            return <ActionButton className='bg-red-600' text='Remove' onClick={() => handleClickRemove()} />
         } else {
-            return <ActionButton className='bg-blue-600' text='Select' onClick={() => handleClickAdd()} />
+            return <ActionButton className='bg-blue-600' text='Select' onClick={() => handleClickAdd()} disabled={book.selected} />
         }
     }
     

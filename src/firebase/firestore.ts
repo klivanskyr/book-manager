@@ -274,22 +274,22 @@ export async function addBookToUser(book: Book, userId: string) {
 
 export async function removeBookFromUser(book: Book, userId: string) {
   // remove book from users/userId/books/
-  await deleteDoc(doc(db, 'users', userId, 'books', book.id));
+  await deleteDoc(doc(db, 'users', userId, 'books', book.bookId));
 
   // remove book from userBooks/userId/books/
-  await deleteDoc(doc(db, 'userBooks', userId, 'books', book.id));
+  await deleteDoc(doc(db, 'userBooks', userId, 'books', book.bookId));
 
   // if no other user has the book, remove book from books
-  const usersBooksQuery = query(collection(db, 'users'), where(`books.${book.id}`, '==', true));
+  const usersBooksQuery = query(collection(db, 'users'), where(`books.${book.bookId}`, '==', true));
   const usersBooksDocs = await getDocs(usersBooksQuery);
 
   if (usersBooksDocs.empty) {
-    await deleteDoc(doc(db, 'books', book.id));
+    await deleteDoc(doc(db, 'books', book.bookId));
   }
 }
 
 export async function updateUserBook(book: Book, userId: string) {
-  await updateDoc(doc(db, 'userBooks', userId, 'books', book.id), {
+  await updateDoc(doc(db, 'userBooks', userId, 'books', book.bookId), {
     review: book.review,
     rating: book.rating,
     isGlobalReview: false,

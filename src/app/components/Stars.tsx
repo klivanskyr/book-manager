@@ -17,7 +17,7 @@ export default function Stars({ size, book }: { size: number, book: Book }) {
       const isResetRating = book.rating === starIndex + 1; // Reset rating if the same star is clicked
       const newBook = { ...book, rating: isResetRating ? 0 : starIndex + 1 };
       await updateUserBook(newBook, user.user_id);
-      setUser({ ...user, books: user.books.map(b => b.id === book.id ? newBook : b) });
+      setUser({ ...user, books: user.books.map(b => b.id === book.bookId ? newBook : b) });
     }
   }
 

@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useContext } from "react";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
+import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
 
 import { TextInput, ActionButton, ModalElement } from "@/app/components"
 import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
 import BookSelectCard from "./BookSelectCard";
 import { UserContext } from "@/app/types/UserContext";
+import { Shelf } from "@/app/types/Shelf";
 
 
 export default function BookSelect({ active, setActive }: { active: boolean, setActive: Function }) {
@@ -17,9 +18,10 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
-    const [selectedShelves, setSelectedShelves] = useState<string[]>([]);
+    const [selectedShelves, setSelectedShelves] = useState<{ shelfId: string, shelfName: string}[]>([]);
 
     const getNewBooks = async () => {
+        if (!user) { return }
         const res = await queryOpenLibrary(text);
         const data = await res.json();
         if (data.code !== 200) {
@@ -27,17 +29,22 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
             setIsLoading(false);
             return [];
         }
-        /* 
-            Loops through books pulled from API
-            for every pulled book, loop through currentBooks and see if
-            there is a match. If so replace the pulled book with the
-            current book so the reviews and rating is preserved
+        /*
+            Loop through books pulled from API
+            for every book, loop through user.shelves and check for matches.
+            If all shelves have the book, then show remove button
+            If no/some shelves have the book, show add button. Add book to all shelves selected,
+            if a shelf is selected that already has the book in the some case, ignore readding it.
+
         */
-        const books = data.books.map((book: Book) => {
-            const currentBook = user?.books?.find(curBook => curBook.key == book.key);
-            return { ...book, selected: currentBook?.selected || false}
+        data.books.map((apiBook: Book) => {
+            const activeShelves = user?.shelves.filter((shelf) => selectedShelves.includes(shelf.shelfId)); //Check if the Ids match and if so include it in the search
+            activeShelves.map((shelf: Shelf) => {
+                if (shelf.books.some((shelfBook) => shelfBook.key === apiBook.key)) {
+                    return { ...apiBook, selected: true }
+                }
+            })
         });
-        setFoundBooks(books);
     }
 
     const handleClick = async () => {
@@ -66,38 +73,56 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         } else {
             return(
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
-                    {foundBooks.map((book: Book, i) => <BookSelectCard key={book.key} book={book} updateFoundBooks={updateFoundBooks}/>)}
+                    {foundBooks.map((book: Book) => <BookSelectCard key={book.key} book={book} updateFoundBooks={updateFoundBooks}/>)}
                 </div>
             )
         }
     }
 
-    function Header() {
+    function updatedSelectedKeys(selectedIds: string[]) {
+        let newSelectedShelves: { shelfId: string, shelfName: string}[] = [];
+        selectedIds.map((selectedId) => {
+            const shelf = user?.shelves.find((shelf) => shelf.shelfId === selectedId);
+            if (shelf) {
+                newSelectedShelves.push({ shelfId: shelf.shelfId, shelfName: shelf.name });
+            }
+        })
+        setSelectedShelves(newSelectedShelves);
+    }
 
-        const userShelves = user.shelves;
+    function Header() {
+        if (!user || !user.shelves) { return (<></>) }
+        const userShelves = user?.shelves;
 
         return (
             <div className='w-full flex flex-row justify-between items-center'>
                 <form className="flex w-1/2" onSubmit={undefined}>
                     <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by Title, Author or ISBN' value={text} setValue={setText} error={error} />
-                    <ActionButton className="w-8 h-16 rounded-l-none rounded-t-lg rounded-r-lg rounded-b-lg shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
+                    <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
                 </form>
-                <Dropdown>
-                    <DropdownTrigger>
-                        <Button color='primary' className='w-[150px] h-12 rounded-lg shadow-small bg-blue-600 text-white text-medium'>Select Shelves</Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                        variant="flat"
-                        closeOnSelect={false}
-                        selectionMode="multiple"
-                        selectedKeys={selectedShelves}
-                        onSelectionChange={(keys) => setSelectedShelves(Array.from(keys) as string[])}
-                    >
-                        {userShelves.map((shelf, i) => (
-                            <DropdownItem key={shelf.value}>{shelf.name}</DropdownItem>
+                <div className='w-1/2 flex flex-row justify-between items-center ml-2'>
+                    <div className='flex flex-row'>
+                        {selectedShelves.map(({shelfId, shelfName}) => (
+                            <Chip key={shelfId} onClose={() => setSelectedShelves(selectedShelves.filter((shelf) => shelfId !== shelf.shelfId))}>{shelfName}</Chip>
                         ))}
-                    </DropdownMenu>
-                </Dropdown>
+                    </div>
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Button color='primary' className='w-[150px] h-12 rounded-lg shadow-small bg-blue-600 text-white text-medium'>Select Shelves</Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            variant="flat"
+                            closeOnSelect={false}
+                            selectionMode="multiple"
+                            selectedKeys={selectedShelves.map((shelf) => shelf.shelfId)}
+                            onSelectionChange={(keys) => updatedSelectedKeys(Array.from(keys) as string[])}
+                        >
+                            {userShelves.map((shelf) => (
+                                <DropdownItem key={shelf.shelfId}>{shelf.name}</DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
             </div>
         )
     }
@@ -122,6 +147,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         )
     
     }
+
     return (
         <ModalElement 
             classNames={{ 
