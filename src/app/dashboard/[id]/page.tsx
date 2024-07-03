@@ -10,14 +10,16 @@ import { Navbar, ActionButton } from "@/app/components";
 import { auth, getShelves } from '@/firebase/firestore';
 import FilterBar from './FilterBar/FiliterBar';
 import Shelves from './Shelves/Shelves';
+import AddShelfModal from './AddShelf';
 
 
 export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
     const { user, setUser } = useContext(UserContext);
-    const [modalActive, setModalActive] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [bookSelectActive, setBookSelectActive] = useState(false);
+    const [addShelfActive, setAddShelfActive] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
-
+    
     /*
         When redirected from login to dashboard, 
         the user is null because they did not 'login' this session.
@@ -26,6 +28,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     useEffect(() => {
         const getUser = async () => {
             if (!user) {
+                setIsLoading(true)
                 const shelves = await getShelves(params.id);
                 if (shelves === null) {
                     router.push('/login');
@@ -33,12 +36,11 @@ export default function Dashboard({ params }: { params: { id: string } }): React
                 }
                 setUser({
                     userId: params.id,
-                    shelves,
+                    shelves
                 });
             }
         }
 
-        console.log('User', user);
         getUser();
     }, [user]);
 
@@ -63,13 +65,15 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     ];
 
     const rightElements = [
-        <ActionButton className='rounded-full h-12' onClick={() => setModalActive(true)} text="Add Book" />,
+        <ActionButton className='m-1 rounded-full h-12' onClick={() => setAddShelfActive(true)} text="Add Shelf" />,
+        <ActionButton className='rounded-full h-12' onClick={() => setBookSelectActive(true)} text="Add Book" />,
         <ActionButton className="m-1 bg-red-500 rounded-full h-12" onClick={handleSignOut} text="Sign Out" />
     ];
 
     return (
         <div className='flex flex-col h-screen'>
-            <BookSelect active={modalActive} setActive={setModalActive} />
+            <BookSelect active={bookSelectActive} setActive={setBookSelectActive} />
+            <AddShelfModal active={addShelfActive} setActive={setAddShelfActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
             {/* <FilterBar isLoading={isLoading} setIsLoading={setIsLoading} /> */}
             <Shelves isLoading={isLoading} setIsLoading={setIsLoading} />

@@ -18,7 +18,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
-    const [selectedShelves, setSelectedShelves] = useState<{ shelfId: string, shelfName: string}[]>([]);
+    const [selectedShelves, setSelectedShelves] = useState<Shelf[]>([]);
 
     const getNewBooks = async () => {
         if (!user) { return }
@@ -27,30 +27,30 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         if (data.code !== 200) {
             setError(data.message);
             setIsLoading(false);
-            return [];
+            return;
         }
         /*
             Loop through books pulled from API
             for every book, loop through user.shelves and check for matches.
-            If all shelves have the book, then show remove button
-            If no/some shelves have the book, show add button. Add book to all shelves selected,
-            if a shelf is selected that already has the book in the some case, ignore readding it.
-
+            Set selected accordingly and let selected control disable of select button
         */
-        data.books.map((apiBook: Book) => {
-            const activeShelves = user?.shelves.filter((shelf) => selectedShelves.includes(shelf.shelfId)); //Check if the Ids match and if so include it in the search
-            activeShelves.map((shelf: Shelf) => {
-                if (shelf.books.some((shelfBook) => shelfBook.key === apiBook.key)) {
-                    return { ...apiBook, selected: true }
-                }
-            })
+        const updatedBooks = data.books.map((apiBook: Book) => {
+            const isBookInASelectedShelf = selectedShelves.some((shelf) => shelf.books.some((book) => book.key === apiBook.key));
+            if (isBookInASelectedShelf) {
+                return apiBook.selected = true;
+            }
+            return apiBook;
         });
+        setFoundBooks(updatedBooks);
     }
 
     const handleClick = async () => {
         setSubmitted(true);
         setIsLoading(true);
-        if (text === '') { return }
+        if (text === '') { 
+            setIsLoading(false);
+            return;
+         }
         await getNewBooks();
         setText('');
         setIsLoading(false);
@@ -73,18 +73,18 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
         } else {
             return(
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
-                    {foundBooks.map((book: Book) => <BookSelectCard key={book.key} book={book} updateFoundBooks={updateFoundBooks}/>)}
+                    {foundBooks.map((book: Book) => <BookSelectCard key={book.key} book={book} selectedShelves={selectedShelves} updateFoundBooks={updateFoundBooks}/>)}
                 </div>
             )
         }
     }
 
     function updatedSelectedKeys(selectedIds: string[]) {
-        let newSelectedShelves: { shelfId: string, shelfName: string}[] = [];
+        let newSelectedShelves: Shelf[] = [];
         selectedIds.map((selectedId) => {
             const shelf = user?.shelves.find((shelf) => shelf.shelfId === selectedId);
             if (shelf) {
-                newSelectedShelves.push({ shelfId: shelf.shelfId, shelfName: shelf.name });
+                newSelectedShelves.push(shelf);
             }
         })
         setSelectedShelves(newSelectedShelves);
@@ -98,12 +98,15 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
             <div className='w-full flex flex-row justify-between items-center'>
                 <form className="flex w-1/2" onSubmit={undefined}>
                     <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by Title, Author or ISBN' value={text} setValue={setText} error={error} />
-                    <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
+                    {selectedShelves.length === 0 
+                        ? <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-400" text='Submit' onClick={() => {}} disabled={true} />
+                        : <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
+                    }
                 </form>
                 <div className='w-1/2 flex flex-row justify-between items-center ml-2'>
                     <div className='flex flex-row'>
-                        {selectedShelves.map(({shelfId, shelfName}) => (
-                            <Chip key={shelfId} onClose={() => setSelectedShelves(selectedShelves.filter((shelf) => shelfId !== shelf.shelfId))}>{shelfName}</Chip>
+                        {selectedShelves.map((shelf) => (
+                            <Chip key={shelf.shelfId} onClose={() => setSelectedShelves(selectedShelves.filter((selectedShelf) => shelf.shelfId !== selectedShelf.shelfId))}>{shelf.name}</Chip>
                         ))}
                     </div>
                     <Dropdown>

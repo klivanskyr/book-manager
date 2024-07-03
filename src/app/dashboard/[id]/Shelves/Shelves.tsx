@@ -1,9 +1,8 @@
 import { Accordion, AccordionItem, Image, Link, Spinner } from "@nextui-org/react";
 import { bookIcon } from "@/assets";
 import { UserContext } from "@/app/types/UserContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Table, Row, Column } from "@/app/components";
-import { Book } from "@/app/types/Book";
 import { Shelf } from "@/app/types/Shelf";
 
 export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
@@ -44,31 +43,31 @@ export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolea
       )
     }
 
-    if (!user || !user.shelves || isLoading) {
+    function AccordionShelves() {
+      console.log(user?.shelves)
+      if (!user?.shelves) {
+        return <div className="w-full h-full flex flex-row items-center justify-center"><Spinner size="lg" /></div>
+      } else {
+        const test = ['Shelf 1', 'Shelf 2']
+        const content = [<h1>content</h1>, <h1>content</h1>, <h1>content</h1>, <h1>content</h1>, <h1>content</h1>, <h1>content</h1>, <h1>content</h1>, <h1>content</h1>, <h1>content</h1>, <h1>content</h1>, ]
+        setIsLoading(false);
         return (
-            <div className="flex justify-center items-center h-[500px]">
-                <Spinner className='' size='lg' />
-            </div>
+          <Accordion variant="splitted" selectionMode="multiple">
+          {user.shelves.map((shelf, i) => (
+            <AccordionItem key={shelf.shelfId + `${i}`} title={shelf.name} startContent={<Image  className="p-1.5 w-[50px] h-[50px] bg-slate-50 border border-slate-200 rounded-full" radius="lg" src={bookIcon.src}/>}>
+              <div className="m-1/2 w-full flex flex-row justify-center items-center">{user && <Link href={`/dashboard/${user.userId}/shelf/${shelf.shelfId}`} className="p-1">View Shelf Details</Link>}</div>
+              <BookTable shelf={shelf} />
+          </AccordionItem>
+          ))}
+        </Accordion>
         );
+      }
+      
     }
+
     return (
-        <div className="mx-2 my-4">
-          <Accordion className='' variant="splitted">
-            {user.shelves.map((shelf) => (
-              <AccordionItem key={shelf.shelfId} title={shelf.name} startContent={
-                <Image 
-                  className="p-1.5 w-[50px] h-[50px] bg-slate-50 border border-slate-200 rounded-full"
-                  radius="lg"
-                  src={bookIcon.src}
-                />
-              }>
-                <BookTable shelf={shelf} />
-                <div className="my-4 w-full flex flex-row justify-center items-center">
-                  <Link href={`/dashboard/${user.userId}/shelf/${shelf.shelfId}`} className="text-white bg-blue-600 shadow-md rounded-full border py-[10px] px-[15px] ">View Shelf Details</Link>
-                </div>
-              </AccordionItem>
-            ))}
-          </Accordion>
+        <div className="p-1 py-4 h-full w-full">
+          <AccordionShelves />
         </div>
     );
 }

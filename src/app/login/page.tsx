@@ -8,6 +8,7 @@ import { EmailInput, PasswordInput, ActionButton, LoadingButton } from '@/app/co
 import { UserContext } from '../types/UserContext';
 import { Form } from '../components';
 import emailIsValid from '../utils/emailIsValid';
+import { getShelves } from '@/firebase/firestore';
 
 export default function Login(): ReactElement {
   const { user, setUser } = useContext(UserContext);
@@ -45,12 +46,8 @@ export default function Login(): ReactElement {
       setIsLoading(false);
       return;
     }
+      setUser(null);
 
-      setUser({
-        user_id: data.uid,
-        books: user ? user.books : null,
-        shownBooks: []
-      });
       setIsLoading(false);
       router.push(`/dashboard/${data.uid}`);
   }
