@@ -13,7 +13,7 @@ import Shelves from './Shelves/Shelves';
 import AddShelfModal from './AddShelf';
 
 
-export default function Dashboard({ params }: { params: { id: string } }): ReactElement {
+export default function Dashboard({ params }: { params: { userId: string } }): ReactElement {
     const { user, setUser } = useContext(UserContext);
     const [bookSelectActive, setBookSelectActive] = useState(false);
     const [addShelfActive, setAddShelfActive] = useState(false);
@@ -30,13 +30,13 @@ export default function Dashboard({ params }: { params: { id: string } }): React
             if (!user || !user.userId || !user.shelves ) {
                 console.log('fetching user');
                 setIsLoading(true)
-                const shelves = await getShelves(params.id);
+                const shelves = await getShelves(params.userId);
                 if (shelves === null) {
                     router.push('/login');
                     return;
                 }
                 setUser({
-                    userId: params.id,
+                    userId: params.userId,
                     shelves
                 });
             }
