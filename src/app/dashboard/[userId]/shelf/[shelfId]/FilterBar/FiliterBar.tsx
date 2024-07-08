@@ -6,8 +6,9 @@ import { useContext, useEffect, useState } from "react";
 import { Slider } from "@nextui-org/react";
 import { UserContext } from "@/app/types/UserContext";
 import { Book } from "@/app/types/Book";
+import { Shelf } from "@/app/types/Shelf";
 
-export default function FilterBar({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
+export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: { isLoading: boolean, setIsLoading: Function, shelf: Shelf, setShelf: Function }) {
     const { user, setUser } = useContext(UserContext);
     const [titleFilter, setTitleFilter] = useState<string>('');
     const [authorFilter, setAuthorFilter] = useState<string>('');
@@ -16,20 +17,24 @@ export default function FilterBar({ isLoading, setIsLoading }: { isLoading: bool
 
     //client side filtering of books because firestore does not support where clauses on different fields at once
     useEffect(() => {
-        if (user && user.books) {
+        console.log('filtering books');
+        if (user && user.shelves && shelf && shelf.books) {
             setIsLoading(true);
             let newBooks: Book[] = [];
-            user.books.forEach((book: Book) => {
+            shelf.books.forEach((book: Book) => {
                 if (book.title.toLowerCase().startsWith(titleFilter.toLowerCase()) && book.author.toLowerCase().startsWith(authorFilter.toLowerCase()) && book.rating >= ratingFilter[0] && book.rating <= ratingFilter[1]) {
                     newBooks.push(book);
                 }
             });
-            if (JSON.stringify(newBooks) != JSON.stringify(user.shownBooks)) { //only update if the books are different
-                setUser({ ...user, shownBooks: newBooks });
+            if (JSON.stringify(newBooks) != JSON.stringify(shelf.shownBooks)) { //only update if the books are different
+                const oldShelf = user.shelves.find((s: Shelf) => s.shelfId === shelf.shelfId);
+                if (!oldShelf) return;
+                const newShelf = { ...oldShelf, shownBooks: newBooks };
+                setShelf(newShelf);
             }
             setIsLoading(false);
         }
-    }, [titleFilter, authorFilter, ratingFilter, user]);
+    }, [titleFilter, authorFilter, ratingFilter]);
 
     const leftElements = [
         <TextInput className='h-13 w-[250px] pr-2' label='Title' value={titleFilter} setValue={setTitleFilter} disabled={isLoading} />,
@@ -38,7 +43,7 @@ export default function FilterBar({ isLoading, setIsLoading }: { isLoading: bool
     ]
 
     const rightElements = [
-        <SortBy isLoading={isLoading} setIsLoading={setIsLoading} />
+        // <SortBy isLoading={isLoading} setIsLoading={setIsLoading} />
     ]
 
     return (

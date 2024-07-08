@@ -35,6 +35,7 @@ export default function SortBy({ isLoading, setIsLoading }: { isLoading: boolean
     type Order = 'default' | 'reversed';
    
     useEffect(() => {
+        console.log('sorting books')
         if (!user) return;
         const sort = async () => {
             setIsLoading(true);

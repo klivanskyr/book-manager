@@ -31,7 +31,7 @@ export async function queryOpenLibrary(query: string): Promise<NextResponse> {
             review: '',
             rating: 0,
             isbn: entry.isbn?.[0] ?? 'Unknown ISBN',
-            coverUrl: entry.cover_edition_key ? `${baseCoverUrl}${entry.cover_edition_key}-M.jpg?default=false` : coverPlaceholder.src,
+            coverUrl: entry.cover_edition_key ? `${baseCoverUrl}${entry.cover_edition_key}-L.jpg?default=false` : coverPlaceholder.src,
             bgColor: [127, 127, 127], //default
             selected: false,
             bgLoaded: false,

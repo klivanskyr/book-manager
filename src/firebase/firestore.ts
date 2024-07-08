@@ -3,7 +3,7 @@ import { Book } from "@/app/types/Book";
 import { Shelf } from "@/app/types/Shelf";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy } from "firebase/firestore";
+import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy, getDoc } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -124,8 +124,9 @@ export async function getBooks(userId: string, sort: Sort={}): Promise<Book[] | 
 
 export async function getShelves(userId: string) {
   try {
-    // Get ShelfIds from userShelves. Only owned right now
     console.log('Getting shelves for user', userId);
+    
+    // Get ShelfIds from userShelves. Only owned right now
     const ownedUserShelvesDocs = await getDocs(collection(db, 'userShelves', userId, 'owned'));
     if (ownedUserShelvesDocs.empty) { return [] }
     const ownedUserShelvesIds = ownedUserShelvesDocs.docs.map(doc => doc.id);
@@ -134,12 +135,11 @@ export async function getShelves(userId: string) {
     const shelvesDocs = await getDocs(query(collection(db, 'shelves'), where(documentId(), 'in', ownedUserShelvesIds)));
     const ownedShelvesData = shelvesDocs.docs.map(doc => doc.data());
 
-    // Get bookId and Review data from shelves
-    let shelves: Shelf[] = [];
-    ownedUserShelvesIds.forEach(async shelfId => {
+    // Use Promise.all to fetch book data for each shelf in parallel
+    const shelves = await Promise.all(ownedUserShelvesIds.map(async shelfId => {
       const booksDocs = await getDocs(collection(db, 'shelves', shelfId, 'books'));
-      if (booksDocs.empty) {  //If shelf has no books
-        shelves.push({
+      if (booksDocs.empty) {
+        return {
           shelfId,
           name: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().name || '',
           description: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().description || '',
@@ -147,18 +147,16 @@ export async function getShelves(userId: string) {
           createdBy: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().createdBy || '',
           books: [],
           shownBooks: []
-        });
-        return;
+        };
       } 
       const bookIds = booksDocs.docs.map(doc => doc.id);
       const bookReview = booksDocs.docs.map(doc => doc.data());
 
       const booksdocs = await getDocs(query(collection(db, 'books'), where(documentId(), 'in', bookIds)));
-      let books: Book[] = [];
-      booksdocs.forEach(doc => {
+      const books = booksdocs.docs.map(doc => {
         const bookData = doc.data();
         const reviewData = bookReview.find(review => review.id === doc.id);
-        books.push({
+        return {
           bookId: doc.id,
           key: bookData.key,
           title: bookData.title,
@@ -170,10 +168,10 @@ export async function getShelves(userId: string) {
           bgColor: bookData.bgColor,
           imgLoaded: false,
           selected: true
-        });
+        };
       });
 
-      shelves.push({
+      return {
         shelfId,
         name: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().name || '',
         description: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().description || '',
@@ -181,13 +179,92 @@ export async function getShelves(userId: string) {
         createdBy: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().createdBy || '',
         books,
         shownBooks: books
-      });
-    });
+      };
+    }));
 
     return shelves;
   } catch (error) {
     console.log('Error in getShelves', error);
     return null;
+  }
+}
+
+
+export async function getUser(userId: string): Promise<{ username: string, profileImage: string, email: string } | null> {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (!userDoc.exists()) { return null }
+    const userData = userDoc.data();
+    return {
+      username: userData.username,
+      profileImage: userData.profileImage,
+      email: userData.email,
+    };
+  } catch (error) {
+    console.log('Error in getUser', error);
+    return null;
+  }
+}
+
+export async function getShelf(shelfId: string): Promise<Shelf | null> {
+  try {
+    // get the shelf metadata
+    const shelfDoc = await getDoc(doc(db, 'shelves', shelfId));
+    if (!shelfDoc.exists()) { return null }
+    const shelfData = shelfDoc.data();
+
+    // get book ids 
+    const shelfBooksDocs = await getDocs(collection(db, 'shelves', shelfId, 'books'));
+    let books: Book[] = [];
+    if (!shelfBooksDocs.empty) { 
+      const bookIds = shelfBooksDocs.docs.map(doc => doc.id);
+      const bookReviews = shelfBooksDocs.docs.map(doc => doc.data());
+
+      // create books
+      bookIds.map(async bookId => {
+        const bookDoc = await getDoc(doc(db, 'books', bookId));
+        if (!bookDoc.exists()) { return }
+        const bookData = bookDoc.data();
+        const reviewData = bookReviews.find(review => review.id === bookId);
+        books.push({
+          bookId,
+          key: bookData.key,
+          title: bookData.title,
+          author: bookData.author,
+          review: reviewData?.review || '',
+          rating: reviewData?.rating || 0,
+          isbn: bookData.isbn,
+          coverUrl: bookData.coverUrl,
+          bgColor: bookData.bgColor,
+          imgLoaded: false,
+          selected: true
+        });
+    });
+
+    return {
+      shelfId,
+      name: shelfData.name,
+      description: shelfData.description,
+      isPublic: shelfData.isPublic,
+      createdBy: shelfData.createdBy,
+      books,
+      shownBooks: books
+    };
+  } else {
+      return {
+        shelfId,
+        name: shelfData.name,
+        description: shelfData.description,
+        isPublic: shelfData.isPublic,
+        createdBy: shelfData.createdBy,
+        books: [],
+        shownBooks: []
+      };
+  }
+
+  } catch (error) {
+    console.log('Error in getShelf', error);
+    return null
   }
 }
 
@@ -234,6 +311,20 @@ export async function addBookToUserShelf(book: Book, userId: string, shelfId: st
   }
   catch (error) {
     console.log('Error in addBookToUserShelf', error);
+  }
+}
+
+export async function updateBookOnUserShelf(newBook: Book, userId: string, shelfId: string) {
+  try {
+    console.log('Updating book on user shelf', newBook, userId, shelfId);
+    const bookRef = doc(db, 'shelves', shelfId, 'books', newBook.bookId);
+    await updateDoc(bookRef, {
+      review: newBook.review,
+      rating: newBook.rating,
+      isGlobalReview: false,
+    });
+  } catch (error) {
+    console.log('Error in updateBookOnUserShelf', error);
   }
 }
 

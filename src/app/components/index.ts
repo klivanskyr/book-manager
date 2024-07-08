@@ -11,3 +11,4 @@ export { default as Stars } from './Stars';
 export { default as FallBackImage } from './FallBackImage';
 export { default as Table } from './Table';
 export type { Row, Column } from './Table';
+export { default as BooksList } from './BooksList';

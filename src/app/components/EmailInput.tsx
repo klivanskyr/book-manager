@@ -4,6 +4,7 @@ export default function EmailInput({ className='', disabled = false, error, valu
     return (
         <Input
             isClearable
+            autoComplete='email'
             type="email"
             label="Email"
             size='lg'
