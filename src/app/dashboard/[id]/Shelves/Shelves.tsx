@@ -1,10 +1,9 @@
 import { Accordion, AccordionItem, Image, Link, Spinner } from "@nextui-org/react";
 import { bookIcon } from "@/assets";
 import { UserContext } from "@/app/types/UserContext";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Table, Row, Column } from "@/app/components";
 import { Shelf } from "@/app/types/Shelf";
-import { getShelves } from "@/firebase/firestore";
 
 export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
     const { user, setUser } = useContext(UserContext);

@@ -35,7 +35,7 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(new URL(`/dashboard/${data.uid}`, req.nextUrl), { status: 302 });
         }
 
-        if (req.nextUrl.pathname.startsWith('/dashboard') && req.nextUrl.pathname !== `/dashboard/${data.uid}`) {
+        if (req.nextUrl.pathname.startsWith('/dashboard') && !req.nextUrl.pathname.startsWith(`/dashboard/${data.uid}`)) {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
 
