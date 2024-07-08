@@ -2,14 +2,12 @@ import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
 
 import { ActionButton, FallBackImage, LoadingButton } from "@/app/components";
 import { Book } from "@/app/types/Book";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { fetchDominantColor } from "@/app/utils/color";
-import { UserContext } from "@/app/types/UserContext";
-import { addBookToUser, addBookToUserShelf, addBooktoUserShelves, getBooks, getShelves, removeBookFromUser } from "@/firebase/firestore";
+import { addBooktoUserShelves, getShelves, } from "@/firebase/firestore";
 import { Shelf } from "@/app/types/Shelf";
 
 export default function BookSelectCard({ book, selectedShelves, updateFoundBooks }: { book: Book, selectedShelves: Shelf[], updateFoundBooks: Function }) {
-    const { user, setUser } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
     
     //handle selecting book from modal
@@ -18,10 +16,8 @@ export default function BookSelectCard({ book, selectedShelves, updateFoundBooks
         const [r, g, b] = await fetchDominantColor(book.coverUrl);
         const updatedBook = { ...book, selected: true, bgColor: {r: Math.min(r+50, 255), g: Math.min(g+50, 255), b: Math.min(b+50, 255)}};
         updateFoundBooks(updatedBook);
-        if (user) {
-            await addBooktoUserShelves(updatedBook, user.userId, selectedShelves.map((shelf) => shelf.shelfId));
-            await setUser({ ...user, shelves: await getShelves(user.userId) as Shelf[] });
-        } 
+        await addBooktoUserShelves(updatedBook, user.userId, selectedShelves.map((shelf) => shelf.shelfId));
+        await setUser({ ...user, shelves: await getShelves(user.userId) as Shelf[] });
         setIsLoading(false);
     }
 

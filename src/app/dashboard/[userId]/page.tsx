@@ -1,7 +1,6 @@
 'use client';
 
-import { ReactElement, useContext, useEffect, useState } from 'react';
-import { UserContext } from '@/app/types/UserContext';
+import { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 
@@ -10,46 +9,27 @@ import { Navbar, ActionButton } from "@/app/components";
 import { auth, getShelves } from '@/firebase/firestore';
 import Shelves from './Shelves/Shelves';
 import AddShelfModal from './AddShelf';
-import { Spinner } from '@nextui-org/react';
+import { Shelf } from '@/app/types/Shelf';
 
 
 export default function Dashboard({ params }: { params: { userId: string } }): ReactElement {
-    const { user, setUser } = useContext(UserContext);
+    const [shelves, setShelves] = useState<Shelf[]>([]);
     const [bookSelectActive, setBookSelectActive] = useState(false);
     const [addShelfActive, setAddShelfActive] = useState(false);
     const router = useRouter();
-    
-    /*
-        When redirected from login to dashboard, 
-        the user is null because they did not 'login' this session.
-        So we need to fetch their information
-    */
-        useEffect(() => {
-            (async () => {
-                const getUser = async () => {
-                    if (!user || !user.userId || !user.shelves) {
-                        console.log('fetching user');
-                        const shelves = await getShelves(params.userId);
-                        console.log('shelves', shelves);
-                        if (shelves === null) {
-                            router.push('/login');
-                            return;
-                        }
-                        setUser({
-                            userId: params.userId,
-                            shelves: shelves
-                        });
-                    }
-                }
-        
-                await getUser();
-                console.log('user', user);
-            })();
-        }, [user]);
-        
+
+    const fetchLatestShelves = async (userId: string) => {
+        const shelves = await getShelves(userId);
+        if (!shelves) {
+            console.error('No shelves found');
+            return;
+        }
+        console.log('Shelves:', shelves);
+        setShelves(shelves);
+    }
 
     useEffect(() => {
-        console.log('USER', user);
+        fetchLatestShelves(params.userId);
     }, []);
 
     const handleSignOut = async () => {
@@ -59,7 +39,6 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
         });
         signOut(auth)
         .then(() => {
-            setUser(null);
             router.push('/login');
         })
         .catch((error) => {
@@ -80,10 +59,10 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
 
     return (
         <div className='flex flex-col h-screen'>
-            <BookSelect active={bookSelectActive} setActive={setBookSelectActive} />
-            <AddShelfModal active={addShelfActive} setActive={setAddShelfActive} />
+            <BookSelect shelves={shelves} active={bookSelectActive} setActive={setBookSelectActive} />
+            <AddShelfModal fetchLatestShelves={fetchLatestShelves} userId={params.userId} active={addShelfActive} setActive={setAddShelfActive} />
             <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
-            <Shelves />
+            <Shelves shelves={shelves} userId={params.userId} />
         </div>
     )
 }

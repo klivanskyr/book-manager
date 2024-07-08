@@ -1,16 +1,14 @@
 'use client';
 
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 import { ModalElement } from "@/app/components";
 import { Shelf } from "@/app/types/Shelf";
 import { addShelfToUser, getShelves } from "@/firebase/firestore";
-import { UserContext } from "@/app/types/UserContext";
 import { Button, Checkbox, Input } from "@nextui-org/react";
 
-export default function AddShelfModal({ active, setActive }: { active: boolean, setActive: Function }) {
+export default function AddShelfModal({ userId, fetchLatestShelves, active, setActive }: { userId: string, fetchLatestShelves: Function, active: boolean, setActive: Function }) {
     const [input, setInput] = useState({ name: '', description: '', isPublic: false });
-    const { user, setUser } = useContext(UserContext);
 
     function Header() {
         return (
@@ -23,10 +21,8 @@ export default function AddShelfModal({ active, setActive }: { active: boolean, 
     function Body() {
         const handleSubmit = async (e: React.FormEvent) => {
             e.preventDefault();
-            if (!user) return;
-            console.log('input', input as Shelf);
-            await addShelfToUser(input as Shelf, user.userId);
-            setUser({ ...user, shelves: await getShelves(user.userId) as Shelf[]});
+            await addShelfToUser(input as Shelf, userId);
+            await fetchLatestShelves(userId);
             setActive(false);
         }
 

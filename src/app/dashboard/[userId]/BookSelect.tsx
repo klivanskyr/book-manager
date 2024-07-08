@@ -1,18 +1,16 @@
 'use client';
 
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
 
 import { TextInput, ActionButton, ModalElement } from "@/app/components"
 import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
 import BookSelectCard from "./BookSelectCard";
-import { UserContext } from "@/app/types/UserContext";
 import { Shelf } from "@/app/types/Shelf";
 
 
-export default function BookSelect({ active, setActive }: { active: boolean, setActive: Function }) {
-    const { user, setUser } = useContext(UserContext);
+export default function BookSelect({ shelves, active, setActive }: { shelves: Shelf[], active: boolean, setActive: Function }) {
     const [text, setText] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +19,6 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     const [selectedShelves, setSelectedShelves] = useState<Shelf[]>([]);
 
     const getNewBooks = async () => {
-        if (!user) { return }
         const res = await queryOpenLibrary(text);
         const data = await res.json();
         if (data.code !== 200) {
@@ -82,7 +79,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     function updatedSelectedKeys(selectedIds: string[]) {
         let newSelectedShelves: Shelf[] = [];
         selectedIds.map((selectedId) => {
-            const shelf = user?.shelves.find((shelf) => shelf.shelfId === selectedId);
+            const shelf = shelves.find((shelf) => shelf.shelfId === selectedId);
             if (shelf) {
                 newSelectedShelves.push(shelf);
             }
@@ -91,9 +88,6 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
     }
 
     function Header() {
-        if (!user || !user.shelves) { return (<></>) }
-        const userShelves = user?.shelves;
-
         return (
             <div className='w-full flex flex-row justify-between items-center'>
                 <form className="flex w-1/2" onSubmit={undefined}>
@@ -120,7 +114,7 @@ export default function BookSelect({ active, setActive }: { active: boolean, set
                             selectedKeys={selectedShelves.map((shelf) => shelf.shelfId)}
                             onSelectionChange={(keys) => updatedSelectedKeys(Array.from(keys) as string[])}
                         >
-                            {userShelves.map((shelf) => (
+                            {shelves.map((shelf) => (
                                 <DropdownItem key={shelf.shelfId}>{shelf.name}</DropdownItem>
                             ))}
                         </DropdownMenu>

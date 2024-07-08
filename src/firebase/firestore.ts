@@ -51,7 +51,17 @@ export async function createNewUser(userId: string, username: string, email: str
     await setDoc(doc(db, 'userShelves', userId), {});
     await setDoc(doc(db, 'userShelves', userId, 'owned', shelfId), { owned: true });
 
+
+    //create fast lookup denormailized data for user books
+    await setDoc(doc(db, 'users', userId, 'shelves', shelfId), {
+      name: 'All Books',
+      description: 'All books you have added',
+      isPublic: false,
+      createdBy: userId
+    });
+
     return true;
+
   } catch (error) {
     console.log('Error in createNewUser', error);
     return false;
@@ -122,66 +132,23 @@ export async function getBooks(userId: string, sort: Sort={}): Promise<Book[] | 
   }
 }
 
-export async function getShelves(userId: string) {
+export async function getShelves(userId: string): Promise<Shelf[] | null> {
   try {
     console.log('Getting shelves for user', userId);
-    
-    // Get ShelfIds from userShelves. Only owned right now
-    const ownedUserShelvesDocs = await getDocs(collection(db, 'userShelves', userId, 'owned'));
-    if (ownedUserShelvesDocs.empty) { return [] }
-    const ownedUserShelvesIds = ownedUserShelvesDocs.docs.map(doc => doc.id);
-
-    // Get shelf data from shelfIds
-    const shelvesDocs = await getDocs(query(collection(db, 'shelves'), where(documentId(), 'in', ownedUserShelvesIds)));
-    const ownedShelvesData = shelvesDocs.docs.map(doc => doc.data());
-
-    // Use Promise.all to fetch book data for each shelf in parallel
-    const shelves = await Promise.all(ownedUserShelvesIds.map(async shelfId => {
-      const booksDocs = await getDocs(collection(db, 'shelves', shelfId, 'books'));
-      if (booksDocs.empty) {
-        return {
-          shelfId,
-          name: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().name || '',
-          description: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().description || '',
-          isPublic: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().isPublic || false,
-          createdBy: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().createdBy || '',
-          books: [],
-          shownBooks: []
-        };
-      } 
-      const bookIds = booksDocs.docs.map(doc => doc.id);
-      const bookReview = booksDocs.docs.map(doc => doc.data());
-
-      const booksdocs = await getDocs(query(collection(db, 'books'), where(documentId(), 'in', bookIds)));
-      const books = booksdocs.docs.map(doc => {
-        const bookData = doc.data();
-        const reviewData = bookReview.find(review => review.id === doc.id);
-        return {
-          bookId: doc.id,
-          key: bookData.key,
-          title: bookData.title,
-          author: bookData.author,
-          review: reviewData?.review || '',
-          rating: reviewData?.rating || 0,
-          isbn: bookData.isbn,
-          coverUrl: bookData.coverUrl,
-          bgColor: bookData.bgColor,
-          imgLoaded: false,
-          selected: true
-        };
+    const shelvesRef = await getDocs(collection(db, 'users', userId, 'shelves'));
+    let shelves: Shelf[] = [];
+    shelvesRef.forEach(doc => {
+      shelves.push({
+        shelfId: doc.id || '',
+        name: doc.data().name || '',
+        description: doc.data().description || '',
+        isPublic: doc.data().isPublic || false,
+        createdBy: doc.data().createdBy || '',
+        books: doc.data().books || [],
+        shownBooks: doc.data().books || []
       });
-
-      return {
-        shelfId,
-        name: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().name || '',
-        description: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().description || '',
-        isPublic: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().isPublic || false,
-        createdBy: shelvesDocs.docs.find(doc => doc.id === shelfId)?.data().createdBy || '',
-        books,
-        shownBooks: books
-      };
-    }));
-
+    });
+    console.log('Shelves:', shelves);
     return shelves;
   } catch (error) {
     console.log('Error in getShelves', error);
@@ -206,67 +173,67 @@ export async function getUser(userId: string): Promise<{ username: string, profi
   }
 }
 
-export async function getShelf(shelfId: string): Promise<Shelf | null> {
-  try {
-    // get the shelf metadata
-    const shelfDoc = await getDoc(doc(db, 'shelves', shelfId));
-    if (!shelfDoc.exists()) { return null }
-    const shelfData = shelfDoc.data();
+// export async function getShelf(shelfId: string): Promise<Shelf | null> {
+//   try {
+//     // get the shelf metadata
+//     const shelfDoc = await getDoc(doc(db, 'shelves', shelfId));
+//     if (!shelfDoc.exists()) { return null }
+//     const shelfData = shelfDoc.data();
 
-    // get book ids 
-    const shelfBooksDocs = await getDocs(collection(db, 'shelves', shelfId, 'books'));
-    let books: Book[] = [];
-    if (!shelfBooksDocs.empty) { 
-      const bookIds = shelfBooksDocs.docs.map(doc => doc.id);
-      const bookReviews = shelfBooksDocs.docs.map(doc => doc.data());
+//     // get book ids 
+//     const shelfBooksDocs = await getDocs(collection(db, 'shelves', shelfId, 'books'));
+//     let books: Book[] = [];
+//     if (!shelfBooksDocs.empty) { 
+//       const bookIds = shelfBooksDocs.docs.map(doc => doc.id);
+//       const bookReviews = shelfBooksDocs.docs.map(doc => doc.data());
 
-      // create books
-      bookIds.map(async bookId => {
-        const bookDoc = await getDoc(doc(db, 'books', bookId));
-        if (!bookDoc.exists()) { return }
-        const bookData = bookDoc.data();
-        const reviewData = bookReviews.find(review => review.id === bookId);
-        books.push({
-          bookId,
-          key: bookData.key,
-          title: bookData.title,
-          author: bookData.author,
-          review: reviewData?.review || '',
-          rating: reviewData?.rating || 0,
-          isbn: bookData.isbn,
-          coverUrl: bookData.coverUrl,
-          bgColor: bookData.bgColor,
-          imgLoaded: false,
-          selected: true
-        });
-    });
+//       // create books
+//       bookIds.map(async bookId => {
+//         const bookDoc = await getDoc(doc(db, 'books', bookId));
+//         if (!bookDoc.exists()) { return }
+//         const bookData = bookDoc.data();
+//         const reviewData = bookReviews.find(review => review.id === bookId);
+//         books.push({
+//           bookId,
+//           key: bookData.key,
+//           title: bookData.title,
+//           author: bookData.author,
+//           review: reviewData?.review || '',
+//           rating: reviewData?.rating || 0,
+//           isbn: bookData.isbn,
+//           coverUrl: bookData.coverUrl,
+//           bgColor: bookData.bgColor,
+//           imgLoaded: false,
+//           selected: true
+//         });
+//     });
 
-    return {
-      shelfId,
-      name: shelfData.name,
-      description: shelfData.description,
-      isPublic: shelfData.isPublic,
-      createdBy: shelfData.createdBy,
-      books,
-      shownBooks: books
-    };
-  } else {
-      return {
-        shelfId,
-        name: shelfData.name,
-        description: shelfData.description,
-        isPublic: shelfData.isPublic,
-        createdBy: shelfData.createdBy,
-        books: [],
-        shownBooks: []
-      };
-  }
+//     return {
+//       shelfId,
+//       name: shelfData.name,
+//       description: shelfData.description,
+//       isPublic: shelfData.isPublic,
+//       createdBy: shelfData.createdBy,
+//       books,
+//       shownBooks: books
+//     };
+//   } else {
+//       return {
+//         shelfId,
+//         name: shelfData.name,
+//         description: shelfData.description,
+//         isPublic: shelfData.isPublic,
+//         createdBy: shelfData.createdBy,
+//         books: [],
+//         shownBooks: []
+//       };
+//   }
 
-  } catch (error) {
-    console.log('Error in getShelf', error);
-    return null
-  }
-}
+//   } catch (error) {
+//     console.log('Error in getShelf', error);
+//     return null
+//   }
+// }
 
 export async function addBookToUserShelf(book: Book, userId: string, shelfId: string) {
   try {
@@ -397,6 +364,14 @@ export async function addShelfToUser(shelf: Shelf, userId: string) {
     });
     //Add shelf to userShelves
     await setDoc(doc(db, 'userShelves', userId, 'owned', docRef.id), { owned: true });
+
+    //Add shelf to user
+    await setDoc(doc(db, 'users', userId, 'shelves', docRef.id), {
+      name: shelf.name,
+      description: shelf.description,
+      isPublic: shelf.isPublic,
+      createdBy: userId
+    });
     return;
   } catch (error) {
     console.log('Error in addShelfToUser', error);
@@ -404,85 +379,85 @@ export async function addShelfToUser(shelf: Shelf, userId: string) {
   }
 }
 
-export async function addBookToUser(book: Book, userId: string) {
-  try {
-    console.log('Adding book to user', book, userId);
-    //Check if book is in books
-    const booksQuery = query(collection(db, 'books'), where('key', '==', book.key));
-    const booksDocs = await getDocs(booksQuery);
+// export async function addBookToUser(book: Book, userId: string) {
+//   try {
+//     console.log('Adding book to user', book, userId);
+//     //Check if book is in books
+//     const booksQuery = query(collection(db, 'books'), where('key', '==', book.key));
+//     const booksDocs = await getDocs(booksQuery);
 
-    if (booksDocs.empty) { //If new book
-      //Create book
-      const docRef = await addDoc(collection(db, 'books'), {
-        title: book.title,
-        author: book.author,
-        key: book.key,
-        isbn: book.isbn,
-        coverUrl: book.coverUrl,
-        bgColor: { r: book.bgColor.r, b: book.bgColor.b, g: book.bgColor.g },
-        createdAt: Timestamp.now()
-      });
+//     if (booksDocs.empty) { //If new book
+//       //Create book
+//       const docRef = await addDoc(collection(db, 'books'), {
+//         title: book.title,
+//         author: book.author,
+//         key: book.key,
+//         isbn: book.isbn,
+//         coverUrl: book.coverUrl,
+//         bgColor: { r: book.bgColor.r, b: book.bgColor.b, g: book.bgColor.g },
+//         createdAt: Timestamp.now()
+//       });
 
-      //Add book to userBooks
-      await setDoc(doc(collection(db, 'userBooks', userId, 'books'), docRef.id), {
-        review: '',
-        rating: 0,
-        isGlobalReview: false, //default to individual reviews
-      });
+//       //Add book to userBooks
+//       await setDoc(doc(collection(db, 'userBooks', userId, 'books'), docRef.id), {
+//         review: '',
+//         rating: 0,
+//         isGlobalReview: false, //default to individual reviews
+//       });
 
-      //Add book to user
-      await setDoc(doc(db, 'users', userId, 'books', docRef.id), { selected: true });
+//       //Add book to user
+//       await setDoc(doc(db, 'users', userId, 'books', docRef.id), { selected: true });
 
-    } else { //If book already exists
-      const bookId = booksDocs.docs[0].id;
+//     } else { //If book already exists
+//       const bookId = booksDocs.docs[0].id;
 
-      //Add book to userBooks
-      await setDoc(doc(collection(db, 'userBooks', userId, 'books'), bookId), {
-        review: '',
-        rating: 0,
-        isGlobalReview: false, //default to individual reviews
-      });
+//       //Add book to userBooks
+//       await setDoc(doc(collection(db, 'userBooks', userId, 'books'), bookId), {
+//         review: '',
+//         rating: 0,
+//         isGlobalReview: false, //default to individual reviews
+//       });
 
-      //Add book to user
-      await setDoc(doc(db, 'users', userId, 'books', bookId), { selected: true });
-    } 
-  } catch (error) {
-    console.log('Error in addBookToUser', error);
-  }
-}
+//       //Add book to user
+//       await setDoc(doc(db, 'users', userId, 'books', bookId), { selected: true });
+//     } 
+//   } catch (error) {
+//     console.log('Error in addBookToUser', error);
+//   }
+// }
 
-export async function removeBookFromUser(book: Book, userId: string) {
-  // remove book from users/userId/books/
-  await deleteDoc(doc(db, 'users', userId, 'books', book.bookId));
+// export async function removeBookFromUser(book: Book, userId: string) {
+//   // remove book from users/userId/books/
+//   await deleteDoc(doc(db, 'users', userId, 'books', book.bookId));
 
-  // remove book from userBooks/userId/books/
-  await deleteDoc(doc(db, 'userBooks', userId, 'books', book.bookId));
+//   // remove book from userBooks/userId/books/
+//   await deleteDoc(doc(db, 'userBooks', userId, 'books', book.bookId));
 
-  // if no other user has the book, remove book from books
-  const usersBooksQuery = query(collection(db, 'users'), where(`books.${book.bookId}`, '==', true));
-  const usersBooksDocs = await getDocs(usersBooksQuery);
+//   // if no other user has the book, remove book from books
+//   const usersBooksQuery = query(collection(db, 'users'), where(`books.${book.bookId}`, '==', true));
+//   const usersBooksDocs = await getDocs(usersBooksQuery);
 
-  if (usersBooksDocs.empty) {
-    await deleteDoc(doc(db, 'books', book.bookId));
-  }
-}
+//   if (usersBooksDocs.empty) {
+//     await deleteDoc(doc(db, 'books', book.bookId));
+//   }
+// }
 
-export async function updateUserBook(book: Book, userId: string) {
-  await updateDoc(doc(db, 'userBooks', userId, 'books', book.bookId), {
-    review: book.review,
-    rating: book.rating,
-    isGlobalReview: false,
-    lastUpdated: Timestamp.now()
-  });
-}
+// export async function updateUserBook(book: Book, userId: string) {
+//   await updateDoc(doc(db, 'userBooks', userId, 'books', book.bookId), {
+//     review: book.review,
+//     rating: book.rating,
+//     isGlobalReview: false,
+//     lastUpdated: Timestamp.now()
+//   });
+// }
 
-export async function getUserIdByEmail(email: string) {
-  const usersQuery = query(collection(db, 'users'), where('email', '==', email));
-  const usersDocs = await getDocs(usersQuery);
+// export async function getUserIdByEmail(email: string) {
+//   const usersQuery = query(collection(db, 'users'), where('email', '==', email));
+//   const usersDocs = await getDocs(usersQuery);
 
-  if (usersDocs.empty) {
-    return null;
-  }
+//   if (usersDocs.empty) {
+//     return null;
+//   }
 
-  return usersDocs.docs[0].id;
-}
+//   return usersDocs.docs[0].id;
+// }

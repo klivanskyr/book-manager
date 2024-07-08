@@ -5,9 +5,7 @@ import { useContext, useState } from "react";
 import { Table, Row, Column } from "@/app/components";
 import { Shelf } from "@/app/types/Shelf";
 
-export default function Shelves() {
-    const { user, setUser } = useContext(UserContext);
-
+export default function Shelves({ shelves, userId }: { userId: string, shelves: Shelf[] }) {
     function BookTable({ shelf }: { shelf: Shelf }) {
       const columns: Column[] = [
         {
@@ -43,13 +41,12 @@ export default function Shelves() {
       )
     }
 
-    if (!user) return <></>
     return (
         <div className="p-1 py-4 h-full w-full">
           <Accordion variant="splitted" selectionMode="multiple">
-            {user?.shelves.map((shelf, i) => (
+            {shelves.map((shelf, i) => (
               <AccordionItem key={shelf.shelfId + `${i}`} title={shelf.name} startContent={<Image  className="p-1.5 w-[50px] h-[50px] bg-slate-50 border border-slate-200 rounded-full" radius="lg" src={bookIcon.src}/>}>
-                <div className="m-1/2 w-full flex flex-row justify-center items-center">{user && <Link href={`/dashboard/${user.userId}/shelf/${shelf.shelfId}`} className="p-1">View Shelf Details</Link>}</div>
+                <div className="m-1/2 w-full flex flex-row justify-center items-center"><Link href={`/dashboard/${userId}/shelf/${shelf.shelfId}`} className="p-1">View Shelf Details</Link></div>
                 <BookTable shelf={shelf} />
             </AccordionItem>
             ))}

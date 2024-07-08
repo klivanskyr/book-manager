@@ -1,17 +1,15 @@
 'use client'; 
 
-import { useState, useContext, ReactElement } from 'react';
+import { useState, ReactElement } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { EmailInput, PasswordInput, ActionButton, LoadingButton } from '@/app/components';
-import { UserContext } from '../types/UserContext';
 import { Form } from '../components';
 import emailIsValid from '../utils/emailIsValid';
 import { getShelves } from '@/firebase/firestore';
 
 export default function Login(): ReactElement {
-  const { user, setUser } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [input, setInput] = useState({ email: '', password: '' });
   const [error, setError] = useState<string>('');
@@ -45,14 +43,6 @@ export default function Login(): ReactElement {
       setIsLoading(false);
       return;
     }
-    const updatedUser = async () => {
-      setUser({
-        userId: data.uid,
-        shelves: await getShelves(data.uid) as []
-      });
-    }
-
-    await updatedUser();
     
     setIsLoading(false);
     router.push(`/dashboard/${data.uid}`);
