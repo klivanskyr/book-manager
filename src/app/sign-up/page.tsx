@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput } from '@/app/components';
-import { Button } from '@nextui-org/react';
-import { addBookToUserShelf, getShelves } from '@/firebase/firestore';
 
 export default function Signup() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -52,18 +50,18 @@ export default function Signup() {
             },
             body: JSON.stringify({ ...input, createdWith: 'email' })
         });
-        const data = await res.json();
         setIsLoading(false);
-        if (data.code !== 200) {
-            const errorMessage = data.message;
+        if (!res.ok) {
+            const errorMessage = res.statusText;
             setInput({ username: '', email: '', password: '' })
-            if (errorMessage.code === 'auth/email-already-in-use') {
+            if (res.statusText === 'auth/email-already-in-use') {
                 setError('Email already in use');
                 return;
             }
-            setError(errorMessage.code);
+            setError(res.statusText);
             return;
         } else {
+            console.log('User created successfully');
             router.push('/login');
         }
     }

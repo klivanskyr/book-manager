@@ -19,7 +19,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 return NextResponse.json({ code: 400, message: 'User not found' });
             } else {
                 const token = await userCredential.user.getIdToken();
-                const res = NextResponse.json({ code: 200, message: 'User logged in' });
+                const res = NextResponse.json({ code: 200, message: 'User logged in', uid: userCredential.user.uid });
                 res.cookies.set('token', token);
                 return res;
             }

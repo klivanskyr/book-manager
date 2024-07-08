@@ -39,17 +39,23 @@ export default function Login(): ReactElement {
       cache: 'no-cache',
       body: JSON.stringify({ ...input, createdWith: 'email' })
     });
-
     const data = await res.json();
     if (data.code !== 200) {
       setError(data.message);
       setIsLoading(false);
       return;
     }
-      setUser(null);
+    const updatedUser = async () => {
+      setUser({
+        userId: data.uid,
+        shelves: await getShelves(data.uid) as []
+      });
+    }
 
-      setIsLoading(false);
-      router.push(`/dashboard/${data.uid}`);
+    await updatedUser();
+    
+    setIsLoading(false);
+    router.push(`/dashboard/${data.uid}`);
   }
   
   function SubmitButton() {

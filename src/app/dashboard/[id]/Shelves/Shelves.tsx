@@ -4,6 +4,7 @@ import { UserContext } from "@/app/types/UserContext";
 import { useContext, useEffect } from "react";
 import { Table, Row, Column } from "@/app/components";
 import { Shelf } from "@/app/types/Shelf";
+import { getShelves } from "@/firebase/firestore";
 
 export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolean, setIsLoading: Function }) {
     const { user, setUser } = useContext(UserContext);
@@ -44,7 +45,6 @@ export default function Shelves({ isLoading, setIsLoading }: { isLoading: boolea
     }
 
     function AccordionShelves() {
-      console.log(user?.shelves)
       if (!user?.shelves) {
         return <div className="w-full h-full flex flex-row items-center justify-center"><Spinner size="lg" /></div>
       } else {

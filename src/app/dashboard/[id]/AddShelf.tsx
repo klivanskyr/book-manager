@@ -49,8 +49,8 @@ export default function AddShelfModal({ active, setActive }: { active: boolean, 
                 body: "min-h-[500px]",
                 header: "shadow-small",
                 footer: "shadow-small",
-                closeButton: 'hidden'
             }}
+            onOpenChange={(isOpen: boolean) => setActive(isOpen)}
             size='5xl'
             active={active} 
             Header={Header()} 

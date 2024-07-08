@@ -27,7 +27,8 @@ export default function Dashboard({ params }: { params: { id: string } }): React
     */
     useEffect(() => {
         const getUser = async () => {
-            if (!user) {
+            if (!user || !user.userId || !user.shelves ) {
+                console.log('fetching user');
                 setIsLoading(true)
                 const shelves = await getShelves(params.id);
                 if (shelves === null) {
@@ -42,6 +43,7 @@ export default function Dashboard({ params }: { params: { id: string } }): React
         }
 
         getUser();
+        console.log('user', user);
     }, [user]);
 
     const handleSignOut = async () => {

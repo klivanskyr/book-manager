@@ -125,6 +125,7 @@ export async function getBooks(userId: string, sort: Sort={}): Promise<Book[] | 
 export async function getShelves(userId: string) {
   try {
     // Get ShelfIds from userShelves. Only owned right now
+    console.log('Getting shelves for user', userId);
     const ownedUserShelvesDocs = await getDocs(collection(db, 'userShelves', userId, 'owned'));
     if (ownedUserShelvesDocs.empty) { return [] }
     const ownedUserShelvesIds = ownedUserShelvesDocs.docs.map(doc => doc.id);
