@@ -8,9 +8,11 @@ import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
 import BookSelectCard from "./BookSelectCard";
 import { Shelf } from "@/app/types/Shelf";
+import { addBookToUserShelf, addBooktoUserShelves } from "@/firebase/firestore";
+import { fetchDominantColor } from "@/app/utils/color";
 
 
-export default function BookSelect({ shelves, active, setActive }: { shelves: Shelf[], active: boolean, setActive: Function }) {
+export default function BookSelect({ shelves, fetchShelves, userId, active, setActive }: { shelves: Shelf[], fetchShelves: Function, userId: string, active: boolean, setActive: Function }) {
     const [text, setText] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -18,14 +20,23 @@ export default function BookSelect({ shelves, active, setActive }: { shelves: Sh
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
     const [selectedShelves, setSelectedShelves] = useState<Shelf[]>([]);
 
-    const getNewBooks = async () => {
+    const handleClick = async () => {
+        setSubmitted(true);
+        setIsLoading(true);
+        if (text === '') { 
+            setIsLoading(false);
+            return;
+        }
+
         const res = await queryOpenLibrary(text);
         const data = await res.json();
+
         if (data.code !== 200) {
             setError(data.message);
             setIsLoading(false);
             return;
         }
+
         /*
             Loop through books pulled from API
             for every book, loop through user.shelves and check for matches.
@@ -38,42 +49,22 @@ export default function BookSelect({ shelves, active, setActive }: { shelves: Sh
             }
             return apiBook;
         });
+        
         setFoundBooks(updatedBooks);
-    }
-
-    const handleClick = async () => {
-        setSubmitted(true);
-        setIsLoading(true);
-        if (text === '') { 
-            setIsLoading(false);
-            return;
-         }
-        await getNewBooks();
-        setText('');
         setIsLoading(false);
+        setText('');
     }
 
-    function updateFoundBooks(updatedBook: Book) {
-        const updatedBooks = foundBooks.map((book) => {
-            if (book.key === updatedBook.key) {
-                return updatedBook;
-            } else {
-                return book;
-            }
-        });
-        setFoundBooks(updatedBooks);
-    }
+    /** Adds a book to a user as well as changes it's 
+     * selected field to true so its select button will be red in the modal */
+    const addBook = async (newBook: Book) => {
+        const [r, g, b] = await fetchDominantColor(newBook.coverUrl);
+        const updatedBook = { ...newBook, selected: true, bgColor: {r: Math.min(r+50, 255), g: Math.min(g+50, 255), b: Math.min(b+50, 255)}};
 
-    function displayBooks() {
-        if (foundBooks.length === 0 && submitted) {
-            return (<></>)
-        } else {
-            return(
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
-                    {foundBooks.map((book: Book) => <BookSelectCard key={book.key} book={book} selectedShelves={selectedShelves} updateFoundBooks={updateFoundBooks}/>)}
-                </div>
-            )
-        }
+        const updatedBooks = foundBooks.map((book) => book.key === updatedBook.key ? updatedBook : book);
+        setFoundBooks(updatedBooks); // Make select button red
+        await addBooktoUserShelves(updatedBook, userId, selectedShelves.map((shelf) => shelf.shelfId));
+        await fetchShelves(userId);
     }
 
     function updatedSelectedKeys(selectedIds: string[]) {
@@ -87,6 +78,7 @@ export default function BookSelect({ shelves, active, setActive }: { shelves: Sh
         setSelectedShelves(newSelectedShelves);
     }
 
+    // Header contains search bar, submit button and selected shelves button
     function Header() {
         return (
             <div className='w-full flex flex-row justify-between items-center'>
@@ -124,6 +116,7 @@ export default function BookSelect({ shelves, active, setActive }: { shelves: Sh
         )
     }
 
+    //Body is grid of books cards
     function Body() {
         if (!submitted) {
             return (<></>)
@@ -134,15 +127,19 @@ export default function BookSelect({ shelves, active, setActive }: { shelves: Sh
                 </div>
             )
         } else {
-            return displayBooks();
+            return (
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
+                    {foundBooks.map((book: Book) => <BookSelectCard key={book.key} book={book} addBook={addBook} />)}
+                </div>
+            )
         }
     }
 
+    //Close button
     function Footer() {
         return (
             <ActionButton className='bg-blue-600 rounded-full' text='Close' onClick={() => setActive(false)} />
         )
-    
     }
 
     return (

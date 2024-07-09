@@ -66,6 +66,7 @@ export default function Reset() {
         <h1 className='pt-5 pb-12 text-2xl font-semibold' >Reset Your Account</h1>,
         <EmailInput className='mb-8' value={email} setValue={setEmail} error={error} />,
         <SubmitButton />,
+        <h2 className={`m-2 text-red-600 font-light text-xl ${error ? 'opacity-100' : 'opacity-0'}`} >{error}</h2>,
         <h1 className='mt-3'>Remember your password? <Link href='/login' >Sign In</Link> </h1>
     ]
 

@@ -3,38 +3,15 @@ import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
 import { ActionButton, FallBackImage, LoadingButton } from "@/app/components";
 import { Book } from "@/app/types/Book";
 import { useState } from "react";
-import { fetchDominantColor } from "@/app/utils/color";
-import { addBooktoUserShelves, getShelves, } from "@/firebase/firestore";
-import { Shelf } from "@/app/types/Shelf";
 
-export default function BookSelectCard({ book, selectedShelves, updateFoundBooks }: { book: Book, selectedShelves: Shelf[], updateFoundBooks: Function }) {
+export default function BookSelectCard({ book, addBook }: { book: Book, addBook: Function }) {
     const [isLoading, setIsLoading] = useState(false);
-    
-    //handle selecting book from modal
-    const handleClickAdd = async (): Promise<void> => {
+
+    const handleClick = async () => {
         setIsLoading(true);
-        const [r, g, b] = await fetchDominantColor(book.coverUrl);
-        const updatedBook = { ...book, selected: true, bgColor: {r: Math.min(r+50, 255), g: Math.min(g+50, 255), b: Math.min(b+50, 255)}};
-        updateFoundBooks(updatedBook);
-        await addBooktoUserShelves(updatedBook, user.userId, selectedShelves.map((shelf) => shelf.shelfId));
-        await setUser({ ...user, shelves: await getShelves(user.userId) as Shelf[] });
+        await addBook(book);
         setIsLoading(false);
     }
-
-    // //handle removing book from modal
-    // const handleClickRemove = async (): Promise<void>  => {
-    //     setIsLoading(true);
-    //     if (user && user.books) {
-    //         //Find book in user books where it will have an id.
-    //         const usersBooksRef = user.books.find((userBook) => userBook.key === book.key);
-    //         if (!usersBooksRef) { return; } //Not possible to remove book that is not in user books
-    //         await removeBookFromUser(usersBooksRef, user.user_id)
-    //         setUser({ ...user, books: await getBooks(user.user_id) });
-    //     };
-    //     const updatedBook = { ...book, selected: false };
-    //     updateFoundBooks(updatedBook);
-    //     setIsLoading(false);
-    // }
 
     function CurrentButton() {
         if (book.selected) {
@@ -42,7 +19,7 @@ export default function BookSelectCard({ book, selectedShelves, updateFoundBooks
         } else if (isLoading) {
             return <LoadingButton className='bg-blue-600' color='primary' isLoading={isLoading} />
         } else {
-            return <ActionButton className='bg-blue-600' text='Select' onClick={() => handleClickAdd()} />
+            return <ActionButton className='bg-blue-600' text='Select' onClick={handleClick} />
         }
     }
     

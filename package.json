@@ -18,7 +18,7 @@
     "antd": "^5.17.4",
     "bcrypt-ts": "^5.0.2",
     "colorthief": "^2.4.0",
-    "firebase": "^10.12.2",
+    "firebase": "^10.12.3",
     "firebase-admin": "^12.2.0",
     "framer-motion": "^11.2.11",
     "jsonwebtoken": "^9.0.2",
