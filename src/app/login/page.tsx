@@ -39,7 +39,12 @@ export default function Login(): ReactElement {
     });
     const data = await res.json();
     if (data.code !== 200) {
-      setError(data.message);
+      const message: string = data.message;
+      console.log('message', message);
+      if (message.includes('invalid-credential')) { setError('Invalid Credentials') }
+      else if (message.includes('too-many-requests')) { setError('Too many requests, try again later')}
+      else if (message.includes('user-not-found')) { setError('User not found') }
+      else { setError(data.message) }
       setIsLoading(false);
       return;
     }
