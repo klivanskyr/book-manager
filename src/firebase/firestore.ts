@@ -313,6 +313,7 @@ export async function updateBookOnUserShelf(newBook: Book, userId: string, shelf
 
 export async function addBooktoUserShelves(book: Book, userId: string, shelfIds: string[]) {
   if (shelfIds.length === 0) return console.log('No shelves to add book to');
+  shelfIds = shelfIds.filter(shelfId => shelfId !== 'all-books'); //remove all-books shelf because its not a real shelf
   try {
     //Check if book is in books
     const booksQuery = query(collection(db, 'books'), where('key', '==', book.key));
@@ -372,6 +373,8 @@ export async function addBooktoUserShelves(book: Book, userId: string, shelfIds:
 }
 
 export async function addShelfToUser(shelf: Shelf, userId: string) {
+  if (shelf.name === '') return console.log('Shelf name is required');
+  if (shelf.name === 'all-books') return console.log('Shelf name cannot be all-books');
   try {
     //Create shelf
     const docRef = await addDoc(collection(db, 'shelves'), {

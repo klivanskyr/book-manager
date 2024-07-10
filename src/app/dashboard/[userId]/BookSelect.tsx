@@ -8,7 +8,7 @@ import { queryOpenLibrary } from "@/app/utils/openlibrary";
 import { Book } from "@/app/types/Book";
 import BookSelectCard from "./BookSelectCard";
 import { Shelf } from "@/app/types/Shelf";
-import { addBookToUserShelf, addBooktoUserShelves } from "@/firebase/firestore";
+import { addBooktoUserShelves } from "@/firebase/firestore";
 import { fetchDominantColor } from "@/app/utils/color";
 
 
