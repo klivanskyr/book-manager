@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { Book } from "@/app/types/Book";
-import { Shelf } from "@/app/types/Shelf";
+import { Book } from "@/types/Book";
+import { Shelf } from "@/types/Shelf";
 import { initializeApp } from "firebase/app";
 import { getAuth, signOut } from "firebase/auth";
 import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy, getDoc } from "firebase/firestore";

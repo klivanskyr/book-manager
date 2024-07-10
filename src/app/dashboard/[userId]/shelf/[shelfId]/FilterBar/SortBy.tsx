@@ -1,8 +1,8 @@
 import { getBooks } from "@/firebase/firestore";
-import { UserContext } from "@/app/types/UserContext";
+import { UserContext } from "@/types/UserContext";
 import { Select, SelectItem } from "@nextui-org/react";
 import { useContext, useEffect, useState } from "react";
-import { Book } from "@/app/types/Book";
+import { Book } from "@/types/Book";
 
 const enum SortOptions {
     TitleAZ = 'Title A to Z',

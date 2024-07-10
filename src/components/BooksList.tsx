@@ -1,6 +1,6 @@
 'use client';
 
-import { FallBackImage, ModalElement, Stars } from "@/app/components";
+import { FallBackImage, ModalElement, Stars } from "@/components";
 import { Book } from "../types/Book";
 import { Shelf } from "../types/Shelf";
 import { FaTimes } from "react-icons/fa";

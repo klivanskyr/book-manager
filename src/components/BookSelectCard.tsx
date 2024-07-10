@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
 
-import { ActionButton, FallBackImage, LoadingButton } from "@/app/components";
-import { Book } from "@/app/types/Book";
+import { ActionButton, FallBackImage, LoadingButton } from "@/components";
+import { Book } from "@/types/Book";
 import { useState } from "react";
 
 export default function BookSelectCard({ book, addBook }: { book: Book, addBook: Function }) {

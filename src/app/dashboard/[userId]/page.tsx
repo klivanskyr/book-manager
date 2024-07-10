@@ -4,10 +4,10 @@ import { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 
-import BookSelect from './BookSelect';
-import { Navbar, ActionButton, ShelfTables, AddShelfModal } from "@/app/components";
+import { BookSelect } from '@/components';
+import { Navbar, ActionButton, ShelfTables, AddShelfModal } from "@/components";
 import { auth, getAllBooks, getShelves } from '@/firebase/firestore';
-import { Shelf } from '@/app/types/Shelf';
+import { Shelf } from '@/types/Shelf';
 
 
 export default function Dashboard({ params }: { params: { userId: string } }): ReactElement {
@@ -51,8 +51,9 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
     ];
 
     const rightElements = [
-        <ActionButton className='m-1 rounded-full h-12' onClick={() => setAddShelfActive(true)} text="Add Shelf" />,
-        <ActionButton className='rounded-full h-12' onClick={() => setBookSelectActive(true)} text="Add Book" />,
+        <ActionButton className='rounded-full h-12 bg-green-500 shadow-medium text-white font-light w-[300px]' onClick={() => router.push('/explore')} text="Explore" />,
+        <ActionButton className='m-1 rounded-full h-12 font-light' onClick={() => setAddShelfActive(true)} text="Add Shelf" />,
+        <ActionButton className='rounded-full h-12 font-light' onClick={() => setBookSelectActive(true)} text="Add Book" />,
         <ActionButton className="m-1 bg-red-500 rounded-full h-12" onClick={handleSignOut} text="Sign Out" />
     ];
 

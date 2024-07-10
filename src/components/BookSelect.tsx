@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
 
-import { TextInput, ActionButton, ModalElement } from "@/app/components"
-import { queryOpenLibrary } from "@/app/utils/openlibrary";
-import { Book } from "@/app/types/Book";
+import { TextInput, ActionButton, ModalElement } from "@/components"
+import { queryOpenLibrary } from "@/utils/openlibrary";
+import { Book } from "@/types/Book";
 import BookSelectCard from "./BookSelectCard";
-import { Shelf } from "@/app/types/Shelf";
+import { Shelf } from "@/types/Shelf";
 import { addBooktoUserShelves } from "@/firebase/firestore";
-import { fetchDominantColor } from "@/app/utils/color";
+import { fetchDominantColor } from "@/utils/color";
 
 
 export default function BookSelect({ shelves, fetchShelves, userId, active, setActive }: { shelves: Shelf[], fetchShelves: Function, userId: string, active: boolean, setActive: Function }) {

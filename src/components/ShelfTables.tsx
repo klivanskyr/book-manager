@@ -1,7 +1,7 @@
 import { Accordion, AccordionItem, Image, Link } from "@nextui-org/react";
 import { bookIcon } from "@/assets";
-import { Table, Row, Column } from "@/app/components";
-import { Shelf } from "@/app/types/Shelf";
+import { Table, Row, Column } from "@/components";
+import { Shelf } from "@/types/Shelf";
 
 export default function Shelves({ shelves, userId }: { userId: string, shelves: Shelf[] }) {
   function BookTable({ shelf }: { shelf: Shelf }) {

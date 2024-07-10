@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Spinner } from "@nextui-org/react";
 
-import { Book, Shelf } from "@/app/types";
+import { Book, Shelf } from "@/types";
 import { getShelf, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
-import { BooksList } from "@/app/components";
+import { BooksList } from "@/components";
 import FilterBar from "./FilterBar/FiliterBar";
-import BookSelect from "../../BookSelect";
+import { BookSelect } from "@/components";
 
 
 export default function Page({ params }: { params: { userId: string, shelfId: string }}) {

@@ -1,7 +1,7 @@
 'use client' 
 
 import { useState  } from 'react';
-import { User, UserContext } from '@/app/types/UserContext';
+import { User, UserContext } from '@/types/UserContext';
 
 export function ParentProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);

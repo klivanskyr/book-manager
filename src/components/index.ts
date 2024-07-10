@@ -14,3 +14,4 @@ export type { Row, Column } from './Table';
 export { default as BooksList } from './BooksList';
 export { default as ShelfTables } from './ShelfTables';
 export { default as AddShelfModal } from './AddShelfModal';
+export { default as BookSelect } from './BookSelect';

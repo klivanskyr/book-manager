@@ -1,7 +1,7 @@
 import { FaStar } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-import { Book } from '@/app/types/Book';
+import { Book } from '@/types/Book';
 import { updateBookOnUserShelf } from '@/firebase/firestore';
 
 export default function Stars({ size, className='', userId, shelfId, book, handleUpdate, disabled=false }: { size: number, className?: string, userId: string, shelfId: string, book: Book, handleUpdate: Function, disabled?: boolean}) {
