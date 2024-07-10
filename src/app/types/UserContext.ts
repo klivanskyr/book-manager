@@ -1,12 +1,11 @@
 'use client';
 
-import { ReactNode, useState, createContext } from 'react';
-import { Book } from './Book';
+import { createContext } from 'react';
+import { Shelf } from './Shelf';
 
 export type User = {
-    user_id: string;
-    books: Book[] | null;
-    shownBooks: Book[];
+    userId: string;
+    shelves: Shelf[];
   }
 
 export type UserContextType = {

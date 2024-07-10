@@ -9,3 +9,8 @@ export { default as Navbar } from './Navbar';
 export { default as ModalElement } from './ModalElement';
 export { default as Stars } from './Stars';
 export { default as FallBackImage } from './FallBackImage';
+export { default as Table } from './Table';
+export type { Row, Column } from './Table';
+export { default as BooksList } from './BooksList';
+export { default as ShelfTables } from './ShelfTables';
+export { default as AddShelfModal } from './AddShelfModal';

@@ -1,45 +1,38 @@
-'use client';
-
-import React, { useContext } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 import { Book } from '@/app/types/Book';
-import { UserContext } from '@/app/types/UserContext';
-import { updateUserBook } from '@/app/db/db';
+import { updateBookOnUserShelf } from '@/firebase/firestore';
 
-const Stars = ({ size, book }: { size: number, book: Book }) => {
-  const { user, setUser } = useContext(UserContext);
+export default function Stars({ size, className='', userId, shelfId, book, handleUpdate, disabled=false }: { size: number, className?: string, userId: string, shelfId: string, book: Book, handleUpdate: Function, disabled?: boolean}) {
 
-   // Update star/rating amount
-   async function handleRatingUpdate(book: Book, starIndex: number): Promise<void> {
-    if (user && book.rating === starIndex + 1) {
-      const newBook = { ...book, rating: 0 };
-      await updateUserBook(newBook, user.user_id);
-    } else if (user) {
-      const newBook = { ...book, rating: starIndex + 1 };
-      await updateUserBook(newBook, user.user_id);
+  // Update star/rating amount
+  const handleRatingUpdate = async (book: Book, starIndex: number) => {
+    const isResetRating = book.rating === starIndex + 1; // Reset rating if the same star is clicked
+    const newRating = isResetRating ? 0 : starIndex + 1;
+    const newBook = { ...book, rating: newRating };
+    const error = await updateBookOnUserShelf(userId, shelfId, newBook);
+    if (error) {
+      console.error('Error updating book rating', error);
+      return;
     }
-};
+    handleUpdate(newBook);
+  } 
+
 
   return (
-    <div className='flex flex-row justify-center text-center pb-2'>
+    <div className={className} >
         {[...Array(5)].map((_, i) => (
           <motion.div
             key={i}
             whileHover={{ scale: 1.1 }}
+            className='cursor-pointer'
           >
-            <FaStar 
-                key={i} 
-                color={i < book.rating ? '#01af93' : '#bbbbbb'} 
-                onClick={() => handleRatingUpdate(book, i)}
-                size={size}
-                className='mt-2'
-            />
+            {disabled 
+            ? <FaStar key={i} color={i < book.rating ? '#01af93' : '#bbbbbb'} size={size} /> 
+            : <FaStar key={i} color={i < book.rating ? '#01af93' : '#bbbbbb'} onClick={() => handleRatingUpdate(book, i)} size={size} />}
           </motion.div>
         ))}
     </div>
   )
 }
-
-export default Stars

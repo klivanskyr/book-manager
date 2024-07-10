@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+import emailIsValid from '../utils/emailIsValid';
+import passwordIsValid from '../utils/passwordIsValid';
 import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput } from '@/app/components';
 
 export default function Signup() {
@@ -13,36 +15,27 @@ export default function Signup() {
     const router = useRouter();
 
     function validateInputs(): boolean {
-        if (input.password.length < 8) {
-            setError('Password must be at least 8 characters');
-            return false;
+        const passwordError = passwordIsValid(input.password);
+        if (passwordError) {
+            setError(passwordError);
+            return false
         }
-        if (input.password.length > 35) {
-            setError('Password must be less than 35 characters');
-            return false;
+        const emailError = emailIsValid(input.email);
+        if (emailError) {
+            setError(emailError);
+            return false
         }
-        if (input.username.length < 3) {
-            setError('Username must be at least 3 characters');
-            return false;
-        }
-        if (input.username.length > 35) {
-            setError('Username must be less than 35 characters');
-            return false;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)){
-            setError('Please enter a valid email');
-            return false;
-        }
+        setError('');
         return true;
     }
 
     const handleSubmit = async (e: any) => {
-        setIsLoading(true);
         if (!validateInputs()) {
-            setIsLoading(false);
+            console.log('Invalid input');
             return;
         }
 
+        setIsLoading(true);
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/sign-up`, {
             method: 'POST',
             headers: {
@@ -50,18 +43,20 @@ export default function Signup() {
             },
             body: JSON.stringify({ ...input, createdWith: 'email' })
         });
-        const data = await res.json();
         setIsLoading(false);
-        if (data.code !== 200) {
-            const errorMessage = data.message;
+
+        if (!res.ok) {
+            const errorMessage = res.statusText;
             setInput({ username: '', email: '', password: '' })
-            if (errorMessage.code === 'auth/email-already-in-use') {
+            if (res.statusText === 'auth/email-already-in-use') {
                 setError('Email already in use');
                 return;
             }
-            setError(errorMessage.code);
+            setError(res.statusText);
             return;
+
         } else {
+            console.log('User created successfully');
             router.push('/login');
         }
     }
@@ -82,12 +77,10 @@ export default function Signup() {
         <PasswordInput className="max-w-[500px] my-1.5 shadow-sm rounded-md" disabled={isLoading} value={input.password} setValue={(newValue: string) => setInput({ ...input, password: newValue })} />,
         <SubmitButton />,
         <h2 className={`m-2 text-red-600 font-light text-xl ${error ? 'opacity-100' : 'opacity-0'}`} >{error}</h2>,
-        <div className='py-5 text-center'> Already have an account? <Link className='font-semibold text-lg text-blue-500' href='/login'>Sign In</Link></div>
+        <div className='py-5 text-center'> Already have an account? <Link className='font-semibold text-lg text-blue-500' href='/login'>Sign In</Link></div>,
     ];
 
     return (
-        <div>
-            <Form elements={formElements} />
-        </div>
+        <Form elements={formElements} />
     )
 }

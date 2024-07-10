@@ -12,6 +12,7 @@ export default function PasswordInput({ className='', disabled = false, error, v
     return (
         <Input
             label='Password'
+            autoComplete='password'
             value={value}
             onChange={(e: any) => setValue(e.target.value)}
             className={className}

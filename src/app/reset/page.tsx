@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { ActionButton, EmailInput, Form, LoadingButton } from "@/app/components";
 import { Link } from '@nextui-org/react';
 import emailIsValid from '@/app/utils/emailIsValid';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '@/firebase/firebase';
-import { getUserByEmail } from '../db';
+import { auth, getUserIdByEmail } from '@/firebase/firestore';
 
 export default function Reset() {
     const [email, setEmail] = useState<string>('');
@@ -32,7 +31,7 @@ export default function Reset() {
         }
 
         //check database for email
-        const res = await getUserByEmail(email)
+        const res = await getUserIdByEmail(email)
 
         if (!res) {
             setIsLoading(false);
@@ -67,6 +66,7 @@ export default function Reset() {
         <h1 className='pt-5 pb-12 text-2xl font-semibold' >Reset Your Account</h1>,
         <EmailInput className='mb-8' value={email} setValue={setEmail} error={error} />,
         <SubmitButton />,
+        <h2 className={`m-2 text-red-600 font-light text-xl ${error ? 'opacity-100' : 'opacity-0'}`} >{error}</h2>,
         <h1 className='mt-3'>Remember your password? <Link href='/login' >Sign In</Link> </h1>
     ]
 

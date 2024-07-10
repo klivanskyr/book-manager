@@ -1,16 +1,19 @@
-import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export function DELETE(req: NextRequest) {
+export function DELETE(req: NextRequest): NextResponse {
     try {
-        const token = cookies().get('token');
+        const token = req.cookies.get('token');
+
         if (!token) {
-            return new Response(null, { status: 400, statusText: 'No token found' });
-        } else {
-            cookies().delete('token');
-            return new Response(null, { status: 200, statusText: 'Logged out' });
+            return NextResponse.json({ code: 400, message: 'User not logged in' });
         }
+
+        // Delete the token cookie
+        const response = NextResponse.json({ code: 200, message: 'User logged out' });
+        response.cookies.delete('token');
+        return response;
+        
     } catch (error) {
-        return new Response(null, { status: 500, statusText: 'Internal Server Error' });
+        return NextResponse.json({ code: 500, message: "Internal Server Error" })
     }
 }
