@@ -26,6 +26,7 @@ export default function Stars({ size, className='', userId, shelfId, book, handl
           <motion.div
             key={i}
             whileHover={{ scale: 1.1 }}
+            className='cursor-pointer'
           >
             {disabled 
             ? <FaStar key={i} color={i < book.rating ? '#01af93' : '#bbbbbb'} size={size} /> 

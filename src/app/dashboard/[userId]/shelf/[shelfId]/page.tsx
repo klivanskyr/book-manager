@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Spinner } from "@nextui-org/react";
 
 import { Book, Shelf } from "@/app/types";
-import { getShelf, removeBookFromShelf } from "@/firebase/firestore";
+import { getShelf, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
 import { BooksList } from "@/app/components";
 import FilterBar from "./FilterBar/FiliterBar";
 import BookSelect from "../../BookSelect";
@@ -52,11 +52,20 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     const handleUpdateShelf = async (newBook: Book) => {
         if (!shelf) return;
-        setIsBooksLoading(true);
+        const oldShelf = shelf;
+
+        // client side update
         const newBooks = shelf.books.map((book) => book.bookId === newBook.bookId ? newBook : book);
         const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
         setShelf(newShelf);
-        setIsBooksLoading(false);
+
+        // server side update
+        const error = await updateBookOnUserShelf(params.userId, params.shelfId, newBook);
+        if (error) {
+            console.error('Error updating book', error);
+            setShelf(oldShelf); //revert changes
+            return;
+        }
     }
 
     function Header() {

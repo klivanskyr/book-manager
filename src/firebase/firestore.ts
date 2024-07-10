@@ -609,7 +609,7 @@ export async function removeBookFromShelf(userId: string, shelfId: string, bookI
 }
 
 /**
- * Updates users/userId/shelves/shelfId/books/bookId with new Rating and/or Review
+ * Updates users/userId/shelves/shelfId/books/bookId and shelves/shelfId/books/bookId with new Rating and/or Review
  * @param newBook 
  * @param userId 
  * @param shelfId 
@@ -619,6 +619,13 @@ export async function updateBookOnUserShelf(userId: string, shelfId: string, new
   try {
     const bookDoc = doc(db, 'users', userId, 'shelves', shelfId, 'books', newBook.bookId);
     await setDoc(bookDoc, {
+      review: newBook.review,
+      rating: newBook.rating,
+    },
+    { merge: true });
+
+    const shelfBookDoc = doc(db, 'shelves', shelfId, 'books', newBook.bookId);
+    await setDoc(shelfBookDoc, {
       review: newBook.review,
       rating: newBook.rating,
     },

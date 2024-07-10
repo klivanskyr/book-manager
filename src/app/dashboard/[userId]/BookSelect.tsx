@@ -18,7 +18,7 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [foundBooks, setFoundBooks] = useState<Book[]>([]);
-    const [selectedShelves, setSelectedShelves] = useState<Shelf[]>([]);
+    const [selectedShelves, setSelectedShelves] = useState<Shelf[]>(shelves.length === 1 ? [shelves[0]] : []); // Default to first shelf if only one exists
 
     const handleClick = async () => {
         setSubmitted(true);
@@ -92,27 +92,31 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
                     }
                 </form>
                 <div className='w-1/2 flex flex-row justify-between items-center ml-2'>
-                    <div className='flex flex-row'>
-                        {selectedShelves.map((shelf) => (
-                            <Chip key={shelf.shelfId} onClose={() => setSelectedShelves(selectedShelves.filter((selectedShelf) => shelf.shelfId !== selectedShelf.shelfId))}>{shelf.name}</Chip>
-                        ))}
-                    </div>
-                    <Dropdown>
-                        <DropdownTrigger>
-                            <Button color='primary' className='w-[150px] h-12 rounded-lg shadow-small bg-blue-600 text-white text-medium'>Select Shelves</Button>
-                        </DropdownTrigger>
-                        <DropdownMenu
-                            variant="flat"
-                            closeOnSelect={false}
-                            selectionMode="multiple"
-                            selectedKeys={selectedShelves.map((shelf) => shelf.shelfId)}
-                            onSelectionChange={(keys) => updatedSelectedKeys(Array.from(keys) as string[])}
-                        >
-                            {shelves.map((shelf) => (
-                                <DropdownItem key={shelf.shelfId}>{shelf.name}</DropdownItem>
-                            ))}
-                        </DropdownMenu>
-                    </Dropdown>
+                    {shelves.length > 1 && 
+                        <>
+                            <div className='flex flex-row'>
+                                {selectedShelves.map((shelf) => (
+                                    <Chip key={shelf.shelfId} onClose={() => setSelectedShelves(selectedShelves.filter((selectedShelf) => shelf.shelfId !== selectedShelf.shelfId))}>{shelf.name}</Chip>
+                                ))}
+                            </div>
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button color='primary' className='w-[150px] h-12 rounded-lg shadow-small bg-blue-600 text-white text-medium'>Select Shelves</Button>
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                    variant="flat"
+                                    closeOnSelect={false}
+                                    selectionMode="multiple"
+                                    selectedKeys={selectedShelves.map((shelf) => shelf.shelfId)}
+                                    onSelectionChange={(keys) => updatedSelectedKeys(Array.from(keys) as string[])}
+                                >
+                                    {shelves.map((shelf) => (
+                                        <DropdownItem key={shelf.shelfId}>{shelf.name}</DropdownItem>
+                                    ))}
+                                </DropdownMenu>
+                            </Dropdown>
+                        </>
+                    }
                 </div>
             </div>
         )
