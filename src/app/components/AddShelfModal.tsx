@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { ModalElement } from "@/app/components";
 import { Shelf } from "@/app/types/Shelf";
-import { addShelfToUser, getShelves } from "@/firebase/firestore";
+import { addShelfToUser } from "@/firebase/firestore";
 import { Button, Checkbox, Input } from "@nextui-org/react";
 
 export default function AddShelfModal({ userId, fetchLatestShelves, active, setActive }: { userId: string, fetchLatestShelves: Function, active: boolean, setActive: Function }) {

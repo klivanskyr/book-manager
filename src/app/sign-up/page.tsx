@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+import emailIsValid from '../utils/emailIsValid';
+import passwordIsValid from '../utils/passwordIsValid';
 import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput } from '@/app/components';
 
 export default function Signup() {
@@ -13,36 +15,27 @@ export default function Signup() {
     const router = useRouter();
 
     function validateInputs(): boolean {
-        if (input.password.length < 8) {
-            setError('Password must be at least 8 characters');
-            return false;
+        const passwordError = passwordIsValid(input.password);
+        if (passwordError) {
+            setError(passwordError);
+            return false
         }
-        if (input.password.length > 35) {
-            setError('Password must be less than 35 characters');
-            return false;
+        const emailError = emailIsValid(input.email);
+        if (emailError) {
+            setError(emailError);
+            return false
         }
-        if (input.username.length < 3) {
-            setError('Username must be at least 3 characters');
-            return false;
-        }
-        if (input.username.length > 35) {
-            setError('Username must be less than 35 characters');
-            return false;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)){
-            setError('Please enter a valid email');
-            return false;
-        }
+        setError('');
         return true;
     }
 
     const handleSubmit = async (e: any) => {
-        setIsLoading(true);
         if (!validateInputs()) {
-            setIsLoading(false);
+            console.log('Invalid input');
             return;
         }
 
+        setIsLoading(true);
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/sign-up`, {
             method: 'POST',
             headers: {
@@ -51,6 +44,7 @@ export default function Signup() {
             body: JSON.stringify({ ...input, createdWith: 'email' })
         });
         setIsLoading(false);
+
         if (!res.ok) {
             const errorMessage = res.statusText;
             setInput({ username: '', email: '', password: '' })
@@ -60,6 +54,7 @@ export default function Signup() {
             }
             setError(res.statusText);
             return;
+
         } else {
             console.log('User created successfully');
             router.push('/login');
@@ -86,8 +81,6 @@ export default function Signup() {
     ];
 
     return (
-        <div>
-            <Form elements={formElements} />
-        </div>
+        <Form elements={formElements} />
     )
 }
