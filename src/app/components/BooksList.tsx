@@ -5,9 +5,9 @@ import { Book } from "../types/Book";
 import { Shelf } from "../types/Shelf";
 import { FaTimes } from "react-icons/fa";
 import { useState } from "react";
-import { Button, Modal, ModalBody, ModalHeader } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 
-export default function BooksList({ ownerPermission, handleRemoveBook, books, shelf }: { ownerPermission: boolean, handleRemoveBook: Function, shelf: Shelf, books: Book[] }) {
+export default function BooksList({ ownerPermission, handleRemoveBook, books, shelf, handleUpdateShelf }: { ownerPermission: boolean, handleRemoveBook: Function, shelf: Shelf, books: Book[], handleUpdateShelf: Function }) {
     const [activeDeleteModal, setActiveDeleteModal] = useState<boolean>(false);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
@@ -73,7 +73,7 @@ export default function BooksList({ ownerPermission, handleRemoveBook, books, sh
                                         <p className="">ISBN: {book.isbn}</p>
                                     </div>
                                     <div>
-                                        <Stars className='flex flex-row' shelfId={shelf.shelfId} book={book} size={25} />
+                                        <Stars className="flex flex-row" book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} shelfId={shelf.shelfId} size={25} userId={shelf.createdById} disabled={!ownerPermission} />
                                         <p className='text-blue-500' >View Review</p>
                                     </div>
                                 </div>

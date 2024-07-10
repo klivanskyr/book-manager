@@ -35,13 +35,28 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
     }, []);
 
     const handleRemoveBook = async (book: Book) => {
+        if (!shelf) return;
+        setIsBooksLoading(true);
         //This might get really slow as the database grows
         const error = await removeBookFromShelf(params.userId, params.shelfId, book.bookId);
         if (error) {
             console.error('Error removing book from shelf', error);
             return;
         }
-        fetchShelf();
+        
+        const newBooks = shelf.books.filter((b) => b.bookId !== book.bookId);
+        const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
+        setShelf(newShelf);
+        setIsBooksLoading(false);
+    }
+
+    const handleUpdateShelf = async (newBook: Book) => {
+        if (!shelf) return;
+        setIsBooksLoading(true);
+        const newBooks = shelf.books.map((book) => book.bookId === newBook.bookId ? newBook : book);
+        const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
+        setShelf(newShelf);
+        setIsBooksLoading(false);
     }
 
     function Header() {
@@ -78,7 +93,9 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
             <Header />
             <FilterBar shelf={shelf} setShelf={setShelf} isLoading={isBooksLoading} setIsLoading={setIsBooksLoading}  />
             <BookSelect active={bookSelectActive} setActive={setBookSelectActive} userId={params.userId} fetchShelves={fetchShelf} shelves={[shelf]} />
-            {isBooksLoading ? <div className="flex flex-row justify-center items-center w-full h-full"><Spinner size="lg"/></div> : <BooksList handleRemoveBook={handleRemoveBook} ownerPermission={ownerPermission} shelf={shelf} books={shelf.shownBooks} />}
+            {isBooksLoading 
+            ? <div className="flex flex-row justify-center items-center w-full h-full"><Spinner size="lg"/></div> 
+            : <BooksList handleRemoveBook={handleRemoveBook} handleUpdateShelf={handleUpdateShelf} ownerPermission={ownerPermission} shelf={shelf} books={shelf.shownBooks} />}
         </div>
     )
 }

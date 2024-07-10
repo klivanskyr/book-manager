@@ -297,22 +297,6 @@ export async function getUser(userId: string): Promise<{ username: string, profi
 //   }
 // }
 
-export async function updateBookOnUserShelf(newBook: Book, userId: string, shelfId: string) {
-  try {
-    console.log('Updating book on user shelf', newBook, userId, shelfId);
-
-    //Update book in shelves
-    const bookRef = doc(db, 'shelves', shelfId, 'books', newBook.bookId);
-    await updateDoc(bookRef, {
-      review: newBook.review,
-      rating: newBook.rating,
-      isGlobalReview: false,
-    });
-  } catch (error) {
-    console.log('Error in updateBookOnUserShelf', error);
-  }
-}
-
 export async function addBooktoUserShelves(book: Book, userId: string, shelfIds: string[]) {
   if (shelfIds.length === 0) return console.log('No shelves to add book to');
   shelfIds = shelfIds.filter(shelfId => shelfId !== 'all-books'); //remove all-books shelf because its not a real shelf
@@ -621,5 +605,29 @@ export async function removeBookFromShelf(userId: string, shelfId: string, bookI
   } catch (error) {
     console.log('Error in removeBookFromShelf', error);
     return `${error}`
+  }
+}
+
+/**
+ * Updates users/userId/shelves/shelfId/books/bookId with new Rating and/or Review
+ * @param newBook 
+ * @param userId 
+ * @param shelfId 
+ * @returns string if error, else null
+ */
+export async function updateBookOnUserShelf(userId: string, shelfId: string, newBook: Book): Promise<Option<string>> {
+  try {
+    const bookDoc = doc(db, 'users', userId, 'shelves', shelfId, 'books', newBook.bookId);
+    await setDoc(bookDoc, {
+      review: newBook.review,
+      rating: newBook.rating,
+    },
+    { merge: true });
+    
+    return null;
+
+  } catch (error) {
+    console.log('Error in updateBookOnUserShelf', error);
+    return `${error}`;
   }
 }
