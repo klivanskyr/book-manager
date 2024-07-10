@@ -54,7 +54,7 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                 <div className="flex flex-col items-end justify-centerm mx-0.5">
                     <div className="flex flex-row">
                         {ownerPermission && <Button className='bg-blue-600 text-white shadow-medium mx-1' onClick={() => setBookSelectActive(true)}>Add Book</Button>}
-                        <Button className='bg-blue-600 text-white shadow-medium' onClick={() => router.push(`/dashboard/${params.userId}`)}>Go To Dashboard</Button>
+                        <Button className='bg-white text-black border border-gray-200 shadow-medium' onClick={() => router.push(`/dashboard/${params.userId}`)}>Go To Dashboard</Button>
                     </div>
                     <div className="flex flex-row mt-2">
                         <p className="mr-8">Created By: {shelf?.createdByName || "Username"}</p>
