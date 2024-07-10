@@ -2,14 +2,12 @@
 
 import { Navbar, TextInput } from "@/app/components";
 import SortBy from "./SortBy";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Slider } from "@nextui-org/react";
-import { UserContext } from "@/app/types/UserContext";
 import { Book } from "@/app/types/Book";
 import { Shelf } from "@/app/types/Shelf";
 
 export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: { isLoading: boolean, setIsLoading: Function, shelf: Shelf, setShelf: Function }) {
-    const { user, setUser } = useContext(UserContext);
     const [titleFilter, setTitleFilter] = useState<string>('');
     const [authorFilter, setAuthorFilter] = useState<string>('');
     const [ratingFilter, setRatingFilter] = useState<[number, number]>([0, 5]);
@@ -17,8 +15,7 @@ export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: 
 
     //client side filtering of books because firestore does not support where clauses on different fields at once
     useEffect(() => {
-        console.log('filtering books');
-        if (user && user.shelves && shelf && shelf.books) {
+        if (shelf) {
             setIsLoading(true);
             let newBooks: Book[] = [];
             shelf.books.forEach((book: Book) => {
@@ -27,9 +24,7 @@ export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: 
                 }
             });
             if (JSON.stringify(newBooks) != JSON.stringify(shelf.shownBooks)) { //only update if the books are different
-                const oldShelf = user.shelves.find((s: Shelf) => s.shelfId === shelf.shelfId);
-                if (!oldShelf) return;
-                const newShelf = { ...oldShelf, shownBooks: newBooks };
+                const newShelf = { ...shelf, shownBooks: newBooks };
                 setShelf(newShelf);
             }
             setIsLoading(false);

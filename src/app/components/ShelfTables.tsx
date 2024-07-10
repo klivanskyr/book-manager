@@ -39,12 +39,10 @@ export default function Shelves({ shelves, userId }: { userId: string, shelves: 
     )
   }
 
-  console.log(shelves);
-
   return (
       <div className="p-1 py-4 h-full w-full">
         <Accordion variant="splitted" selectionMode="multiple">
-          {shelves.map((shelf, i) => (
+          {shelves.sort((_, b) => b.shelfId === 'all-books' ? 1 : -1).map((shelf, i) => (
             <AccordionItem key={shelf.shelfId + `${i}`} title={shelf.name} startContent={<Image  className="p-1.5 w-[50px] h-[50px] bg-slate-50 border border-slate-200 rounded-full" radius="lg" src={bookIcon.src}/>}>
               <div className="m-1/2 w-full flex flex-row justify-center items-center"><Link href={`/dashboard/${userId}/shelf/${shelf.shelfId}`} className="p-1">View Shelf Details</Link></div>
               <BookTable shelf={shelf} />

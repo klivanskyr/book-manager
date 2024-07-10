@@ -45,7 +45,7 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
         const updatedBooks = data.books.map((apiBook: Book) => {
             const isBookInASelectedShelf = selectedShelves.some((shelf) => shelf.books.some((book) => book.key === apiBook.key));
             if (isBookInASelectedShelf) {
-                return apiBook.selected = true;
+                return { ...apiBook, selected: true };
             }
             return apiBook;
         });
@@ -55,8 +55,10 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
         setText('');
     }
 
-    /** Adds a book to a user as well as changes it's 
-     * selected field to true so its select button will be red in the modal */
+    /** 
+     * Adds a book to a user as well as changes it's 
+     * selected field to true so its select button will be red in the modal
+    */
     const addBook = async (newBook: Book) => {
         const [r, g, b] = await fetchDominantColor(newBook.coverUrl);
         const updatedBook = { ...newBook, selected: true, bgColor: {r: Math.min(r+50, 255), g: Math.min(g+50, 255), b: Math.min(b+50, 255)}};

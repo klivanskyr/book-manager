@@ -5,7 +5,9 @@ export type Shelf = {
     name: string,
     description: string,
     isPublic: boolean,
-    createdBy: string,
+    createdById: string,
+    createdByName: string,
+    createdByImage: string,
     books: Book[]
     shownBooks: Book[]
 }

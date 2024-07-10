@@ -2,34 +2,47 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Spinner } from "@nextui-org/react";
+import { Button, Spinner } from "@nextui-org/react";
 
-import { Shelf } from "@/app/types/Shelf";
-import { getShelf } from "@/firebase/firestore";
+import { Book, Shelf } from "@/app/types";
+import { getShelf, removeBookFromShelf } from "@/firebase/firestore";
 import { BooksList } from "@/app/components";
 import FilterBar from "./FilterBar/FiliterBar";
+import BookSelect from "../../BookSelect";
 
 
 export default function Page({ params }: { params: { userId: string, shelfId: string }}) {
     const [shelf, setShelf] = useState<Shelf | null>(null);
-    const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
     const [isBooksLoading, setIsBooksLoading] = useState<boolean>(true);
+    const [bookSelectActive, setBookSelectActive] = useState<boolean>(false);
     const router = useRouter();
 
-    const fetchShelf = async (shelfId: string) => {
-        setIsPageLoading(true);
-        const shelf = await getShelf(shelfId);
+    const ownerPermission = shelf?.createdById === params.userId;
+
+    const fetchShelf = async () => {
+        setIsBooksLoading(true);
+        const shelf = await getShelf(params.shelfId);
         if (!shelf) {
-            console.error('No shelves found');
+            console.error('No shelves found', shelf, params);
             return;
         }
         setShelf(shelf);
+        setIsBooksLoading(false);
     }
 
     useEffect(() => {
-        fetchShelf(params.shelfId);
-        setIsPageLoading(false);
+        fetchShelf();
     }, []);
+
+    const handleRemoveBook = async (book: Book) => {
+        //This might get really slow as the database grows
+        const error = await removeBookFromShelf(params.userId, params.shelfId, book.bookId);
+        if (error) {
+            console.error('Error removing book from shelf', error);
+            return;
+        }
+        fetchShelf();
+    }
 
     function Header() {
         return (
@@ -38,16 +51,22 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                     <h1 className='font-medium text-4xl max-w-[500px] truncate'>{shelf?.name || "Title"}</h1>
                     <h2 className="italic font-light max-w-[500px] truncate">{shelf?.description || "Description"}</h2>
                 </div>
-                <div className="flex flex-row">
-                    <p className="mr-2">Created By: {shelf?.createdBy || "Username"}</p>
-                    <p>IMAGE</p>
+                <div className="flex flex-col items-end justify-centerm mx-0.5">
+                    <div className="flex flex-row">
+                        {ownerPermission && <Button className='bg-blue-600 text-white shadow-medium mx-1' onClick={() => setBookSelectActive(true)}>Add Book</Button>}
+                        <Button className='bg-blue-600 text-white shadow-medium' onClick={() => router.push(`/dashboard/${params.userId}`)}>Go To Dashboard</Button>
+                    </div>
+                    <div className="flex flex-row mt-2">
+                        <p className="mr-8">Created By: {shelf?.createdByName || "Username"}</p>
+                        <p className="mr-2">IMAGE</p>
+                    </div>
                 </div>
             </div>
         )
 
     }
 
-    if (isPageLoading || shelf === null) {
+    if (shelf === null) {
         return (
             <div className="w-screen h-screen flex flex-row items-center justify-center">
                 <Spinner size="lg" label="Loading..."/>
@@ -55,10 +74,11 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
         )
     }
     return (
-        <div className="w-screen h-screen">
+        <div className="w-screen">
             <Header />
             <FilterBar shelf={shelf} setShelf={setShelf} isLoading={isBooksLoading} setIsLoading={setIsBooksLoading}  />
-            <BooksList shelf={shelf} books={shelf.shownBooks} />
+            <BookSelect active={bookSelectActive} setActive={setBookSelectActive} userId={params.userId} fetchShelves={fetchShelf} shelves={[shelf]} />
+            {isBooksLoading ? <div className="flex flex-row justify-center items-center w-full h-full"><Spinner size="lg"/></div> : <BooksList handleRemoveBook={handleRemoveBook} ownerPermission={ownerPermission} shelf={shelf} books={shelf.shownBooks} />}
         </div>
     )
 }
