@@ -11,6 +11,7 @@ import UserProfile from './userProfile.svg';
 import Plus from './plus.svg';
 import Check from './check.svg';
 import Minus from './minus.svg';
+import Globe from './global-svgrepo-com.svg';
 
 export {
   coverPlaceholder,
@@ -25,5 +26,6 @@ export {
   UserProfile,
   Plus,
   Check,
-  Minus
+  Minus,
+  Globe
 };

@@ -15,9 +15,10 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
     const [shelf, setShelf] = useState<Shelf | null>(null);
     const [isBooksLoading, setIsBooksLoading] = useState<boolean>(true);
     const [bookSelectActive, setBookSelectActive] = useState<boolean>(false);
+    const [makePublicActive, setMakePublicActive] = useState<boolean>(false);
     const router = useRouter();
 
-    const ownerPermission = shelf?.createdById === params.userId;
+    const isOwner = shelf?.createdById === params.userId;
 
     const fetchShelf = async () => {
         setIsBooksLoading(true);
@@ -77,8 +78,9 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                 </div>
                 <div className="flex flex-col items-end justify-centerm mx-0.5">
                     <div className="flex flex-row">
-                        {ownerPermission && <Button className='bg-blue-600 text-white shadow-medium mx-1' onClick={() => setBookSelectActive(true)}>Add Book</Button>}
-                        <Button className='bg-white text-black border border-gray-200 shadow-medium' onClick={() => router.push(`/dashboard/${params.userId}`)}>Go To Dashboard</Button>
+                        {isOwner && <Button className='bg-blue-600 text-white shadow-medium' onClick={() => setBookSelectActive(true)}>Add Book</Button>}
+                        <Button className='mx-1 bg-white text-black border border-gray-200 shadow-medium' onClick={() => router.push(`/dashboard/${params.userId}`)}>Go To Dashboard</Button>
+                        {isOwner && <Button className='bg-white text-black border border-gray-200 shadow-medium' onClick={() => router.push(`/dashboard/${params.userId}/shelf/${params.shelfId}/settings`)}>Settings</Button>}
                     </div>
                     <div className="flex flex-row mt-2">
                         <p className="mr-8">Created By: {shelf?.createdByName || "Username"}</p>
@@ -104,7 +106,7 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
             <BookSelect active={bookSelectActive} setActive={setBookSelectActive} userId={params.userId} fetchShelves={fetchShelf} shelves={[shelf]} />
             {isBooksLoading 
             ? <div className="flex flex-row justify-center items-center w-full h-full"><Spinner size="lg"/></div> 
-            : <BooksList handleRemoveBook={handleRemoveBook} handleUpdateShelf={handleUpdateShelf} ownerPermission={ownerPermission} shelf={shelf} books={shelf.shownBooks} />}
+            : <BooksList handleRemoveBook={handleRemoveBook} handleUpdateShelf={handleUpdateShelf} isOwner={isOwner} shelf={shelf} books={shelf.shownBooks} />}
         </div>
     )
 }

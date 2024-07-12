@@ -436,5 +436,28 @@ export async function getAllPublicShelves(sort?: Sort, filter?: Filter): Promise
     console.log('Error in getExploreShelves', error);
     return null;
   }
+}
 
+export async function updateShelf(newShelf: Shelf): Promise<Option<string>> {
+  try {
+    const newData = {
+      name: newShelf.name,
+      description: newShelf.description,
+      isPublic: newShelf.isPublic,
+      image: newShelf.image || '',
+    }
+
+    // Update in shelves
+    const shelvesDoc = doc(db, 'shelves', newShelf.shelfId);
+    await setDoc(shelvesDoc, newData, { merge: true });
+
+    // Update in user/userId/shelves/shelfId
+    const userShelvesDoc = doc(db, 'users', newShelf.createdById, 'shelves', newShelf.shelfId);
+    await setDoc(userShelvesDoc, newData, { merge: true });
+
+    return null;
+  } catch (error) {
+    console.log('Error in updateShelf', error);
+    return `${error}`;
+  }
 }

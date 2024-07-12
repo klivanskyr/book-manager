@@ -7,7 +7,7 @@ import { FaTimes } from "react-icons/fa";
 import { useState } from "react";
 import { Button, Modal, Textarea } from "@nextui-org/react";
 
-export default function BooksList({ ownerPermission, handleRemoveBook, books, shelf, handleUpdateShelf }: { ownerPermission: boolean, handleRemoveBook: Function, shelf: Shelf, books: Book[], handleUpdateShelf: Function }) {
+export default function BooksList({ isOwner, handleRemoveBook, books, shelf, handleUpdateShelf }: { isOwner: boolean, handleRemoveBook: Function, shelf: Shelf, books: Book[], handleUpdateShelf: Function }) {
     const [activeDeleteModal, setActiveDeleteModal] = useState<boolean>(false);
     const [activeReviewModal, setActiveReviewModal] = useState<boolean>(false);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -90,8 +90,8 @@ export default function BooksList({ ownerPermission, handleRemoveBook, books, sh
         if (!book) return <></>;
         return (
             <form className='w-full flex flex-col items-center justify-center' onSubmit={(e) => e.preventDefault()}>
-                <Stars className='flex flex-row' book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} size={30} shelfId={shelf.shelfId} userId={shelf.createdById} disabled={!ownerPermission} />
-                {ownerPermission && <Button className='mt-4 bg-blue-600 text-white font-medium' type='submit' onClick={handleReviewSubmit}>Submit Review</Button>}
+                <Stars className='flex flex-row' book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} size={30} shelfId={shelf.shelfId} userId={shelf.createdById} disabled={!isOwner} />
+                {isOwner && <Button className='mt-4 bg-blue-600 text-white font-medium' type='submit' onClick={handleReviewSubmit}>Submit Review</Button>}
             </form>
         )
     }
@@ -105,7 +105,7 @@ export default function BooksList({ ownerPermission, handleRemoveBook, books, sh
                     <div key={book.bookId} className="shadow-medium flex flex-row items-center p-4 m-2.5 justify-between">
                         <div className="flex flex-col w-full">
                             <div className="flex flex-row items-center justify-end -m-2">
-                                {ownerPermission && <FaTimes className="text-red-500 hover:cursor-pointer" onClick={() => handleDeleteOpen(book)} />}
+                                {isOwner && <FaTimes className="text-red-500 hover:cursor-pointer" onClick={() => handleDeleteOpen(book)} />}
                             </div>
                             <div className="flex flex-row items-center w-full">
                                 <FallBackImage className="max-h-[220px] min-h-[200px] min-w-[140px] rounded-md" alt={`${book.title}`} height={150} width={150} src={book.coverUrl} />
@@ -116,7 +116,7 @@ export default function BooksList({ ownerPermission, handleRemoveBook, books, sh
                                         <p className="">ISBN: {book.isbn}</p>
                                     </div>
                                     <div>
-                                        <Stars className="flex flex-row" book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} shelfId={shelf.shelfId} size={25} userId={shelf.createdById} disabled={!ownerPermission} />
+                                        <Stars className="flex flex-row" book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} shelfId={shelf.shelfId} size={25} userId={shelf.createdById} disabled={!isOwner} />
                                         <h3 className='text-blue-500 mt-1.5 hover:cursor-pointer' onClick={() => handleReviewOpen(book)}>View Review</h3>
                                     </div>
                                 </div>
