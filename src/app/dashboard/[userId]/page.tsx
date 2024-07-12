@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 
 import { BookSelect } from '@/components';
-import { Navbar, ActionButton, ShelfTables, AddShelfModal } from "@/components";
-import { auth, getAllBooks, getShelves } from '@/firebase/firestore';
+import { NavBarLR, ActionButton, ShelfTables, AddShelfModal } from "@/components";
+import { auth, getAllBooks, getUserShelves } from '@/firebase/firestore';
 import { Shelf } from '@/types/Shelf';
 
 
@@ -17,7 +17,7 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
     const router = useRouter();
 
     const fetchShelves = async (userId: string) => {
-        const shelves = await getShelves(userId);
+        const shelves = await getUserShelves(userId);
         if (!shelves) {
             console.error('No shelves found');
             return;
@@ -38,7 +38,7 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
         });
         signOut(auth)
         .then(() => {
-            router.push('/login');
+            router.push('/explore');
         })
         .catch((error) => {
             console.error(error);
@@ -47,21 +47,21 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
 
 
     const leftElements = [
-        <h1 className="mx-4 font-medium text-lg text-center">Book Manager</h1>,
+        <h1 className="mx-4 font-medium text-lg text-center text-white">Book Manager</h1>,
     ];
 
     const rightElements = [
-        <ActionButton className='rounded-full h-12 bg-green-500 shadow-medium text-white font-light w-[300px]' onClick={() => router.push('/explore')} text="Explore" />,
-        <ActionButton className='m-1 rounded-full h-12 font-light' onClick={() => setAddShelfActive(true)} text="Add Shelf" />,
-        <ActionButton className='rounded-full h-12 font-light' onClick={() => setBookSelectActive(true)} text="Add Book" />,
-        <ActionButton className="m-1 bg-red-500 rounded-full h-12" onClick={handleSignOut} text="Sign Out" />
+        <ActionButton className='rounded-full h-12 bg-slate-600 hover:bg-slate-500 transition-all shadow-medium text-white font-light w-[300px]' onClick={() => router.push('/explore')} text="Explore" />,
+        <ActionButton className='m-1 rounded-full h-12 bg-slate-600 hover:bg-slate-500 transition-all shadow-medium text-white font-light' onClick={() => setAddShelfActive(true)} text="Add Shelf" />,
+        <ActionButton className='rounded-full h-12 bg-slate-600 hover:bg-slate-500 transition-all shadow-medium text-white font-light' onClick={() => setBookSelectActive(true)} text="Add Book" />,
+        <ActionButton className="m-1 border-1.5 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white transition-all rounded-full h-12" onClick={handleSignOut} text="Sign Out" />
     ];
 
     return (
         <div className='flex flex-col h-screen'>
             <BookSelect userId={params.userId} shelves={shelves} fetchShelves={fetchShelves} active={bookSelectActive} setActive={setBookSelectActive} />
             <AddShelfModal fetchLatestShelves={fetchShelves} userId={params.userId} active={addShelfActive} setActive={setAddShelfActive} />
-            <Navbar className='w-full flex justify-between h-16 bg-slate-50 shadow-md' leftElements={leftElements} rightElements={rightElements} />
+            <NavBarLR className='w-full flex justify-between h-16 bg-slate-700 shadow-md' leftElements={leftElements} rightElements={rightElements} />
             <ShelfTables shelves={shelves} userId={params.userId} />
         </div>
     )

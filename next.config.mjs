@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-        serverComponentsExternalPackages: ['bcrypt'],
-    },
     async headers() {
         return [
             {
@@ -20,18 +17,10 @@ const nextConfig = {
         return [
             {
                 source: '/',
-                destination: '/login',
+                destination: '/explore',
                 permanent: true,
             }
         ]
-    },
-    async rewrites() {
-        return [
-            {
-                source: '/login',
-                destination: '/',
-            }
-        ];
     },
     images: {
         remotePatterns: [
@@ -40,6 +29,15 @@ const nextConfig = {
             }
         ],
     },
-  };
-  
+    webpack(config) {
+        config.module.rules.push({
+            test: /\.svg$/,
+            use: ['@svgr/webpack'],
+        });
+
+        return config;
+    }
+};
+
+
 export default nextConfig;

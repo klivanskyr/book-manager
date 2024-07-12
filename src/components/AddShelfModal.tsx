@@ -24,6 +24,7 @@ export default function AddShelfModal({ userId, fetchLatestShelves, active, setA
             await addShelfToUser(input as Shelf, userId);
             await fetchLatestShelves(userId);
             setActive(false);
+            setInput({ name: '', description: '', isPublic: false });
         }
 
         return (

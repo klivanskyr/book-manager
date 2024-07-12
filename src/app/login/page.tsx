@@ -50,7 +50,7 @@ export default function Login(): ReactElement {
     }
     
     setIsLoading(false);
-    router.push(`/dashboard/${data.uid}`);
+    router.push(`/explore/${data.uid}`);
   }
   
   function SubmitButton() {

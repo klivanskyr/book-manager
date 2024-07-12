@@ -1,13 +1,29 @@
 import coverPlaceholder from './coverPlaceholder.jpg';
-import passwordEyeFull from './passwordEyeFull.svg';
-import passwordEyeSlashed from './passwordEyeSlashed.svg';
-import googleG from './GoogleGLogo.svg';
-import bookIcon from './bookIcon.svg';
+import PasswordEyeFull from './passwordEyeFull.svg';
+import PasswordEyeSlashed from './passwordEyeSlashed.svg';
+import GoogleG from './GoogleGLogo.svg';
+import BookIcon from './bookIcon.svg';
+import ExploreIcon from './explore.svg';
+import Questionmark from './questionmark.svg';
+import Search from './search.svg';
+import Settings from './settings.svg';
+import UserProfile from './userProfile.svg';
+import Plus from './plus.svg';
+import Check from './check.svg';
+import Minus from './minus.svg';
 
 export {
   coverPlaceholder,
-  passwordEyeFull,
-  passwordEyeSlashed,
-  googleG,
-  bookIcon
+  PasswordEyeFull,
+  PasswordEyeSlashed,
+  GoogleG,
+  BookIcon,
+  ExploreIcon,
+  Questionmark,
+  Search,
+  Settings,
+  UserProfile,
+  Plus,
+  Check,
+  Minus
 };

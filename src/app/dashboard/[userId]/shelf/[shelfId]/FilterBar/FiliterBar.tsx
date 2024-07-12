@@ -1,6 +1,6 @@
 'use client';
 
-import { Navbar, TextInput } from "@/components";
+import { NavBarLR, TextInput } from "@/components";
 import SortBy from "./SortBy";
 import { useEffect, useState } from "react";
 import { Slider } from "@nextui-org/react";
@@ -42,6 +42,6 @@ export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: 
     ]
 
     return (
-        <Navbar className='flex flex-row justify-between my-2 mx-4' leftElements={leftElements} rightElements={rightElements} />
+        <NavBarLR className='flex flex-row justify-between my-2 mx-4' leftElements={leftElements} rightElements={rightElements} />
     )
 }

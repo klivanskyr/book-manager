@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Spinner } from "@nextui-org/react";
 
 import { Book, Shelf } from "@/types";
-import { getShelf, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
+import { getAllBooks, getShelf, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
 import { BooksList } from "@/components";
 import FilterBar from "./FilterBar/FiliterBar";
 import { BookSelect } from "@/components";
@@ -21,7 +21,7 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     const fetchShelf = async () => {
         setIsBooksLoading(true);
-        const shelf = await getShelf(params.shelfId);
+        const shelf = params.shelfId === 'all-books' ? await getAllBooks(params.userId) : await getShelf(params.shelfId);
         if (!shelf) {
             console.error('No shelves found', shelf, params);
             return;

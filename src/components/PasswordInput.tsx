@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Input, Button } from '@nextui-org/react';
 
-import { passwordEyeFull, passwordEyeSlashed } from '@/assets';
+import { PasswordEyeFull, PasswordEyeSlashed } from '@/assets';
 import Image from 'next/image';
 
 export default function PasswordInput({ className='', disabled = false, error, value, setValue }: { className?: string, disabled?: boolean, error?: string, value: any, setValue: Function }) {
@@ -21,8 +21,8 @@ export default function PasswordInput({ className='', disabled = false, error, v
                 <Button className='bg-transparent' isIconOnly onClick={() => setIsVisable(!isVisable)}>
                     {/* If password is empty, dont show icon. Then allow switching between text and password */}
                     {!value ? <></> : (isVisable
-                    ? <Image src={passwordEyeSlashed} alt="Hide Password" height={30} width={30} /> 
-                    : <Image src={passwordEyeFull} alt="Show Password" height={30} width={30} />)}
+                    ? <PasswordEyeSlashed className='w-[30px] h-[30px]' /> 
+                    : <PasswordEyeFull className='w-[30px] h-[30px]' />)}
                 </Button>
             }
             type = {isVisable ? "text" : "password" }
