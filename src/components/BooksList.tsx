@@ -7,7 +7,7 @@ import { FaTimes } from "react-icons/fa";
 import { useState } from "react";
 import { Button, Modal, Textarea } from "@nextui-org/react";
 
-export default function BooksList({ isOwner, handleRemoveBook, books, shelf, handleUpdateShelf }: { isOwner: boolean, handleRemoveBook: Function, shelf: Shelf, books: Book[], handleUpdateShelf: Function }) {
+export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, books, shelf, handleUpdateShelf=()=>{} }: { isOwner?: boolean, handleRemoveBook?: Function, shelf: Shelf, books: Book[], handleUpdateShelf?: Function }) {
     const [activeDeleteModal, setActiveDeleteModal] = useState<boolean>(false);
     const [activeReviewModal, setActiveReviewModal] = useState<boolean>(false);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);

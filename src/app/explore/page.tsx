@@ -6,14 +6,19 @@ import { NavBarLMR, SideBar, SideBarSections, ExploreCard } from '@/components';
 import { UserProfile, ExploreIcon, Settings, Questionmark } from '@/assets';
 import { Button, Link, Spinner } from '@nextui-org/react';
 import { Book, Shelf } from '@/types';
-import { auth, getAllPublicShelves, getUserShelves } from '@/firebase/firestore';import { useRouter } from 'next/navigation';
+import { auth, getAllPublicShelves, getUserShelves } from '@/firebase/firestore';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 
 
-export default function ExploreLoggedIn({ params }: { params: { userId?: string[] }}) {
+export default function Explore() {
     const [shelves, setShelves] = useState<Shelf[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const router = useRouter();
+    
+    const searchParams = useSearchParams();
+    const userId = searchParams.get('userId')
+
 
     const fetchShelves = async () => {
         // Get all public shelves
@@ -25,8 +30,8 @@ export default function ExploreLoggedIn({ params }: { params: { userId?: string[
         setShelves(shelves);
 
         // Check if user is logged in and get their followed shelves
-        if (params?.userId?.[0]) {
-            const followedShelves = await getUserShelves(params.userId[0], 'followed');
+        if (userId) {
+            const followedShelves = await getUserShelves(userId, 'followed');
             if (!followedShelves) {
                 console.error('No shelves found');
                 return;
@@ -78,15 +83,15 @@ export default function ExploreLoggedIn({ params }: { params: { userId?: string[
     ];
 
     const rightNavElements = [
-        (!params.userId ? <Button className='rounded-full text-white bg-slate-600 ' onClick={() => router.push('/login')}>Sign In</Button> : <></>),
-        (params?.userId?.[0] ? <Button className="w-[100px] border-1.5 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white transition-all rounded-full h-12" onClick={handleSignOut}>Sign Out</Button> : <></>),
+        (!userId ? <Button className='rounded-full text-white bg-slate-600 ' onClick={() => router.push('/login')}>Sign In</Button> : <></>),
+        (userId ? <Button className="w-[100px] border-1.5 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white transition-all rounded-full h-12" onClick={handleSignOut}>Sign Out</Button> : <></>),
     ];
 
     const toImplement = 'text-red-600'
     const sideBarSections: SideBarSections = {
         "You": {
             "startContent": <UserProfile className='h-[30px] w-[40px]'/>,
-            "subsections": [<Link href={`/dashboard/${params.userId}`}>Dashboard</Link>, <Link className={toImplement}>Recent</Link>, <Link className={toImplement}>Liked</Link>, <Link className={toImplement}>Saved</Link>]
+            "subsections": [<Link href={userId ? `/dashboard/${userId}` : `/login`}>Dashboard</Link>, <Link className={toImplement}>Recent</Link>, <Link className={toImplement}>Liked</Link>, <Link className={toImplement}>Saved</Link>]
         },
         "Explore": {
             "startContent": <ExploreIcon className='h-[37px] w-[40px]'/>,
@@ -110,7 +115,7 @@ export default function ExploreLoggedIn({ params }: { params: { userId?: string[
                 <div className='w-full h-full flex flex-col items-center justify-center p-4'>
                     {isLoading 
                         ? <div className='w-full h-full flex flex-row items-center justify-center'><Spinner size='lg' /></div>
-                        : shelves.map((shelf, index) => <ExploreCard shelf={shelf} userId={params?.userId?.[0]} loggedIn={Boolean(params.userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
+                        : shelves.map((shelf, index) => <ExploreCard shelf={shelf} userId={userId} loggedIn={Boolean(userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
                 </div>
             </div>
         </>

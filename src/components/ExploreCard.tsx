@@ -2,8 +2,11 @@ import { Image } from "@nextui-org/react"
 import FollowButton from "./FollowButton"
 import { Shelf } from "@/types"
 import { followShelf, unfollowShelf } from "@/firebase/firestore"
+import { useRouter } from "next/navigation"
 
-export default function Card({ userId, loggedIn, shelf, updateShelf }: { userId?: string, loggedIn: boolean, shelf: Shelf, updateShelf: Function }) {
+export default function Card({ userId=null, loggedIn=false, shelf, updateShelf=()=>{} }: { userId: string | null, loggedIn?: boolean, shelf: Shelf, updateShelf?: Function }) {
+    const router = useRouter();
+    
     const date: { month: number, day: number, year: number } = {
         month: shelf.createdAt.toDate().getMonth(),
         day: shelf.createdAt.toDate().getDate(),
@@ -32,7 +35,7 @@ export default function Card({ userId, loggedIn, shelf, updateShelf }: { userId?
     }
 
     return (
-        <div className='shadow-medium border p-4 w-11/12 h-[150px] flex flex-row justify-start my-1'>
+        <div className='shadow-medium border p-4 w-11/12 h-[150px] flex flex-row justify-start my-1 hover:cursor-pointer hover:shadow-large transition-all' onClick={() => router.push(`/explore/${shelf.shelfId}`)}>
             <div className='flex flex-row w-full justify-between'>
                 <div className='p-2 flex flex-col justify-evenly text-center items-center'> 
                     {loggedIn && (shelf.createdById !== userId) && <FollowButton className='p-1 flex flex-row justify-center items-center rounded-full w-[35px] h-[35px] hover:cursor-pointer m-1' isFollowing={Boolean(shelf.following)} onClick={handleFollowUnfollow} />}

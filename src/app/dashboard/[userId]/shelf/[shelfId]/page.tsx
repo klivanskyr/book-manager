@@ -6,10 +6,7 @@ import { Button, Spinner } from "@nextui-org/react";
 
 import { Book, Shelf } from "@/types";
 import { getAllBooks, getShelf, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
-import { BooksList } from "@/components";
-import FilterBar from "./FilterBar/FiliterBar";
-import { BookSelect } from "@/components";
-
+import { BooksList, FilterBar, BookSelect } from "@/components";
 
 export default function Page({ params }: { params: { userId: string, shelfId: string }}) {
     const [shelf, setShelf] = useState<Shelf | null>(null);

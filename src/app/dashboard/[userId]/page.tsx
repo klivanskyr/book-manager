@@ -8,23 +8,34 @@ import { BookSelect } from '@/components';
 import { NavBarLR, ActionButton, ShelfTables, AddShelfModal } from "@/components";
 import { auth, getAllBooks, getUserShelves } from '@/firebase/firestore';
 import { Shelf } from '@/types/Shelf';
+import { Button } from '@nextui-org/react';
 
+type Tab = 'owned' | 'followed';
 
 export default function Dashboard({ params }: { params: { userId: string } }): ReactElement {
-    const [shelves, setShelves] = useState<Shelf[]>([]);
+    const [ownedShelves, setOwnedShelves] = useState<Shelf[]>([]);
+    const [followedShelves, setFollowedShelves] = useState<Shelf[]>([]);
     const [bookSelectActive, setBookSelectActive] = useState(false);
     const [addShelfActive, setAddShelfActive] = useState(false);
+    const [activeTab, setActiveTab] = useState<Tab>('owned');
     const router = useRouter();
 
     const fetchShelves = async (userId: string) => {
-        const shelves = await getUserShelves(userId, 'owned');
-        if (!shelves) {
+        const ownedShelves = await getUserShelves(userId, 'owned');
+        if (!ownedShelves) {
             console.error('No shelves found');
             return;
         }
         const allBooksShelf: Shelf = await getAllBooks(userId);
-        shelves.push(allBooksShelf)
-        setShelves(shelves);
+        ownedShelves.push(allBooksShelf);
+        setOwnedShelves(ownedShelves);
+
+        const followedShelves = await getUserShelves(userId, 'followed');
+        if (!followedShelves) {
+            console.error('No shelves found');
+            return;
+        }
+        setFollowedShelves(followedShelves);
     }
 
     useEffect(() => {
@@ -59,10 +70,16 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
 
     return (
         <div className='flex flex-col h-screen'>
-            <BookSelect userId={params.userId} shelves={shelves} fetchShelves={fetchShelves} active={bookSelectActive} setActive={setBookSelectActive} />
+            <BookSelect userId={params.userId} shelves={ownedShelves} fetchShelves={fetchShelves} active={bookSelectActive} setActive={setBookSelectActive} />
             <AddShelfModal fetchLatestShelves={fetchShelves} userId={params.userId} active={addShelfActive} setActive={setAddShelfActive} />
             <NavBarLR className='w-full flex justify-between h-16 bg-slate-700 shadow-md' leftElements={leftElements} rightElements={rightElements} />
-            <ShelfTables shelves={shelves} userId={params.userId} />
+            <div className='flex flex-row'>
+                <Button className={`${activeTab === 'owned' ? 'bg-white border-r-1.5 border-t-1.5 border-l-1.5' : 'bg-gray-300'} rounded-b-none ml-1 mt-1`} onClick={() => setActiveTab('owned')}>View Owned</Button>
+                <div className='border-b-1 w-[2px]'></div>
+                <Button className={`${activeTab === 'followed' ? 'bg-white border-r-1 border-t-1 border-l-1' : 'bg-gray-300'} rounded-b-none mt-1`} onClick={() => setActiveTab('followed')}>View Followed</Button>
+                <div className='w-full border-b-1'></div>
+            </div>
+            <ShelfTables shelves={activeTab === 'owned' ? ownedShelves : followedShelves} userId={params.userId} />
         </div>
     )
 }
