@@ -1,19 +1,41 @@
 import { Image } from "@nextui-org/react"
 import FollowButton from "./FollowButton"
 import { Shelf } from "@/types"
+import { followShelf, unfollowShelf } from "@/firebase/firestore"
 
-export default function Card({ loggedIn, shelf }: { loggedIn: boolean, shelf: Shelf }) {
+export default function Card({ userId, loggedIn, shelf, updateShelf }: { userId?: string, loggedIn: boolean, shelf: Shelf, updateShelf: Function }) {
     const date: { month: number, day: number, year: number } = {
         month: shelf.createdAt.toDate().getMonth(),
         day: shelf.createdAt.toDate().getDate(),
         year: shelf.createdAt.toDate().getFullYear(),
     }
 
+    const handleFollowUnfollow = async () => {
+        if (!userId) return console.error('No user id');
+        if (shelf.following) {
+            //unfollow
+            const error = await unfollowShelf(userId, shelf);
+            if (error) {
+                console.error('Error unfollowing shelf', error);
+                return;
+            }
+            updateShelf({ ...shelf, following: false, followers: shelf.followers - 1 })
+        } else {
+            //follow
+            const error = await followShelf(userId, shelf);
+            if (error) {
+                console.error('Error following shelf', error);
+                return;
+            }
+            updateShelf({ ...shelf, following: true, followers: shelf.followers + 1 })
+        }
+    }
+
     return (
-        <div className='shadow-medium border p-4 w-11/12 flex flex-row justify-start my-1'>
+        <div className='shadow-medium border p-4 w-11/12 h-[150px] flex flex-row justify-start my-1'>
             <div className='flex flex-row w-full justify-between'>
-                <div className='p-6 flex flex-col justify-evenly text-center items-center'> 
-                    {loggedIn && <FollowButton className='flex flex-row justify-center items-center border rounded-full w-[50px] h-[50px] hover:cursor-pointer m-1' isFollowing={true} onClick={() => {}} />}
+                <div className='p-2 flex flex-col justify-evenly text-center items-center'> 
+                    {loggedIn && (shelf.createdById !== userId) && <FollowButton className='p-1 flex flex-row justify-center items-center rounded-full w-[35px] h-[35px] hover:cursor-pointer m-1' isFollowing={Boolean(shelf.following)} onClick={handleFollowUnfollow} />}
                     <p className={`m-1 ${loggedIn ? 'mt-4 text-xl' : 'text-2xl'}`} >{shelf.followers}</p>
                 </div>
                 <div className='flex flex-row items-center justify-start p-4 w-3/4'>

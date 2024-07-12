@@ -1,26 +1,36 @@
 import { Check, Plus } from "@/assets"
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 
 
 export default function FollowButton({ className='', isFollowing, onClick }: { className?: string, isFollowing: boolean; onClick: Function }): JSX.Element {
-    const variants = {
-        initial: { rotate: 0, scale: 1 },
-        animate: { rotate: 360, scale: 1.2, transition: { duration: 0.5 } },
-    };
 
     return (
-        <motion.div
-            className={className}
-            onClick={(e) => onClick()}
-            animate="animate"
-            initial="initial"
-            variants={variants}
-        >
+        <div className={`${className}`} onClick={(e) => onClick()}>
+        <AnimatePresence initial={true}>
             {isFollowing ? (
-                <Check className='h-[30px] w-[30px]' />
+            <motion.div
+                key="check"
+                initial={{ opacity: 0, rotate: -90 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={{ opacity: 0, rotate: 90 }}
+                transition={{ duration: 0.2 }}
+                className="absolute h-[30px] w-[30px]"
+            >
+                <Check className="h-full w-full" />
+            </motion.div>
             ) : (
-                <Plus className='h-[30px] w-[30px]' />
+            <motion.div
+                key="plus"
+                initial={{ opacity: 0, rotate: -90 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={{ opacity: 0, rotate: 90 }}
+                transition={{ duration: 0.2 }}
+                className="absolute h-[30px] w-[30px]"
+            >
+                <Plus className="h-full w-full" />
+            </motion.div>
             )}
-        </motion.div>
+        </AnimatePresence>
+    </div>
     );
 }

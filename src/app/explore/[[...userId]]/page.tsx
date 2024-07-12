@@ -6,39 +6,80 @@ import { NavBarLMR, SideBar, SideBarSections, ExploreCard } from '@/components';
 import { UserProfile, ExploreIcon, Settings, Questionmark } from '@/assets';
 import { Button, Link, Spinner } from '@nextui-org/react';
 import { Book, Shelf } from '@/types';
-import { getAllPublicShelves, getUserShelves } from '@/firebase/firestore';import { useRouter } from 'next/navigation';
+import { auth, getAllPublicShelves, getUserShelves } from '@/firebase/firestore';import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
 
 
-export default function ExploreLoggedIn({ params }: { params: { userId?: string }}) {
+export default function ExploreLoggedIn({ params }: { params: { userId?: string[] }}) {
     const [shelves, setShelves] = useState<Shelf[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const router = useRouter();
 
     const fetchShelves = async () => {
-        setIsLoading(true);
+        // Get all public shelves
         const shelves = await getAllPublicShelves();
         if (!shelves) {
             console.error('No shelves found');
             return;
         }
         setShelves(shelves);
-        setIsLoading(false);
+
+        // Check if user is logged in and get their followed shelves
+        if (params?.userId?.[0]) {
+            const followedShelves = await getUserShelves(params.userId[0], 'followed');
+            if (!followedShelves) {
+                console.error('No shelves found');
+                return;
+            }
+            // Update shelves with followed status
+            const updatedShelves = shelves.map((shelf) => {
+                if (followedShelves.some((followedShelf) => followedShelf.shelfId === shelf.shelfId)) {
+                    return { ...shelf, following: true };
+                }
+                return shelf;
+            });
+            setShelves(updatedShelves);
+
+        }
     }
 
     useEffect(() => {
+        setIsLoading(true);
         fetchShelves();
+        setIsLoading(false);
     }, []);
+
+    const handleUpdateShelf = (newShelf: Shelf) => {
+        // client side update
+        const newShelves = shelves.map((shelf) => shelf.shelfId === newShelf.shelfId ? newShelf : shelf);
+        setShelves(newShelves);
+    }
+
+    const handleSignOut = async () => {
+        await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
+            method: 'DELETE',
+            cache: 'no-cache',
+        });
+        signOut(auth)
+        .then(() => {
+            router.push('/explore');
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
 
     const leftNavElements = [
         <h1 className="font-medium text-lg text-center text-white">Book Manager</h1>,
     ];
 
     const middleNavElements = [
-        <h1 className='text-white'>Middle</h1>
+        <></>
     ];
 
     const rightNavElements = [
         (!params.userId ? <Button className='rounded-full text-white bg-slate-600 ' onClick={() => router.push('/login')}>Sign In</Button> : <></>),
+        (params?.userId?.[0] ? <Button className="w-[100px] border-1.5 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white transition-all rounded-full h-12" onClick={handleSignOut}>Sign Out</Button> : <></>),
     ];
 
     const toImplement = 'text-red-600'
@@ -69,7 +110,7 @@ export default function ExploreLoggedIn({ params }: { params: { userId?: string 
                 <div className='w-full h-full flex flex-col items-center justify-center p-4'>
                     {isLoading 
                         ? <div className='w-full h-full flex flex-row items-center justify-center'><Spinner size='lg' /></div>
-                        : shelves.map((shelf, index) => <ExploreCard shelf={shelf} loggedIn={Boolean(params.userId)} key={`${shelf.shelfId}${index}`} />)}
+                        : shelves.map((shelf, index) => <ExploreCard shelf={shelf} userId={params?.userId?.[0]} loggedIn={Boolean(params.userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
                 </div>
             </div>
         </>

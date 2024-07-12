@@ -17,7 +17,7 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
     const router = useRouter();
 
     const fetchShelves = async (userId: string) => {
-        const shelves = await getUserShelves(userId);
+        const shelves = await getUserShelves(userId, 'owned');
         if (!shelves) {
             console.error('No shelves found');
             return;

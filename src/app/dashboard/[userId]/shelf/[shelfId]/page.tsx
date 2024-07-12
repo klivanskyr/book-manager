@@ -15,7 +15,6 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
     const [shelf, setShelf] = useState<Shelf | null>(null);
     const [isBooksLoading, setIsBooksLoading] = useState<boolean>(true);
     const [bookSelectActive, setBookSelectActive] = useState<boolean>(false);
-    const [makePublicActive, setMakePublicActive] = useState<boolean>(false);
     const router = useRouter();
 
     const isOwner = shelf?.createdById === params.userId;

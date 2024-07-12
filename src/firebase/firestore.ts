@@ -46,55 +46,6 @@ export async function createNewUser(userId: string, username: string, email: str
   }
 }
 
-export async function getUserShelves(userId: string): Promise<Shelf[] | null> {
-  try {
-    // console.log('Getting shelves for user', userId);
-    const shelvesRef = await getDocs(collection(db, 'users', userId, 'shelves'));
-    const shelfPromises: Promise<Shelf>[] = shelvesRef.docs.map(async doc => {
-      const shelfData = doc.data();
-      const booksRef = await getDocs(collection(db, 'users', userId, 'shelves', doc.id, 'books'));
-      const books: Book[] = booksRef.docs.map(bookDoc => {
-        const bookData = bookDoc.data();
-        return ({
-          bookId: bookDoc.id,
-          key: bookData.key,
-          title: bookData.title,
-          author: bookData.author,
-          review: bookData.review,
-          rating: bookData.rating,
-          isbn: bookData.isbn,
-          bgColor: bookData.bgColor,
-          coverUrl: bookData.coverUrl,
-          imgLoaded: false,
-          selected: true
-        });
-      });
-
-      return ({
-        shelfId: doc.id,
-        name: shelfData.name,
-        description: shelfData.description,
-        isPublic: shelfData.isPublic,
-        followers: shelfData.followers,
-        image: shelfData.image,
-        createdById: shelfData.createdById,
-        createdByName: shelfData.createdByName,
-        createdByImage: shelfData.createdByImage,
-        createdAt: shelfData.createdAt,
-        books: books,
-        shownBooks: books
-      });
-    });
-
-    const shelves = await Promise.all(shelfPromises);
-
-    return shelves;
-  } catch (error) {
-    console.log('Error in getUserShelves', error);
-    return null;
-  }
-}
-
 export async function getUser(userId: string): Promise<{ username: string, profileImage: string, email: string } | null> {
   try {
     const userDoc = await getDoc(doc(db, 'users', userId));
@@ -155,7 +106,7 @@ export async function addBooktoUserShelves(book: Book, userId: string, shelfIds:
 
     //Add book to user/shelves if it is not already in shelf
     const userShelfPromises = shelfIds.map(shelfId => {
-      const bookRef = doc(db, 'users', userId, 'shelves', shelfId, 'books', bookId);
+      const bookRef = doc(db, 'users', userId, 'ownedShelves', shelfId, 'books', bookId);
       return setDoc(bookRef, { ...bookData, ...reviewData }, { merge: true }); //merge to not overwrite existing data if it exists
     });
 
@@ -196,11 +147,8 @@ export async function addShelfToUser(shelf: Shelf, userId: string) {
     //Create shelf
     const docRef = await addDoc(collection(db, 'shelves'), newShelf);
 
-    //Add shelf to userShelves
-    await setDoc(doc(db, 'userShelves', userId, 'owned', docRef.id), { owned: true });
-
     //Add shelf to user
-    await setDoc(doc(db, 'users', userId, 'shelves', docRef.id), newShelf);
+    await setDoc(doc(db, 'users', userId, 'ownedShelves', docRef.id), newShelf);
     return;
   } catch (error) {
     console.log('Error in addShelfToUser', error);
@@ -307,17 +255,17 @@ export async function removeBookFromShelf(userId: string, shelfId: string, bookI
     // remove book from shelves/shelfId/books/bookId
     await deleteDoc(doc(db, 'shelves', shelfId, 'books', bookId));
 
-    // remove book from users/UserId/shelves/shelfId/books/bookId
-    await deleteDoc(doc(db, 'users', userId, 'shelves', shelfId, 'books', bookId));
+    // remove book from users/UserId/ownedShelves/shelfId/books/bookId
+    await deleteDoc(doc(db, 'users', userId, 'ownedShelves', shelfId, 'books', bookId));
 
     // if last instance of book in the user's shelves, remove the book from user/books/bookId
     // Get all of the user's shelves
-    const userShelvesDocs = await getDocs(collection(db, 'users', userId, 'shelves'));
+    const userShelvesDocs = await getDocs(collection(db, 'users', userId, 'ownedShelves'));
 
     // Check if the book is in any of the user's shelves
     // Loop through each shelf and check if the book is in it
     const instanceInUserShelves = userShelvesDocs.docs.some(async shelfDoc => {
-      const shelfBooksDocs = await getDocs(collection(db, 'users', userId, 'shelves', shelfDoc.id, 'books'));
+      const shelfBooksDocs = await getDocs(collection(db, 'users', userId, 'ownedShelves', shelfDoc.id, 'books'));
       return shelfBooksDocs.docs.some(bookDoc => bookDoc.id === bookId);
     });
 
@@ -353,7 +301,7 @@ export async function removeBookFromShelf(userId: string, shelfId: string, bookI
  */
 export async function updateBookOnUserShelf(userId: string, shelfId: string, newBook: Book): Promise<Option<string>> {
   try {
-    const bookDoc = doc(db, 'users', userId, 'shelves', shelfId, 'books', newBook.bookId);
+    const bookDoc = doc(db, 'users', userId, 'ownedShelves', shelfId, 'books', newBook.bookId);
     await setDoc(bookDoc, {
       review: newBook.review,
       rating: newBook.rating,
@@ -452,12 +400,111 @@ export async function updateShelf(newShelf: Shelf): Promise<Option<string>> {
     await setDoc(shelvesDoc, newData, { merge: true });
 
     // Update in user/userId/shelves/shelfId
-    const userShelvesDoc = doc(db, 'users', newShelf.createdById, 'shelves', newShelf.shelfId);
+    const userShelvesDoc = doc(db, 'users', newShelf.createdById, 'ownedShelves', newShelf.shelfId);
     await setDoc(userShelvesDoc, newData, { merge: true });
 
     return null;
   } catch (error) {
     console.log('Error in updateShelf', error);
+    return `${error}`;
+  }
+}
+
+export type Relation = 'followed' | 'owned';
+export async function getUserShelves(userId: string, relation: Relation): Promise<Shelf[] | null> {
+  const collectionPath = relation === 'owned' ? 'ownedShelves' : 'followedShelves';
+  try {
+    // console.log('Getting shelves for user', userId);
+    const shelvesRef = await getDocs(collection(db, 'users', userId, collectionPath));
+    const shelfPromises: Promise<Shelf>[] = shelvesRef.docs.map(async doc => {
+      const shelfData = doc.data();
+      const booksRef = await getDocs(collection(db, 'users', userId, collectionPath, doc.id, 'books'));
+      const books: Book[] = booksRef.docs.map(bookDoc => {
+        const bookData = bookDoc.data();
+        return ({
+          bookId: bookDoc.id,
+          key: bookData.key,
+          title: bookData.title,
+          author: bookData.author,
+          review: bookData.review,
+          rating: bookData.rating,
+          isbn: bookData.isbn,
+          bgColor: bookData.bgColor,
+          coverUrl: bookData.coverUrl,
+          imgLoaded: false,
+          selected: true
+        });
+      });
+
+      return ({
+        shelfId: doc.id,
+        name: shelfData.name,
+        description: shelfData.description,
+        isPublic: shelfData.isPublic,
+        followers: shelfData.followers,
+        image: shelfData.image,
+        createdById: shelfData.createdById,
+        createdByName: shelfData.createdByName,
+        createdByImage: shelfData.createdByImage,
+        createdAt: shelfData.createdAt,
+        books: books,
+        shownBooks: books
+      });
+    });
+
+    const shelves = await Promise.all(shelfPromises);
+
+    return shelves;
+  } catch (error) {
+    console.log('Error in getUserShelves', error);
+    return null;
+  }
+}
+
+export async function followShelf(userId: string, shelf: Shelf): Promise<Option<string>> {
+  try {
+    // Add shelf to user's followedShelves
+    const userShelfRef = doc(db, 'users', userId, 'followedShelves', shelf.shelfId);
+    await setDoc(userShelfRef, {
+      name: shelf.name,
+      description: shelf.description,
+      isPublic: shelf.isPublic,
+      image: shelf.image,
+      followers: shelf.followers + 1,
+      createdById: shelf.createdById,
+      createdByName: shelf.createdByName,
+      createdByImage: shelf.createdByImage,
+      createdAt: shelf.createdAt
+    });
+
+    // Increment shelf followers
+    const shelfRef = doc(db, 'shelves', shelf.shelfId);
+    await updateDoc(shelfRef, {
+      followers: shelf.followers + 1
+    });
+
+    return null;
+  } catch (error) {
+    console.log('Error in followShelf', error);
+    return `${error}`;
+  }
+}
+
+export async function unfollowShelf(userId: string, shelf: Shelf): Promise<Option<string>> {
+  try {
+    // Remove shelf from user's followedShelves
+    const userShelfRef = doc(db, 'users', userId, 'followedShelves', shelf.shelfId);
+    await deleteDoc(userShelfRef);
+
+    // Decrement shelf followers
+    const shelfRef = doc(db, 'shelves', shelf.shelfId);
+    await updateDoc(shelfRef, {
+      followers: shelf.followers - 1
+    });
+
+    return null;
+  } catch (error) {
+    console.log('Error in unfollowShelf', error);
     return `${error}`;
   }
 }

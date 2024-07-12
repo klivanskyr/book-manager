@@ -7,6 +7,7 @@ export type Shelf = {
     description: string,
     followers: number,
     isPublic: boolean,
+    following?: boolean, //used when displaying shelves in explore
     image: string,
     createdById: string,
     createdByName: string,
