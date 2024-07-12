@@ -19,3 +19,4 @@ export { default as NavBarLMR } from './NavbarLMR';
 export { default as SideBar } from './SideBar';
 export type { Section, SideBarSections } from './SideBar';
 export { default as FollowButton } from './FollowButton';
+export { default as ExploreCard } from './ExploreCard';

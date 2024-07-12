@@ -2,7 +2,7 @@ import { Accordion, AccordionItem } from "@nextui-org/react";
 
 export type Section = {
     startContent: JSX.Element;
-    subsections: string[];
+    subsections: JSX.Element[];
 };
 
 export type SideBarSections = {
@@ -15,7 +15,7 @@ export default function SideBar({ sections }: { sections: SideBarSections }) {
             <Accordion className='h-full' selectionMode="multiple" variant="bordered">
                 {Object.entries(sections).map(([section, { startContent, subsections }], index) => {
                     return (
-                        <AccordionItem className='' key={index} title={section} aria-label={section} startContent={startContent}>
+                        <AccordionItem className='my-1' key={index} title={section} aria-label={section} startContent={startContent}>
                             {subsections.map((subsection, index) => (
                                 <div key={index}>{subsection}</div>
                             ))}
