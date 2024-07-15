@@ -80,7 +80,7 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
     
     function ReviewBody() {
         if (!selectedBook) return <></>;
-        return <Textarea color='primary' size='lg' variant='bordered' placeholder='Input review here' value={selectedBook.review} onChange={(e) => setSelectedBook({ ...selectedBook, review: e.target.value })} />
+        return <Textarea disabled={!isOwner} color='primary' size='lg' variant='bordered' placeholder={isOwner ? 'Input review here' : ''} value={selectedBook.review} onChange={(e) => setSelectedBook({ ...selectedBook, review: e.target.value })} />
 
     }
     
@@ -90,7 +90,10 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
         if (!book) return <></>;
         return (
             <form className='w-full flex flex-col items-center justify-center' onSubmit={(e) => e.preventDefault()}>
-                <Stars className='flex flex-row' book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} size={30} shelfId={shelf.shelfId} userId={shelf.createdById} disabled={!isOwner} />
+                <Stars className='flex flex-row' book={selectedBook} handleUpdate={(newBook: Book) => {
+                    setSelectedBook(newBook);
+                    handleUpdateShelf(newBook);
+                }} size={30} shelfId={shelf.shelfId} userId={shelf.createdById} disabled={!isOwner} />
                 {isOwner && <Button className='mt-4 bg-blue-600 text-white font-medium' type='submit' onClick={handleReviewSubmit}>Submit Review</Button>}
             </form>
         )

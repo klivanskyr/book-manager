@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { NavBarLMR, SideBar, SideBarSections, ExploreCard } from '@/components';
+import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall } from '@/components';
 import { UserProfile, ExploreIcon, Settings, Questionmark } from '@/assets';
 import { Button, Link, Spinner } from '@nextui-org/react';
 import { Book, Shelf } from '@/types';
@@ -115,7 +115,7 @@ export default function Explore() {
                 <div className='w-full h-full flex flex-col items-center justify-center p-4'>
                     {isLoading 
                         ? <div className='w-full h-full flex flex-row items-center justify-center'><Spinner size='lg' /></div>
-                        : shelves.map((shelf, index) => <ExploreCard shelf={shelf} userId={userId} loggedIn={Boolean(userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
+                        : shelves.map((shelf, index) => <ExploreCardSmall shelf={shelf} userId={userId} loggedIn={Boolean(userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
                 </div>
             </div>
         </>
