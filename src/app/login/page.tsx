@@ -41,9 +41,9 @@ export default function Login(): ReactElement {
       body: JSON.stringify({ ...input, createdWith: 'email' })
     });
     const data = await res.json();
+    console.log('returned data', data);
     if (data.code !== 200) {
       const message: string = data.message;
-      console.log('message', message);
       if (message.includes('invalid-credential')) { setError('Invalid Credentials') }
       else if (message.includes('too-many-requests')) { setError('Too many requests, try again later')}
       else if (message.includes('user-not-found')) { setError('User not found') }

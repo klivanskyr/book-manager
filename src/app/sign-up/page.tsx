@@ -45,15 +45,28 @@ export default function Signup() {
         });
         setIsLoading(false);
 
-        if (!res.ok) {
-            const errorMessage = res.statusText;
+        const data = await res.json();
+        const errorMessage: string = data.message;
+        if (data.status !== 200) {
             setInput({ username: '', email: '', password: '' })
-            if (res.statusText === 'auth/email-already-in-use') {
+            if (errorMessage.includes('auth/email-already-in-use')) {
                 setError('Email already in use');
                 return;
+            } else if (errorMessage.includes('auth/weak-password')) {
+                setError('Password is too weak');
+                return;
+            } else if (errorMessage.includes('Username already exists')) {
+                setError('Username already exists');
+                return;
+            } else if (errorMessage.includes('success')) {
+                setError('');
+                console.log('User created successfully');
+                router.push('/login');
+                return;
+            } else {
+                setError(`Error creating user: ${errorMessage}`);
+                return;
             }
-            setError(res.statusText);
-            return;
 
         } else {
             console.log('User created successfully');
