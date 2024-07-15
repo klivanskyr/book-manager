@@ -1,27 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-    console.log(req.nextUrl.pathname);
-    console.log(req.cookies.get('token') || 'No token found');
     try {
         const cookie = req.cookies.get('token');
 
-        console.log('cookie:', cookie);
+        // No token can go to login or explore
         if (!cookie && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/explore')) {
             return NextResponse.next();
         }
 
+        // No token cannot go to dashboard or api/auth/logout, redirect to login
         if (!cookie && req.nextUrl.pathname !== '/login') {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
-
-        const token = cookie?.value;
 
         const res = await fetch(`${process.env.API_DOMAIN}/api/auth/verify`, {
             method: 'POST',
             cache: 'no-cache',
             headers: {
-                'Cookie': `token=${token}`
+                'Cookie': `token=${cookie?.value}`
             }
         });
 
@@ -37,8 +34,8 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
 
-        // Invalid token cannot go to explore/uid
-        if (data.code !== 200 && req.nextUrl.pathname.startsWith('/explore')) {
+        // Invalid token cannot go to explore?userId=uid, redirect to login
+        if (data.code !== 200 && req.nextUrl.pathname.startsWith('/explore') && req.nextUrl.searchParams.has('userId')) {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
 
@@ -52,13 +49,8 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
 
-        // explore can only have 1 subpath explore/uid
-        if (req.nextUrl.pathname.startsWith('/explore') && req.nextUrl.pathname.split('/').length > 3) {
-            return NextResponse.redirect(new URL(`/explore/${data.uid}`, req.nextUrl), { status: 302 });
-        }
-
         // Valid tokens going to someone else's explore will be redirected to login (which then would go to their explore page)
-        if (req.nextUrl.pathname.startsWith('/explore') && !req.nextUrl.pathname.startsWith(`/explore/${data.uid}`)) {
+        if (req.nextUrl.pathname.startsWith('/explore') && req.nextUrl.searchParams.has('userId') && req.nextUrl.searchParams.get('userId') !== data.uid) {
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
 
