@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-    console.log('Middleware', req.nextUrl.pathname);
+    console.log('\nMiddleware', req.nextUrl.pathname, req.nextUrl.searchParams);
     try {
         const cookie = req.cookies.get('token');
 
         // No token can go to login or explore
-        if (!cookie && (req.nextUrl.pathname === '/login' || (req.nextUrl.pathname === '/explore' && !req.nextUrl.searchParams.has('userId')))) {
+        if (!cookie && (req.nextUrl.pathname === '/login' || (req.nextUrl.pathname.startsWith('/explore') && !req.nextUrl.searchParams.has('userId')))) {
             console.log('No token, going to login or explore');
             return NextResponse.next();
         }
@@ -16,7 +16,7 @@ export async function middleware(req: NextRequest) {
             console.log('No token, going to dashboard or logout');
             return NextResponse.redirect(new URL('/login', req.nextUrl), { status: 302 });
         }
-
+        
         const res = await fetch(`${process.env.API_DOMAIN}/api/auth/verify`, {
             method: 'POST',
             cache: 'no-cache',
@@ -28,7 +28,7 @@ export async function middleware(req: NextRequest) {
         const data = await res.json();
 
         // Invalid token can go to login or explore
-        if (data.code !== 200 && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/explore')) {
+        if (data.code !== 200 && (req.nextUrl.pathname === '/login' || (req.nextUrl.pathname.startsWith('/explore') && !req.nextUrl.searchParams.has('userId')))) {
             console.log('Invalid token, going to login or explore');
             return NextResponse.next();
         }

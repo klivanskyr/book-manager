@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall } from '@/components';
+import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall, Filter, FilterType } from '@/components';
 import { UserProfile, ExploreIcon, Settings, Questionmark } from '@/assets';
 import { Button, Link, Spinner } from '@nextui-org/react';
 import { Book, Shelf } from '@/types';
@@ -14,10 +14,12 @@ import { signOut } from 'firebase/auth';
 export default function Explore() {
     const [shelves, setShelves] = useState<Shelf[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [filter, setFilter] = useState<FilterType>('none');
     const router = useRouter();
     
     const searchParams = useSearchParams();
     const userId = searchParams.get('userId')
+    const search = searchParams.get('search');
 
 
     const fetchShelves = async () => {
@@ -91,11 +93,21 @@ export default function Explore() {
     const sideBarSections: SideBarSections = {
         "You": {
             "startContent": <UserProfile className='h-[30px] w-[40px]'/>,
-            "subsections": [<Link href={userId ? `/dashboard/${userId}` : `/login?redirectUrl=/dashboard`}>Dashboard</Link>, <Link className={toImplement}>Recent</Link>, <Link className={toImplement}>Liked</Link>, <Link className={toImplement}>Saved</Link>]
+            "subsections": [
+                <Link href={userId ? `/dashboard/${userId}` : `/login?redirectUrl=/dashboard`}>Dashboard</Link>,
+                <Link href={userId ? `/explore?userId=${userId}` : `/login?redirectUrl=/explore`}>Recent</Link>,
+                <Link className={toImplement}>Liked</Link>,
+                <Link className='cursor-pointer' onPress={userId ? () => setFilter('followed') : () => router.push(`/login?redirectUrl=/explore`)}>Followed</Link>
+            ]
         },
         "Explore": {
             "startContent": <ExploreIcon className='h-[37px] w-[40px]'/>,
-            "subsections": [<Link className={toImplement}>Trending</Link>, <Link className={toImplement}>Books</Link>, <Link className={toImplement}>Authors</Link>, <Link className={toImplement}>Genres</Link>]
+            "subsections": [
+                <Link className='cursor-pointer' onPress={() => setFilter('trending')}>Trending</Link>,
+                <Link className={toImplement}>Books</Link>,
+                <Link className={toImplement}>Authors</Link>,
+                <Link className={toImplement}>Genres</Link>
+            ]
         },
         "Settings": {
             "startContent": <Settings className='h-[35px] w-[40px]'/>,
@@ -112,11 +124,16 @@ export default function Explore() {
             <NavBarLMR className='w-auto flex justify-between h-16 p-4 border bg-slate-700' leftElements={leftNavElements} middleElements={middleNavElements} rightElements={rightNavElements} />
             <div className='flex flex-row w-full h-full'>
                 <SideBar sections={sideBarSections} />
-                <div className='w-full h-full flex flex-col items-center justify-center p-4'>
-                    {isLoading 
-                        ? <div className='w-full h-full flex flex-row items-center justify-center'><Spinner size='lg' /></div>
-                        : shelves.map((shelf, index) => <ExploreCardSmall shelf={shelf} userId={userId} loggedIn={Boolean(userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
-                </div>
+                <h1>{filter}</h1>
+                <Filter shelves={shelves} filter={filter as FilterType}>
+                    {filteredShelves => (
+                        <div className='w-full h-full flex flex-col items-center justify-center p-4'>
+                            {isLoading 
+                                ? <div className='w-full h-full flex flex-row items-center justify-center'><Spinner size='lg' /></div>
+                                : filteredShelves.map((shelf, index) => <ExploreCardSmall shelf={shelf} userId={userId} loggedIn={Boolean(userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
+                        </div>
+                    )}
+                </Filter>
             </div>
         </>
     )

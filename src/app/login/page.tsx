@@ -15,8 +15,7 @@ export default function Login(): ReactElement {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  type RedirectUrl = '/explore' | '/dashboard';
-  const redirectUrl: RedirectUrl = (searchParams.get('redirectUrl') || '/explore') as RedirectUrl;
+  const redirectUrl: string = (searchParams.get('redirectUrl') || '/explore');
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -55,7 +54,17 @@ export default function Login(): ReactElement {
     
     setIsLoading(false);
     console.log('data', data);
-    const url = redirectUrl === '/explore' ? `/explore?userId=${data.uid}` : `/dashboard/${data.uid}`;
+    let url: string = '';
+    if (redirectUrl.startsWith('/dashboard')) {
+      url = `/dashboard/${data.uid}`;
+    } else if (redirectUrl === '/explore') {
+      url = '/explore';
+    } else if (redirectUrl.startsWith('/explore')) {
+      url = `${redirectUrl}?userId=${data.uid}`; // keeps search params if there
+    } else {
+      url = `${redirectUrl}`
+    }
+
     console.log('url', url);
     router.push(url);
   }
