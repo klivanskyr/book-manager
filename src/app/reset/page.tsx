@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ActionButton, EmailInput, Form, LoadingButton } from "@/app/components";
+import { ActionButton, EmailInput, Form, LoadingButton } from "@/components";
 import { Link } from '@nextui-org/react';
-import emailIsValid from '@/app/utils/emailIsValid';
+import emailIsValid from '@/utils/emailIsValid';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth, getUserIdByEmail } from '@/firebase/firestore';
 

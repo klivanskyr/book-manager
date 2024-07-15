@@ -2,17 +2,20 @@
 
 import { useState, ReactElement } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import { EmailInput, PasswordInput, ActionButton, LoadingButton } from '@/app/components';
-import { Form } from '../components';
-import emailIsValid from '../utils/emailIsValid';
+import { EmailInput, PasswordInput, ActionButton, LoadingButton } from '@/components';
+import { Form } from '../../components';
+import emailIsValid from '../../utils/emailIsValid';
 
 export default function Login(): ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [input, setInput] = useState({ email: '', password: '' });
   const [error, setError] = useState<string>('');
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const redirectUrl: string = (searchParams.get('redirectUrl') || '/explore');
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -50,7 +53,20 @@ export default function Login(): ReactElement {
     }
     
     setIsLoading(false);
-    router.push(`/dashboard/${data.uid}`);
+    console.log('data', data);
+    let url: string = '';
+    if (redirectUrl.startsWith('/dashboard')) {
+      url = `/dashboard/${data.uid}`;
+    } else if (redirectUrl === '/explore') {
+      url = '/explore';
+    } else if (redirectUrl.startsWith('/explore')) {
+      url = `${redirectUrl}?userId=${data.uid}`; // keeps search params if there
+    } else {
+      url = `${redirectUrl}`
+    }
+
+    console.log('url', url);
+    router.push(url);
   }
   
   function SubmitButton() {

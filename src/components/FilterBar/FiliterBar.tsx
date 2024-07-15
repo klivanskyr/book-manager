@@ -1,11 +1,11 @@
 'use client';
 
-import { Navbar, TextInput } from "@/app/components";
+import { NavBarLR, TextInput } from "@/components";
 import SortBy from "./SortBy";
 import { useEffect, useState } from "react";
 import { Slider } from "@nextui-org/react";
-import { Book } from "@/app/types/Book";
-import { Shelf } from "@/app/types/Shelf";
+import { Book } from "@/types/Book";
+import { Shelf } from "@/types/Shelf";
 
 export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: { isLoading: boolean, setIsLoading: Function, shelf: Shelf, setShelf: Function }) {
     const [titleFilter, setTitleFilter] = useState<string>('');
@@ -42,6 +42,6 @@ export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: 
     ]
 
     return (
-        <Navbar className='flex flex-row justify-between my-2 mx-4' leftElements={leftElements} rightElements={rightElements} />
+        <NavBarLR className='flex flex-row justify-between my-2 mx-4' leftElements={leftElements} rightElements={rightElements} />
     )
 }

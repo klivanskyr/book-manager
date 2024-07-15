@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-import emailIsValid from '../utils/emailIsValid';
-import passwordIsValid from '../utils/passwordIsValid';
-import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput } from '@/app/components';
+import emailIsValid from '../../utils/emailIsValid';
+import passwordIsValid from '../../utils/passwordIsValid';
+import { TextInput, EmailInput, Form, ActionButton, LoadingButton, PasswordInput } from '@/components';
 
 export default function Signup() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
