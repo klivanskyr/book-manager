@@ -6,7 +6,7 @@ export async function middleware(req: NextRequest) {
         const cookie = req.cookies.get('token');
 
         // No token can go to login or explore
-        if (!cookie && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/explore')) {
+        if (!cookie && (req.nextUrl.pathname === '/login' || (req.nextUrl.pathname === '/explore' && !req.nextUrl.searchParams.has('userId')))) {
             console.log('No token, going to login or explore');
             return NextResponse.next();
         }

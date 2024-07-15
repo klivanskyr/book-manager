@@ -2,7 +2,7 @@
 
 import { useState, ReactElement } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { EmailInput, PasswordInput, ActionButton, LoadingButton } from '@/components';
 import { Form } from '../../components';
@@ -13,6 +13,10 @@ export default function Login(): ReactElement {
   const [input, setInput] = useState({ email: '', password: '' });
   const [error, setError] = useState<string>('');
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  type RedirectUrl = '/explore' | '/dashboard';
+  const redirectUrl: RedirectUrl = (searchParams.get('redirectUrl') || '/explore') as RedirectUrl;
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -50,7 +54,10 @@ export default function Login(): ReactElement {
     }
     
     setIsLoading(false);
-    router.push(`/explore?userId=${data.userId}`);
+    console.log('data', data);
+    const url = redirectUrl === '/explore' ? `/explore?userId=${data.uid}` : `/dashboard/${data.uid}`;
+    console.log('url', url);
+    router.push(url);
   }
   
   function SubmitButton() {

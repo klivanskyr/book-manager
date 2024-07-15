@@ -91,7 +91,7 @@ export default function Explore() {
     const sideBarSections: SideBarSections = {
         "You": {
             "startContent": <UserProfile className='h-[30px] w-[40px]'/>,
-            "subsections": [<Link href={userId ? `/dashboard/${userId}` : `/login`}>Dashboard</Link>, <Link className={toImplement}>Recent</Link>, <Link className={toImplement}>Liked</Link>, <Link className={toImplement}>Saved</Link>]
+            "subsections": [<Link href={userId ? `/dashboard/${userId}` : `/login?redirectUrl=/dashboard`}>Dashboard</Link>, <Link className={toImplement}>Recent</Link>, <Link className={toImplement}>Liked</Link>, <Link className={toImplement}>Saved</Link>]
         },
         "Explore": {
             "startContent": <ExploreIcon className='h-[37px] w-[40px]'/>,
