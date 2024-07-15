@@ -1,6 +1,7 @@
 import { auth } from "@/firebase";
-import { createNewUser } from "@/firebase/firestore";
+import { createNewUser, getUser, getUserByUsername } from "@/firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { FirestoreError } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
 type CreatedWith = 'email' | 'google';
@@ -24,21 +25,38 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         // Create a new user by email and password
         if (createdWith === 'email') { 
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await createNewUser(userCredential.user.uid, username, email, createdWith);
-          
+            try {
+                // Check database for same username
+                const user = await getUserByUsername(username);
+                if (user) {
+                    return NextResponse.json({ message: 'Username already exists' }, { status: 400 });
+                }
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await createNewUser(userCredential.user.uid, username, email, createdWith);
+                return NextResponse.json({ message: 'success' }, { status: 200 });
+            } catch (error) {
+                return NextResponse.json({ message: error.message }, { status: 400 });
+            }
+
         // Create a new user by google   
         } else if (createdWith === 'google') {
-            await createNewUser(googleId, username, email, createdWith)
+            try {
+                const user = await getUserByUsername(username);
+                if (user) {
+                    return NextResponse.json({ message: 'Username already exists' }, { status: 400 });
+                }
+                await createNewUser(googleId, username, email, createdWith);
+                return NextResponse.json({ message: 'success' }, { status: 200 });
+            } catch (error) {
+                return NextResponse.json({ message: error.message }, { status: 400 });
+            }
 
         // Return an error if the createdWith is invalid
         } else {
             return NextResponse.json({ message: 'Invalid createdWith' }, { status: 400 });
         }
 
-        return NextResponse.json({ message: 'success' }, { status: 200 });  
-
     } catch (error) {
-        return NextResponse.json({ message: `Internal server error: ${error}` }, { status: 500 });
+        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
     }
 }

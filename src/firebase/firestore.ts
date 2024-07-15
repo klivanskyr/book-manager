@@ -508,3 +508,15 @@ export async function unfollowShelf(userId: string, shelf: Shelf): Promise<Optio
     return `${error}`;
   }
 }
+
+export async function getUserByUsername(username: string): Promise<Option<string>> {
+  try {
+    const userQuery = query(collection(db, 'users'), where('username', '==', username));
+    const userDocs = await getDocs(userQuery);
+    if (userDocs.empty) return null;
+    return userDocs.docs[0].id;
+  } catch (error) {
+    console.log('Error in getUserByUsername', error);
+    return `${error}`;
+  }
+}
