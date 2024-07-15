@@ -12,6 +12,8 @@ import Plus from './plus.svg';
 import Check from './check.svg';
 import Minus from './minus.svg';
 import Globe from './global-svgrepo-com.svg';
+import ReturnIcon from './return-svgrepo-com.svg';
+import CopyIcon from './copy-svgrepo-com.svg';
 
 export {
   coverPlaceholder,
@@ -27,5 +29,7 @@ export {
   Plus,
   Check,
   Minus,
-  Globe
+  Globe,
+  ReturnIcon,
+  CopyIcon
 };
