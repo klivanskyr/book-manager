@@ -418,7 +418,7 @@ export async function getUserShelves(userId: string, relation: Relation): Promis
     const shelvesRef = await getDocs(collection(db, 'users', userId, collectionPath));
     const shelfPromises: Promise<Shelf>[] = shelvesRef.docs.map(async doc => {
       const shelfData = doc.data();
-      const booksRef = await getDocs(collection(db, 'users', userId, collectionPath, doc.id, 'books'));
+      const booksRef = await getDocs(collection(db, 'shelves', doc.id, 'books'));
       const books: Book[] = booksRef.docs.map(bookDoc => {
         const bookData = bookDoc.data();
         return ({

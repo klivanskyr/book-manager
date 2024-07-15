@@ -35,6 +35,7 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
             console.error('No shelves found');
             return;
         }
+        console.log(followedShelves);
         setFollowedShelves(followedShelves);
     }
 

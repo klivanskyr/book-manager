@@ -44,7 +44,7 @@ export default function Shelves({ shelves, userId }: { userId: string, shelves: 
         <Accordion variant="splitted" selectionMode="multiple">
           {shelves.sort((_, b) => b.shelfId === 'all-books' ? 1 : -1).map((shelf, i) => (
             <AccordionItem key={shelf.shelfId + `${i}`} title={shelf.name} startContent={<BookIcon className='w-[40px] h-[40px]'/>}>
-              <div className="m-1/2 w-full flex flex-row justify-center items-center"><Link href={`${shelf.createdById === userId ? `/dashboard/${userId}/shelf/${shelf.shelfId}` : `explore/${userId}/shelf/${shelf.shelfId}`}`} className="p-1">View Shelf Details</Link></div>
+              <div className="m-1/2 w-full flex flex-row justify-center items-center"><Link href={`${shelf.createdById === userId ? `/dashboard/${userId}/shelf/${shelf.shelfId}` : `/explore/${shelf.shelfId}`}`} className="p-1">View Shelf Details</Link></div>
               <BookTable shelf={shelf} />
           </AccordionItem>
           ))}
