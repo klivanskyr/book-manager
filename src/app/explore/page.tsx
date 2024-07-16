@@ -134,7 +134,7 @@ export default function Explore() {
             <div className='flex flex-row w-full h-full'>
                 <SideBar sections={sideBarSections} />
                 <div className='flex flex-col w-full py-4 px-8 justify-center items-center'>
-                    <FilterBarExplore setShelves={setShelves} />
+                    <FilterBarExplore setShelves={setShelves} setLoading={setIsLoading} />
                     <Filter shelves={shelves} filter={filter as FilterType} setFilter={setFilter} >
                         {filteredShelves => (
                             <div className='w-full h-full flex flex-col items-center justify-start p-4'>

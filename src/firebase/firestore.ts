@@ -343,7 +343,6 @@ export type Filter = {
 export async function getAllPublicShelves(inputFilter?: Filter, inputSort?: Sort): Promise<Option<Shelf[]>> {
   const filter = inputFilter || { key: 'name', value: '' };
   const sort = inputSort || { key: 'createdAt', order: 'desc' };
-  console.log('Filter:', filter, 'Sort:', sort);
   try {
     let shelvesQuery = query(collection(db, 'shelves'), where('isPublic', '==', true));
     if (filter) {
