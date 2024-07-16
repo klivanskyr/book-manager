@@ -84,7 +84,7 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
             <ModalElement size='xl' active={activeSubmitModal} onOpenChange={(isOpen: boolean) => setActiveSubmitModal(isOpen)} Header={Header('Submit Changes')} Body={Body(handleSubmit, setActiveSubmitModal)} />
             <ModalElement size='xl' active={activeRevertModal} onOpenChange={(isOpen: boolean) => setActiveRevertModal(isOpen)} Header={Header('Revert All Changes')} Body={Body(() => fetchShelf(), setActiveRevertModal)} />
             <ModalElement size='xl' active={activeReturnModal} onOpenChange={(isOpen: boolean) => setActiveReturnModal(isOpen)} Header={Header('Revert All Changes')} Body={Body(() => router.push(`/dashboard/${params.userId}/shelf/${params.shelfId}`), setActiveReturnModal)} />
-            <form  className='w-full h-full p-16 m-8 shadow-large flex flex-col' onSubmit={(e) => e.preventDefault()}>
+            <form  className='w-auto h-full p-16 m-8 shadow-large flex flex-col' onSubmit={(e) => e.preventDefault()}>
                 <h1 className="font-light text-4xl mb-8">Shelf Settings</h1>
                 <Skeleton isLoaded={isLoaded} className={`w-[500px] my-2 rounded-md ${isLoaded ? 'opacity-100' : 'opacity-40'}`}>
                     <Input classNames={{ "mainWrapper": "w-[500px] my-2 font-semibold" }} type="text" label="Name" labelPlacement="outside-left" size='lg' value={input.name} onChange={(e) => setInput({ ...input, name: e.target.value })}/>

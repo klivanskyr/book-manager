@@ -2,8 +2,10 @@
 import { Book } from "@/types/Book";
 import { Shelf } from "@/types/Shelf";
 import { initializeApp } from "firebase/app";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signOut, updateEmail, updateProfile } from "firebase/auth";
 import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy, getDoc } from "firebase/firestore";
+import { adminAuth } from "./firebase-admin";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -536,6 +538,18 @@ export async function getUserByUsername(username: string): Promise<Option<string
     return userDocs.docs[0].id;
   } catch (error) {
     console.log('Error in getUserByUsername', error);
+    return `${error}`;
+  }
+}
+
+export async function getUserIdByEmail(email: string): Promise<Option<string>> {
+  try {
+    const userQuery = query(collection(db, 'users'), where('email', '==', email));
+    const userDocs = await getDocs(userQuery);
+    if (userDocs.empty) return null;
+    return userDocs.docs[0].id;
+  } catch (error) {
+    console.log('Error in getUserIdByEmail', error);
     return `${error}`;
   }
 }

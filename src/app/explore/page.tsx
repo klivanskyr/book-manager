@@ -111,8 +111,8 @@ export default function Explore() {
         "Settings": {
             "startContent": <Settings className='h-[35px] w-[40px]'/>,
             "subsections": [
-                <Link className={toImplement}>Profile</Link>,
-                <Link className={toImplement}>Account</Link>,
+                <Link href={userId ? `/profile/${userId}` : `/login?redirectUrl=/explore`}>Profile</Link>,
+                <Link href={userId ? `/profile/${userId}/settings` : `/login?redirectUrl=/explore`}>Account</Link>,
                 <Link className={toImplement}>Appearance</Link>,
                 <Link className={toImplement}>Notifications</Link>
             ],

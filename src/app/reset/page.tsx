@@ -59,7 +59,7 @@ export default function Reset() {
         const className = 'mt-1 mb-2 w-64 h-12';
         return isLoading 
           ? <LoadingButton className={className} color="primary" isLoading={isLoading} /> 
-          : <ActionButton className={className} disabled={isLoading} text='Sign In' onClick={handleSubmit} />
+          : <ActionButton className={className} disabled={isLoading} text='Send Reset Email' onClick={handleSubmit} />
       }
 
     const formElements = [

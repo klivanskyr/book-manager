@@ -28,6 +28,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+book-manager-3fe0f-firebase-adminsdk-zv0gb-9fc83895db.json
 
 # vercel
 .vercel
