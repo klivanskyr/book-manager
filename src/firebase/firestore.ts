@@ -33,6 +33,7 @@ export async function createNewUser(userId: string, username: string, email: str
     //create new user
     await setDoc(doc(db, 'users', userId), {
       username,
+      usernameLowercase: username.toLowerCase(),
       email,
       createdWith,
       profileImage: '',
@@ -74,6 +75,7 @@ export async function addBooktoUserShelves(book: Book, userId: string, shelfIds:
 
     const bookData = {
       title: book.title,
+      titleLowercase: book.title.toLowerCase(),
       author: book.author,
       key: book.key,
       isbn: book.isbn,
@@ -134,12 +136,14 @@ export async function addShelfToUser(shelf: Shelf, userId: string) {
 
     const newShelf = {
       name: shelf.name,
+      nameLowerCase: shelf.name.toLowerCase(),
       description: shelf.description,
       followers: shelf.followers || 0,
       isPublic: shelf.isPublic,
       image: shelf.image || '',
       createdById: userId,
       createdByName: user.username,
+      createdByNameLowerCase: user.username.toLowerCase(),
       createdByImage: user.profileImage,
       createdAt: Timestamp.now()
     };
@@ -324,11 +328,13 @@ export async function updateBookOnUserShelf(userId: string, shelfId: string, new
 }
 
 export type Sort = {
-
+  key: 'nameLowerCase' | 'createdByNameLowerCase' | 'followers' | 'createdAt',
+  order: 'asc' | 'desc',
 }
 
 export type Filter = {
-
+  key: 'nameLowerCase' | 'createdByNameLowerCase',
+  value: string,
 }
 
 /** 
@@ -338,9 +344,21 @@ export type Filter = {
  * @param filter - Filter object with field and value
  * @returns Shelf[] | null
  */
-export async function getAllPublicShelves(sort?: Sort, filter?: Filter): Promise<Option<Shelf[]>> {
+export async function getAllPublicShelves(inputFilter?: Filter, inputSort?: Sort): Promise<Option<Shelf[]>> {
+  const filter = inputFilter || { key: 'nameLowerCase', value: '' };
+  const sort = inputSort || { key: 'createdAt', order: 'desc' };
   try {
-    const shelvesQuery = query(collection(db, 'shelves'), where('isPublic', '==', true));
+    let shelvesQuery = query(collection(db, 'shelves'), where('isPublic', '==', true));
+    if (filter) {
+      if (filter.key === 'nameLowerCase' && filter.value !== '') {
+        shelvesQuery = query(shelvesQuery, where('nameLowerCase', '>=', filter.value), where('nameLowerCase', '<=', filter.value + '\uf8ff'));
+      } else if (filter.key === 'createdByNameLowerCase' && filter.value !== '') {
+        shelvesQuery = query(shelvesQuery, where('createdByNameLowerCase', '>=', filter.value), where('createdByNameLowerCase', '<=', filter.value + '\uf8ff'));
+      }
+    }
+    if (sort) {
+      shelvesQuery = query(shelvesQuery, orderBy(sort.key, sort.order));
+    }
     const shelvesRef = await getDocs(shelvesQuery);
     const shelvesPromises: Promise<Shelf>[] = shelvesRef.docs.map(async doc => {
       const shelfData = doc.data();
@@ -390,6 +408,7 @@ export async function updateShelf(newShelf: Shelf): Promise<Option<string>> {
   try {
     const newData = {
       name: newShelf.name,
+      nameLowerCase: newShelf.name.toLowerCase(),
       description: newShelf.description,
       isPublic: newShelf.isPublic,
       image: newShelf.image || '',
