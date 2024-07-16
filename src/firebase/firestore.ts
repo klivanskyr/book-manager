@@ -324,11 +324,13 @@ export async function updateBookOnUserShelf(userId: string, shelfId: string, new
 }
 
 export type Sort = {
-
+  key: 'name' | 'createdByName' | 'followers' | 'createdAt',
+  order: 'asc' | 'desc',
 }
 
 export type Filter = {
-
+  key: 'name' | 'createdByName',
+  value: string,
 }
 
 /** 
@@ -338,9 +340,22 @@ export type Filter = {
  * @param filter - Filter object with field and value
  * @returns Shelf[] | null
  */
-export async function getAllPublicShelves(sort?: Sort, filter?: Filter): Promise<Option<Shelf[]>> {
+export async function getAllPublicShelves(inputFilter?: Filter, inputSort?: Sort): Promise<Option<Shelf[]>> {
+  const filter = inputFilter || { key: 'name', value: '' };
+  const sort = inputSort || { key: 'createdAt', order: 'desc' };
+  console.log('Filter:', filter, 'Sort:', sort);
   try {
-    const shelvesQuery = query(collection(db, 'shelves'), where('isPublic', '==', true));
+    let shelvesQuery = query(collection(db, 'shelves'), where('isPublic', '==', true));
+    if (filter) {
+      if (filter.key === 'name' && filter.value !== '') {
+        shelvesQuery = query(shelvesQuery, where('name', '>=', filter.value), where('name', '<=', filter.value + '\uf8ff'));
+      } else if (filter.key === 'createdByName' && filter.value !== '') {
+        shelvesQuery = query(shelvesQuery, where('createdByName', '>=', filter.value), where('createdByName', '<=', filter.value + '\uf8ff'));
+      }
+    }
+    if (sort) {
+      shelvesQuery = query(shelvesQuery, orderBy(sort.key, sort.order));
+    }
     const shelvesRef = await getDocs(shelvesQuery);
     const shelvesPromises: Promise<Shelf>[] = shelvesRef.docs.map(async doc => {
       const shelfData = doc.data();

@@ -2,8 +2,7 @@ import { Shelf } from "@/types";
 
 export type Filter = 'none' | 'followed' | 'trending';
 
-export default function Filter({ children, shelves, filter }: { children: (filterShelves: Shelf[]) => React.ReactNode, shelves: Shelf[], filter: Filter }): JSX.Element {
-
+export default function Filter({ children, shelves, filter, setFilter }: { children: (filterShelves: Shelf[]) => React.ReactNode, shelves: Shelf[], filter: Filter, setFilter: Function }): JSX.Element {
     function filterShelves(): Shelf[] {
         switch (filter) {
             case 'none':

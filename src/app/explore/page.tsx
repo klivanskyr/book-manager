@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall, Filter, FilterType } from '@/components';
+import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall, Filter, FilterType, FilterBar, FilterBarExplore } from '@/components';
 import { UserProfile, ExploreIcon, Settings, Questionmark } from '@/assets';
 import { Button, Link, Spinner } from '@nextui-org/react';
 import { Book, Shelf } from '@/types';
@@ -18,8 +18,7 @@ export default function Explore() {
     const router = useRouter();
     
     const searchParams = useSearchParams();
-    const userId = searchParams.get('userId')
-    const search = searchParams.get('search');
+    const userId = searchParams.get('userId');
 
 
     const fetchShelves = async () => {
@@ -111,11 +110,21 @@ export default function Explore() {
         },
         "Settings": {
             "startContent": <Settings className='h-[35px] w-[40px]'/>,
-            "subsections": [<Link className={toImplement}>Profile</Link>, <Link className={toImplement}>Account</Link>, <Link className={toImplement}>Appearance</Link>, <Link className={toImplement}>Notifications</Link>],
+            "subsections": [
+                <Link className={toImplement}>Profile</Link>,
+                <Link className={toImplement}>Account</Link>,
+                <Link className={toImplement}>Appearance</Link>,
+                <Link className={toImplement}>Notifications</Link>
+            ],
         },
         "Help": {
             "startContent": <Questionmark className='h-[40px] w-[40px]'/>,
-            "subsections": [<Link className={toImplement}>FAQ</Link>, <Link className={toImplement}>Contact Us</Link>, <Link className={toImplement}>Report a Bug</Link>, <Link className={toImplement}>Feedback</Link>]
+            "subsections": [
+            <Link className={toImplement}>FAQ</Link>,
+            <Link className={toImplement}>Contact Us</Link>,
+            <Link className={toImplement}>Report a Bug</Link>,
+            <Link className={toImplement}>Feedback</Link>
+            ],
         },
     };
 
@@ -124,16 +133,18 @@ export default function Explore() {
             <NavBarLMR className='w-auto flex justify-between h-16 p-4 border bg-slate-700' leftElements={leftNavElements} middleElements={middleNavElements} rightElements={rightNavElements} />
             <div className='flex flex-row w-full h-full'>
                 <SideBar sections={sideBarSections} />
-                <h1>{filter}</h1>
-                <Filter shelves={shelves} filter={filter as FilterType}>
-                    {filteredShelves => (
-                        <div className='w-full h-full flex flex-col items-center justify-center p-4'>
-                            {isLoading 
-                                ? <div className='w-full h-full flex flex-row items-center justify-center'><Spinner size='lg' /></div>
-                                : filteredShelves.map((shelf, index) => <ExploreCardSmall shelf={shelf} userId={userId} loggedIn={Boolean(userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
-                        </div>
-                    )}
-                </Filter>
+                <div className='flex flex-col w-full py-4 px-8 justify-center items-center'>
+                    <FilterBarExplore setShelves={setShelves} />
+                    <Filter shelves={shelves} filter={filter as FilterType} setFilter={setFilter} >
+                        {filteredShelves => (
+                            <div className='w-full h-full flex flex-col items-center justify-start p-4'>
+                                {isLoading 
+                                    ? <div className='w-full h-full flex flex-row items-center justify-center'><Spinner size='lg' /></div>
+                                    : filteredShelves.map((shelf, index) => <ExploreCardSmall shelf={shelf} userId={userId} loggedIn={Boolean(userId)} key={`${shelf.shelfId}${index}`} updateShelf={handleUpdateShelf}/>)}
+                            </div>
+                        )}
+                    </Filter>
+                </div>
             </div>
         </>
     )
