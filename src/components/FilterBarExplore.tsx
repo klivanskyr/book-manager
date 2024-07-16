@@ -23,24 +23,24 @@ export default function filterBarExplore({ setShelves, setLoading }: { setShelve
         function getFilter(search: string): Filter {
             switch (filters[selectedSearchIndex]) {
                 case 'Title':
-                    return { key: 'name', value: search };
+                    return { key: 'nameLowerCase', value: search };
                 case 'Author':
-                    return { key: 'createdByName', value: search };
+                    return { key: 'createdByNameLowerCase', value: search };
                 default:
-                    return { key: 'name', value: search };
+                    return { key: 'nameLowerCase', value: search };
             }
         }
 
         function getSort(): Sort {
             switch (sorts[selectedSortIndex]) {
                 case 'Title A-Z':
-                    return { key: 'name', order: 'asc' };
+                    return { key: 'nameLowerCase', order: 'asc' };
                 case 'Title Z-A':
-                    return { key: 'name', order: 'desc' };
+                    return { key: 'nameLowerCase', order: 'desc' };
                 case 'Author A-Z':
-                    return { key: 'createdByName', order: 'asc' };
+                    return { key: 'createdByNameLowerCase', order: 'asc' };
                 case 'Author Z-A':
-                    return { key: 'createdByName', order: 'desc' };
+                    return { key: 'createdByNameLowerCase', order: 'desc' };
                 case 'Highest Rating':
                     return { key: 'followers', order: 'desc' };
                 case 'Lowest Rating':
@@ -50,7 +50,7 @@ export default function filterBarExplore({ setShelves, setLoading }: { setShelve
                 case 'Oldest':
                     return { key: 'createdAt', order: 'asc' };
                 default: 
-                    return { key: 'name', order: 'asc' };
+                    return { key: 'nameLowerCase', order: 'asc' };
             }
         }
 
