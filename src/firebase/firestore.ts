@@ -30,7 +30,8 @@ const db = getFirestore(app);
 
 export { db, auth }
 
-export async function createNewUser(userId: string, username: string, email: string, createdWith: string) {
+type CreatedWith = 'email' | 'google';
+export async function createNewUser(userId: string, username: string, email: string, createdWith: CreatedWith, profileImage?: string): Promise<boolean> {
   try {
     //create new user
     await setDoc(doc(db, 'users', userId), {
@@ -38,9 +39,9 @@ export async function createNewUser(userId: string, username: string, email: str
       usernameLowercase: username.toLowerCase(),
       email,
       createdWith,
-      profileImage: '',
+      profileImage: profileImage || '',
       createdAt: Timestamp.now()
-    });
+    }, { merge: true });
     return true;
 
   } catch (error) {
