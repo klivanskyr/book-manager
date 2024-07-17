@@ -73,6 +73,7 @@ export default function Explore() {
         .catch((error) => {
             console.error(error);
         });
+        router.push('/explore');
     }
 
     const leftNavElements = [
