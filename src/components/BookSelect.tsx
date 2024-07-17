@@ -9,7 +9,6 @@ import { Book } from "@/types/Book";
 import BookSelectCard from "./BookSelectCard";
 import { Shelf } from "@/types/Shelf";
 import { addBooktoUserShelves } from "@/firebase/firestore";
-import { fetchDominantColor } from "@/utils/color";
 
 
 export default function BookSelect({ shelves, fetchShelves, userId, active, setActive }: { shelves: Shelf[], fetchShelves: Function, userId: string, active: boolean, setActive: Function }) {
@@ -60,8 +59,7 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
      * selected field to true so its select button will be red in the modal
     */
     const addBook = async (newBook: Book) => {
-        const [r, g, b] = await fetchDominantColor(newBook.coverUrl);
-        const updatedBook = { ...newBook, selected: true, bgColor: {r: Math.min(r+50, 255), g: Math.min(g+50, 255), b: Math.min(b+50, 255)}};
+        const updatedBook = { ...newBook, selected: true, bgColor: {r: 0, g: 0, b: 0}};
 
         const updatedBooks = foundBooks.map((book) => book.key === updatedBook.key ? updatedBook : book);
         setFoundBooks(updatedBooks); // Make select button red
