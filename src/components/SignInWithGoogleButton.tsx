@@ -23,15 +23,17 @@ export default function SignInWithGoogleButton() {
 
         signInWithPopup(auth, provider)
         .then(async (result) => {
-            console.log('result', result);
             if (!result.user) return console.error('Error signing in with Google: No user found');
+            const userInfo = result.user.providerData[0]
+            const userToken = await result.user.getIdToken();
+            console.log('userToken', userToken);
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 cache: 'no-cache',
-                body: JSON.stringify({ createdWith: 'google', token: result.user.getIdToken() })
+                body: JSON.stringify({ email: userInfo.email, createdWith: 'google', token: userToken })
             });
             console.log('response', response);
             const data = await response.json();
@@ -44,14 +46,16 @@ export default function SignInWithGoogleButton() {
             //create user in database if not exists
             const userDocs = await getDocs(query(collection(db, 'users'), where('uid', '==', result.user.uid)));
             if (userDocs.empty) {
-                const successful = await createNewUser(result.user.uid, result.user.displayName || 'Display Name', result.user.email || 'Email', 'google', result.user.photoURL || '');
+                const successful = await createNewUser(userInfo.uid, userInfo.displayName || 'TEMP DISPLAY NAME', userInfo.email || 'TEMP EMAIL', 'google', result.user.photoURL || '');
                 if (!successful) {
                     console.error('Error creating user in database:', result.user.uid);
                     return;
+                } else {
+                    console.log('User created in database:', result.user.uid);
                 }
             }
-            
-            router.push(`/explore?userId=${result.user.uid}`);
+            console.log('google user pushing to explore');
+            router.push(`/explore?userId=${userInfo.uid}`);
         })
         .catch((error) => {
             console.error(`Error signing in with Google: ${error}`);
