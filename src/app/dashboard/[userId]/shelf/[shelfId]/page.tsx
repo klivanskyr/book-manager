@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Spinner } from "@nextui-org/react";
 
 import { Book, Shelf } from "@/types";
-import { getAllBooks, getShelf, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
+import { getAllBooks, getShelf, removeBookFromAllShelves, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
 import { BooksList, FilterBar, BookSelect } from "@/components";
 import { BookIcon, CopyIcon, ReturnIcon, Settings } from "@/assets";
 
@@ -35,17 +35,33 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     const handleRemoveBook = async (book: Book) => {
         if (!shelf) return;
-        // Client side update
-        const newBooks = shelf.books.filter((b) => b.bookId !== book.bookId);
-        const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
-        setShelf(newShelf);
 
-        // Server side update
-        //This might get really slow as the database grows
-        const error = await removeBookFromShelf(params.userId, params.shelfId, book.bookId);
-        if (error) {
-            console.error('Error removing book from shelf', error);
-            return;
+        // all-books shelf removes all instances of book
+        if (shelf.shelfId === 'all-books') {
+            // Client side update
+            const newBooks = shelf.books.filter((b) => b.bookId !== book.bookId);
+            const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
+            setShelf(newShelf);
+
+            // Server side update
+            const error = await removeBookFromAllShelves(params.userId, book.bookId);
+            if (error) {
+                console.error('Error removing book from all shelves', error);
+                return;
+            }
+        } else {
+            // Client side update
+            const newBooks = shelf.books.filter((b) => b.bookId !== book.bookId);
+            const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
+            setShelf(newShelf);
+
+            // Server side update
+            //This might get really slow as the database grows
+            const error = await removeBookFromShelf(params.userId, params.shelfId, book.bookId);
+            if (error) {
+                console.error('Error removing book from shelf', error);
+                return;
+            }
         }
     }
 

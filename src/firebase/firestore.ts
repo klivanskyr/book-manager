@@ -554,3 +554,46 @@ export async function getUserIdByEmail(email: string): Promise<Option<string>> {
     return `${error}`;
   }
 }
+
+export async function removeBookFromAllShelves(userId: string, bookId: string): Promise<Option<string>> {
+  try {
+     // Remove book from all shelves
+    const userShelvesDocs = await getDocs(collection(db, 'users', userId, 'ownedShelves'));
+    const shelfPromises = userShelvesDocs.docs.map(shelfDoc => {
+      return deleteDoc(doc(db, 'users', userId, 'ownedShelves', shelfDoc.id, 'books', bookId));
+    });
+
+    await Promise.all(shelfPromises);
+
+    // Remove book from user/books
+    await deleteDoc(doc(db, 'users', userId, 'books', bookId));
+
+    // Remove book from shelves
+    // does not matter if book is not in shelf
+    const shelvesDocs = await getDocs(query(collection(db, 'shelves'), where('createdById', '==', userId)));
+    const shelfPromises2 = shelvesDocs.docs.map(shelfDoc => {
+      return deleteDoc(doc(db, 'shelves', shelfDoc.id, 'books', bookId));
+    });
+
+    await Promise.all(shelfPromises2);
+
+    // Remove book from books if last instance
+    let needToRemoveBook = true; // false if book is in any shelf
+    const allShelvesDocs = await getDocs(collection(db, 'shelves'));
+    allShelvesDocs.docs.map(async shelfDoc => {
+      const shelfBookDoc = await getDoc(doc(db, 'shelves', shelfDoc.id, 'books', bookId));
+      if (shelfBookDoc.exists()) {
+        needToRemoveBook = false;
+      }
+    });
+
+    if (needToRemoveBook) {
+      await deleteDoc(doc(db, 'books', bookId));
+    }
+
+    return null;
+  } catch (error) {
+    console.log('Error in removeBookFromAllShelves', error);
+    return `${error}`;
+  }
+}

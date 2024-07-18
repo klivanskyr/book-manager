@@ -33,6 +33,19 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
 
     function DeleteHeader() {
         if (!selectedBook) return <></>;
+        
+        // All books removes all instances of the book
+        if (shelf.shelfId === 'all-books') {
+            return (
+                <div className="m-2 flex flex-col justify-center items-center text-center w-full text-xl font-normal">
+                    <p>Are you sure you want to remove</p>
+                    <p className="font-semibold">{selectedBook.title}</p>
+                    <p>from <span className='font-semibold text-red-500 underline'>ALL</span> shelves?</p>
+                </div>
+            )
+        }
+
+        // Single shelf removes only the book from the shelf
         return (
             <div className="m-2 flex flex-col justify-center items-center text-center w-full text-xl font-normal">
                 <p>Are you sure you want to remove</p>
