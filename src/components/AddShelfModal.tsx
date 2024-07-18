@@ -29,9 +29,9 @@ export default function AddShelfModal({ userId, fetchLatestShelves, active, setA
 
         return (
             <div className="flex flex-col h-full w-full">
-                <form className="p-10 flex flex-col items-center text-center justify-center shadow-medium rounded-md m-2" onSubmit={(e) => handleSubmit(e)}>
-                    <Input className='p-1 mt-16 mb-3 w-[700px]' size='lg' label="Name" value={input.name} onChange={(e) => setInput({ ...input, name: e.target.value})}/>
-                    <Input className='p-1 mt-2 mb-10 w-[700px]' size='lg' label="Description" value={input.description} onChange={(e) => setInput({ ...input, description: e.target.value})} />
+                <form className="p-6 lg:p-10 flex flex-col items-center text-center justify-center lg:shadow-medium rounded-md m-2" onSubmit={(e) => handleSubmit(e)}>
+                    <Input className='p-1 mt-16 mb-3 w-[350px] lg:w-[700px]' size='lg' label="Name" value={input.name} onChange={(e) => setInput({ ...input, name: e.target.value})}/>
+                    <Input className='p-1 mt-2 mb-10 w-[350px] lg:w-[700px]' size='lg' label="Description" value={input.description} onChange={(e) => setInput({ ...input, description: e.target.value})} />
                     <Checkbox className='p-2 m-5' isSelected={input.isPublic} onValueChange={(newValue) => setInput({ ...input, isPublic: newValue })}>Viewable by others?</Checkbox> 
                     <Button className='shadow-md h-[50px] w-[100px] m-5 p-2 bg-blue-600 text-white' type="submit">Submit</Button>
                 </form>
@@ -43,16 +43,16 @@ export default function AddShelfModal({ userId, fetchLatestShelves, active, setA
         <ModalElement 
             classNames={{ 
                 base: "y-10",
-                body: "min-h-[500px]",
+                body: "min-h-[700px] lg:min-h-[500px] ",
                 header: "shadow-small",
                 footer: "shadow-small",
             }}
             onOpenChange={(isOpen: boolean) => setActive(isOpen)}
-            size='5xl'
+            size={`5xl`}
             active={active} 
             Header={Header()} 
             Body={Body()} 
-            Footer={<></>} 
+            placement='bottom-center' 
         />
     )
 }

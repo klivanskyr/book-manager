@@ -14,6 +14,8 @@ import Minus from './minus.svg';
 import Globe from './global-svgrepo-com.svg';
 import ReturnIcon from './return-svgrepo-com.svg';
 import CopyIcon from './copy-svgrepo-com.svg';
+import MenuIcon from './menu-svgrepo-com.svg';
+import SearchIcon from './search-alt-svgrepo-com.svg';
 
 export {
   coverPlaceholder,
@@ -31,5 +33,7 @@ export {
   Minus,
   Globe,
   ReturnIcon,
-  CopyIcon
+  CopyIcon,
+  MenuIcon,
+  SearchIcon,
 };

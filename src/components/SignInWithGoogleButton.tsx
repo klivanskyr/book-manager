@@ -1,9 +1,8 @@
 'use client';
 
 import { Button } from "@nextui-org/react";
-import { GoogleAuthProvider, getRedirectResult, signInWithPopup, signInWithRedirect } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/firebase";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { GoogleG } from "@/assets";
@@ -25,8 +24,11 @@ export default function SignInWithGoogleButton() {
         .then(async (result) => {
             if (!result.user) return console.error('Error signing in with Google: No user found');
             const userInfo = result.user.providerData[0]
+            const userId = result.user.uid;
             const userToken = await result.user.getIdToken();
-            console.log('userToken', userToken);
+            // console.log('userInfo', userInfo);
+            // console.log('userId', userId);
+            // console.log('userToken', userToken);
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -35,9 +37,9 @@ export default function SignInWithGoogleButton() {
                 cache: 'no-cache',
                 body: JSON.stringify({ email: userInfo.email, createdWith: 'google', token: userToken })
             });
-            console.log('response', response);
+            // console.log('response', response);
             const data = await response.json();
-            console.log('data', data);
+            // console.log('data', data);
             if (data.code !== 200) {
                 console.error('Error logging in with Google:', data.message);
                 return;
@@ -46,16 +48,16 @@ export default function SignInWithGoogleButton() {
             //create user in database if not exists
             const userDocs = await getDocs(query(collection(db, 'users'), where('uid', '==', result.user.uid)));
             if (userDocs.empty) {
-                const successful = await createNewUser(userInfo.uid, userInfo.displayName || 'TEMP DISPLAY NAME', userInfo.email || 'TEMP EMAIL', 'google', result.user.photoURL || '');
+                const successful = await createNewUser(userId, userInfo.displayName || 'TEMP DISPLAY NAME', userInfo.email || 'TEMP EMAIL', 'google', userInfo.photoURL || '');
                 if (!successful) {
-                    console.error('Error creating user in database:', result.user.uid);
+                    console.error('Error creating user in database:', userId);
                     return;
                 } else {
-                    console.log('User created in database:', result.user.uid);
+                    console.log('User created in database:', userId);
                 }
             }
             console.log('google user pushing to explore');
-            router.push(`/explore?userId=${userInfo.uid}`);
+            router.push(`/explore?userId=${userId}`);
         })
         .catch((error) => {
             console.error(`Error signing in with Google: ${error}`);

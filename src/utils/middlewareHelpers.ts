@@ -82,12 +82,24 @@ export async function handleValidToken(request: NextRequest, userId: string): Pr
     const path = request.nextUrl.pathname;
     const searchParams = request.nextUrl.searchParams;
 
-    // Valid token going to login or explore will be redirected to explore/[userId]
-    if (path === '/login' || path === '/explore') {
-        console.log('Valid token, going to login or explore, redirecting to explore/[userId]');
+    // Valid token going to login redirect to explore?userId=uid
+    if (path === '/login') {
+        console.log('Valid token, going to login, redirecting to explore');
         return NextResponse.redirect(new URL(`/explore?userId=${userId}`, request.nextUrl), { status: 302 });
     }
 
+    // Valid token going to explore without userId will be redirected to explore?userId=uid
+    if (path === '/explore' && !searchParams.has('userId')) {
+        console.log('Valid token, going to explore without userId, redirecting to explore with userId');
+        return NextResponse.redirect(new URL(`/explore?userId=${userId}`, request.nextUrl), { status: 302 });
+    }
+
+    // Vluad token with userId going to explore?userId=uid will be allowed if userId matches
+    if (path === '/explore' && searchParams.has('userId') && searchParams.get('userId') === userId) {
+        console.log('Valid token, going to explore with userId, allowing');
+        return NextResponse.next();
+    }
+    
     // Valid token going to explore?userId=uid will be redirected to login if userId does not match
     if (path === '/explore' && searchParams.has('userId') && searchParams.get('userId') !== userId) {
         console.log('Valid token, going to explore with different userId, redirecting to login');

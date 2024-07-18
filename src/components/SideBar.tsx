@@ -9,9 +9,9 @@ export type SideBarSections = {
     [key: string]: Section;
 }
 
-export default function SideBar({ sections }: { sections: SideBarSections }) {
+export default function SideBar({ className='', sections }: { className?: string, sections: SideBarSections }) {
     return (
-        <div className='w-[400px] h-[850px] border p-2 shadow-md rounded-lg'>
+        <div className={`w-[400px] h-[850px] border p-2 shadow-md rounded-lg ${className}`}>
             <Accordion className='h-full' selectionMode="multiple" variant="bordered">
                 {Object.entries(sections).map(([section, { startContent, subsections }], index) => {
                     return (

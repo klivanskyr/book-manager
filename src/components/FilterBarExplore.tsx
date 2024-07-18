@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input } from "@nextui-org/react";
 import { getAllPublicShelves, Filter, Sort } from '@/firebase/firestore';
 
-export default function filterBarExplore({ setShelves, setLoading }: { setShelves: Function, setLoading: Function }) {
+export default function filterBarExplore({ setShelves, setLoading, className }: { setShelves: Function, setLoading: Function, className?: string }) {
     const [search, setSearch] = useState<string>('');
     const [searchKeys, setSearchKeys] = useState(new Set(["0"]));
     const [sortKeys, setSortKeys] = useState(new Set(['6']));
@@ -74,38 +74,39 @@ export default function filterBarExplore({ setShelves, setLoading }: { setShelve
     }, [searchKeys, sortKeys])
 
     return (
-        <form className='flex flex-row justify-center w-[1000px] items-center' onSubmit={(e) => filterShelves(search, e)}>
-            <Input className='h-[50px] w-[650px]' variant='faded' type='text' label='Search' value={search} onValueChange={(value) => {
+        <form className={`flex flex-col justify-center w-full lg:w-[1000px] lg:flex-row ${className}`} onSubmit={(e) => filterShelves(search, e)}>
+            <Input className='mb-2 lg:m-0 h-[50px] w-full lg:w-[650px]' variant='faded' type='text' label='Search' value={search} onValueChange={(value) => {
                 setSearch(value);
                 debouncedHandler(value);
             }} />
 
-            <Dropdown>
-                <DropdownTrigger>
-                    <Button className='h-[50px] w-[175px] font-light text-[1.025rem] px-2' variant='faded'>Search by {filters[selectedSearchIndex]}</Button>
-                </DropdownTrigger>
-                <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={searchKeys} onSelectionChange={setSearchKeys} >
-                    {filters.map((filter, index) => (
-                        <DropdownItem key={index} textValue={filter}>
-                            <div>{filter}</div>
-                        </DropdownItem>
-                    ))}
-                </DropdownMenu>
-            </Dropdown>
+            <div className='flex flex-row justify-center lg:justify-start items-center pb-[400px] lg:pb-0'>
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button className='h-[50px] w-1/2 lg:w-[175px] font-light text-[1.025rem] px-2 mx-0.5' variant='faded'>Search by {filters[selectedSearchIndex]}</Button>
+                    </DropdownTrigger>
+                    <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={searchKeys} onSelectionChange={setSearchKeys} >
+                        {filters.map((filter, index) => (
+                            <DropdownItem key={index} textValue={filter}>
+                                <div>{filter}</div>
+                            </DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </Dropdown>
 
-            <Dropdown>
-                <DropdownTrigger>
-                    <Button className='h-[50px] w-[175px] font-light text-[1.025rem]' variant='faded'>Sort by {sorts[selectedSortIndex]}</Button>
-                </DropdownTrigger>
-                <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={sortKeys} onSelectionChange={setSortKeys} >
-                    {sorts.map((sort, index) => (
-                        <DropdownItem key={index} textValue={sort}>
-                            <div>{sort}</div>
-                        </DropdownItem>
-                    ))}
-                </DropdownMenu>
-            </Dropdown>
-
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button className='h-[50px] w-1/2 lg:w-[175px] font-light text-[1.025rem] mx-0.5' variant='faded'>Sort by {sorts[selectedSortIndex]}</Button>
+                    </DropdownTrigger>
+                    <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={sortKeys} onSelectionChange={setSortKeys} >
+                        {sorts.map((sort, index) => (
+                            <DropdownItem key={index} textValue={sort}>
+                                <div>{sort}</div>
+                            </DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </Dropdown>
+            </div>
         </form>
     )
 }
