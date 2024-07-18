@@ -58,7 +58,7 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     function Header(message: string) {
         return (
-            <div className="m-2 flex flex-col justify-center items-center text-center w-full text-xl font-normal">
+            <div className="mt-10 lg:mt-6 m-2 flex flex-col justify-center items-center text-center w-full text-2xl lg:text-xl font-normal">
                 <h1>Are you sure you want to</h1> 
                 <h1>{`${message} ?`}</h1>
             </div>
@@ -67,23 +67,23 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     function Body(callback: Function, setModalActive: Function) {
         return (
-            <div className="w-full flex flex-row justify-center items-center">
-                <Button className="mx-2 mb-4 text-red-600 bg-white border border-red-600 hover:text-white hover:bg-red-600 " onClick={() => {
+            <div className="mt-10 lg:mt-0 w-full flex flex-row justify-center items-center">
+                <Button className="w-[60px] h-[45px] lg:w-[40px] mx-2 mb-4 text-red-600 bg-white border border-red-600 hover:text-white hover:bg-red-600" onClick={() => {
                     setModalActive(false);
                     callback();
                 }}>
                     Yes
                 </Button>
-                <Button className="bg-blue-500 text-white mb-4" onClick={() => setModalActive(false)}>No</Button>
+                <Button className="w-[60px] h-[45px] lg:w-[40px] bg-blue-500 text-white mb-4" onClick={() => setModalActive(false)}>No</Button>
             </div>
         )
     }
 
     return (
         <>
-            <ModalElement size='xl' active={activeSubmitModal} onOpenChange={(isOpen: boolean) => setActiveSubmitModal(isOpen)} Header={Header('Submit Changes')} Body={Body(handleSubmit, setActiveSubmitModal)} />
-            <ModalElement size='xl' active={activeRevertModal} onOpenChange={(isOpen: boolean) => setActiveRevertModal(isOpen)} Header={Header('Revert All Changes')} Body={Body(() => fetchShelf(), setActiveRevertModal)} />
-            <ModalElement size='xl' active={activeReturnModal} onOpenChange={(isOpen: boolean) => setActiveReturnModal(isOpen)} Header={Header('Revert All Changes')} Body={Body(() => router.push(`/dashboard/${params.userId}/shelf/${params.shelfId}`), setActiveReturnModal)} />
+            <ModalElement size='xl' classNames={{ base: 'min-h-[60%] lg:min-h-0' }} placement='bottom-center' active={activeSubmitModal} onOpenChange={(isOpen: boolean) => setActiveSubmitModal(isOpen)} Header={Header('Submit Changes')} Body={Body(handleSubmit, setActiveSubmitModal)} />
+            <ModalElement size='xl' classNames={{ base: 'min-h-[60%] lg:min-h-0' }} placement='bottom-center' active={activeRevertModal} onOpenChange={(isOpen: boolean) => setActiveRevertModal(isOpen)} Header={Header('Revert All Changes')} Body={Body(() => fetchShelf(), setActiveRevertModal)} />
+            <ModalElement size='xl' classNames={{ base: 'min-h-[60%] lg:min-h-0' }} placement='bottom-center' active={activeReturnModal} onOpenChange={(isOpen: boolean) => setActiveReturnModal(isOpen)} Header={Header('Revert All Changes')} Body={Body(() => router.push(`/dashboard/${params.userId}/shelf/${params.shelfId}`), setActiveReturnModal)} />
             <form  className='w-auto h-screen lg:h-full p-8 lg:p-16 lg:m-8 lg:shadow-large flex flex-col justify-between lg:justify-start' onSubmit={(e) => e.preventDefault()}>
                 <h1 className="font-light text-4xl mb-8">Shelf Settings</h1>
                 <Skeleton isLoaded={isLoaded} className={`w-[300px] lg:w-[500px] my-2 rounded-md ${isLoaded ? 'opacity-100' : 'opacity-40'}`}>

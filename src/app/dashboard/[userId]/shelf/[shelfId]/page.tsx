@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Spinner } from "@nextui-org/react";
 
 import { Book, Shelf } from "@/types";
 import { getAllBooks, getShelf, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
@@ -35,18 +35,18 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     const handleRemoveBook = async (book: Book) => {
         if (!shelf) return;
-        setIsBooksLoading(true);
+        // Client side update
+        const newBooks = shelf.books.filter((b) => b.bookId !== book.bookId);
+        const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
+        setShelf(newShelf);
+
+        // Server side update
         //This might get really slow as the database grows
         const error = await removeBookFromShelf(params.userId, params.shelfId, book.bookId);
         if (error) {
             console.error('Error removing book from shelf', error);
             return;
         }
-        
-        const newBooks = shelf.books.filter((b) => b.bookId !== book.bookId);
-        const newShelf = { ...shelf, books: newBooks, shownBooks: newBooks };
-        setShelf(newShelf);
-        setIsBooksLoading(false);
     }
 
     const handleUpdateShelf = async (newBook: Book) => {
@@ -93,13 +93,13 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     function Header() {
         return (
-            <div className="w-full h-auto flex flex-row items-center justify-between p-7">
-                <div className="flex flex-col h-full w-auto justify-evenly">
-                    <h1 className='font-medium text-4xl max-w-[500px] truncate'>{shelf?.name || "Title"}</h1>
+            <div className="w-full h-auto flex flex-row items-center justify-between p-2 px-4 lg:p-7">
+                <div className="flex flex-col h-full w-1/2 lg:w-auto justify-evenly">
+                    <h1 className='font-medium text-3xl lg:text-4xl max-w-[500px] truncate'>{shelf?.name || "Title"}</h1>
                     <h2 className="italic font-light max-w-[500px] truncate">{shelf?.description || "Description"}</h2>
                 </div>
-                <div className="flex flex-col items-end justify-centerm mx-0.5">
-                    <div className="flex flex-row">
+                <div className="w-1/2 flex flex-col items-end justify-centerm mx-0.5">
+                    <div className="flex flex-row mb-4 py-0.5">
                         <Dropdown closeOnSelect={false} >
                             <DropdownTrigger>
                                 <Button variant="bordered">Options</Button>
@@ -138,9 +138,12 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                             </DropdownMenu>
                         </Dropdown>
                     </div>
-                    <div className="flex flex-row mt-2">
-                        <p className="mr-8">Created By: {shelf?.createdByName || "Username"}</p>
-                        <p className="mr-2">IMAGE</p>
+                    <div className="flex flex-row items-center mt-2">
+                        {shelf?.createdByImage
+                            ? <p className="text-sm lg:text-xl font-light mr-2">{shelf.createdByName}</p>
+                            : <p className="text-sm lg:text-xl font-light mr-2">Created By: {shelf?.createdByName}</p>
+                        }
+                        {shelf?.createdByImage && <Image className="mr-2" src={shelf.createdByImage} width={30} height={30} alt="User Image" /> }
                     </div>
                 </div>
             </div>

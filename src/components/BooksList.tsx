@@ -101,9 +101,9 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
 
     return (
         <>
-            <ModalElement active={activeDeleteModal} onOpenChange={setActiveDeleteModal} Header={DeleteHeader()} Body={DeleteBody()} Footer={<></>} />
+            <ModalElement active={activeDeleteModal} onOpenChange={setActiveDeleteModal} Header={DeleteHeader()} Body={DeleteBody()} />
             <ModalElement active={activeReviewModal} onOpenChange={setActiveReviewModal} Header={ReviewHeader()} Body={ReviewBody()} Footer={ReviewFooter()} />
-            <div className="grid grid-cols-3 max-w-[1500px] pb-8">
+            <div className="flex flex-col mx-2 lg:mx-0 lg:grid lg:grid-cols-3 max-w-[1500px] pb-8">
                 {books.map(book => (
                     <div key={book.bookId} className="shadow-medium flex flex-row items-center p-4 m-2.5 justify-between">
                         <div className="flex flex-col w-full">
