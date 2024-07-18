@@ -17,6 +17,10 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
     const router = useRouter();
 
     const isOwner = shelf?.createdById === params.userId;
+    if (shelf && shelf.createdById !== params.userId) {
+        console.error('User is not owner of shelf. Shelf created by:', shelf?.createdById, 'User id:', params.userId);
+        router.push(`/dashboard/${params.userId}`);
+    }
 
     const fetchShelf = async () => {
         setIsBooksLoading(true);

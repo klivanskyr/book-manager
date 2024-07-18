@@ -2,9 +2,8 @@
 import { Book } from "@/types/Book";
 import { Shelf } from "@/types/Shelf";
 import { initializeApp } from "firebase/app";
-import { getAuth, signOut, updateEmail, updateProfile } from "firebase/auth";
-import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy, getDoc } from "firebase/firestore";
-import { adminAuth } from "./firebase-admin";
+import { getAuth } from "firebase/auth";
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy, getDoc } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -211,6 +210,11 @@ export async function getShelf(shelfId: string): Promise<Option<Shelf>> {
 
 /** Gets all the books by userId. Returns a Shelf */
 export async function getAllBooks(userId: string) : Promise<Shelf> {
+
+  const userDoc = await getDoc(doc(db, 'users', userId));
+  const userData = userDoc.data();
+
+
   const booksRef = await getDocs(collection(db, 'users', userId, 'books'));
   const books = booksRef.docs.map(doc => {
     const bookData = doc.data();
@@ -235,8 +239,8 @@ export async function getAllBooks(userId: string) : Promise<Shelf> {
     followers: 0,
     image: '',
     createdById: userId,
-    createdByImage: '',
-    createdByName: 'You',
+    createdByImage: userData?.profileImage || '',
+    createdByName: userData?.username || 'You',
     createdAt: Timestamp.now(),
     isPublic: false,
     shelfId: 'all-books',

@@ -12,6 +12,8 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
     const [activeReviewModal, setActiveReviewModal] = useState<boolean>(false);
     const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
+    const isAllBooks = shelf.shelfId === 'all-books';
+
     if (books.length === 0) {
         return (
             <div className="flex flex-row justify-center items-center text-center">
@@ -133,7 +135,7 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
                                     </div>
                                     <div>
                                         <Stars className="flex flex-row" book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} shelfId={shelf.shelfId} size={25} userId={shelf.createdById} disabled={!isOwner} />
-                                        <h3 className='text-blue-500 mt-1.5 hover:cursor-pointer' onClick={() => handleReviewOpen(book)}>View Review</h3>
+                                        <h3 className='text-blue-500 mt-1.5 hover:cursor-pointer' onClick={() => handleReviewOpen(book)}>{isAllBooks ? 'View Reviews' : 'View Review'}</h3>
                                     </div>
                                 </div>
                             </div>
