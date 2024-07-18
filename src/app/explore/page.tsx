@@ -162,7 +162,7 @@ export default function Explore() {
 
     function MobileNavModal() {
         return (
-            <div>
+            <div className='h-screen'>
                 {Object.entries(sideBarSections).map(([section, { startContent, subsections }]) => (
                     <div className='flex flex-col w-full pb-4 -mt-5 border-b-1 border-black border-opacity-50' key={section}>
                         <div className='flex flex-row justify-center items-center text-xl mb-6 mt-12'>
@@ -182,8 +182,8 @@ export default function Explore() {
 
     return (
         <>  
-            <ModalElement placement='bottom-center' active={mobileNavModal} onOpenChange={setMobileNavModal} size='full' Header={<></>} Body={MobileNavModal()} Footer={<></>} />
-            <ModalElement placement='bottom-center' active={mobileSearchModal} onOpenChange={setMobileSearchModal} size='5xl' Header={<></>} Body={MobileSearchModal()} Footer={<></>} />
+            <ModalElement placement='bottom' active={mobileNavModal} onOpenChange={setMobileNavModal} size='full' Body={MobileNavModal()} />
+            <ModalElement placement='bottom' active={mobileSearchModal} onOpenChange={setMobileSearchModal} size='5xl' Body={MobileSearchModal()} />
             <NavBarLMR className='flex flex-row w-full justify-between h-16 p-4 border bg-slate-700' leftElements={leftNavElements} middleElements={middleNavElements} rightElements={rightNavElements} />
             <div className='flex flex-row w-full h-full'>
                 <SideBar className='hidden lg:block' sections={sideBarSections} />
