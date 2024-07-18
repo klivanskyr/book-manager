@@ -35,7 +35,7 @@ export default function Card({ userId=null, loggedIn=false, shelf, updateShelf=(
     }
 
     return (
-        <div className='shadow-medium border p-4 w-11/12 h-[150px] flex flex-row justify-start my-1 hover:cursor-pointer hover:shadow-large transition-all'>
+        <div className='shadow-medium border p-4 w-full lg:w-11/12 h-[150px] flex flex-row justify-start my-1 hover:cursor-pointer hover:shadow-large transition-all'>
             <div className='flex flex-row w-full justify-between'>
                 <div className='p-2 flex flex-col justify-evenly text-center items-center'> 
                     {loggedIn && (shelf.createdById !== userId) && <FollowButton className='p-1 flex flex-row justify-center items-center rounded-full w-[35px] h-[35px] hover:cursor-pointer m-1' isFollowing={Boolean(shelf.following)} onClick={handleFollowUnfollow} />}
