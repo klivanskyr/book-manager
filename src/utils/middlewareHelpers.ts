@@ -111,7 +111,7 @@ export async function handleValidToken(request: NextRequest, userId: string): Pr
         console.log('Valid token, going to someone else\'s dashboard, redirecting to login');
         return NextResponse.redirect(new URL('/login', request.nextUrl), { status: 302 });
     }
-
+    
     // all other cases, allow the request to continue
     return NextResponse.next();
 }

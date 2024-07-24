@@ -82,14 +82,14 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
     function Header() {
         return (
             <div className='w-full flex flex-row justify-between items-center'>
-                <form className="flex w-1/2" onSubmit={undefined}>
+                <form className="flex w-full lg:w-1/2" onSubmit={undefined}>
                     <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by Title, Author or ISBN' value={text} setValue={setText} error={error} />
                     {selectedShelves.length === 0 
                         ? <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-400" text='Submit' onClick={() => {}} disabled={true} />
                         : <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
                     }
                 </form>
-                <div className='w-1/2 flex flex-row justify-between items-center ml-2'>
+                <div className='w-auto lg:w-1/2 flex flex-row justify-between items-center ml-2'>
                     {shelves.length > 1 && 
                         <>
                             <div className='flex flex-row'>
@@ -149,12 +149,13 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
     return (
         <ModalElement 
             classNames={{ 
-                base: "y-10",
-                body: "min-h-[500px]",
+                base: "min-h-[90%] lg:min-h-[500px]",
+                body: "lg:min-h-[500px]",
                 header: "shadow-small",
                 footer: "shadow-small",
                 closeButton: 'hidden'
             }}
+            placement="bottom-center"
             size='5xl'
             active={active} 
             Header={Header()} 
