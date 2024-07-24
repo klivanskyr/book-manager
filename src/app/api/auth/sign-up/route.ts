@@ -35,7 +35,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 await createNewUser(userCredential.user.uid, username, email, createdWith);
                 return NextResponse.json({ message: 'success' }, { status: 200 });
             } catch (error) {
-                return NextResponse.json({ message: error.message }, { status: 400 });
+                const errorMessage = (error as Error).message;
+                return NextResponse.json({ message: errorMessage }, { status: 400 });
             }
 
         // Create a new user by google   
@@ -48,7 +49,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 await createNewUser(googleId, username, email, createdWith);
                 return NextResponse.json({ message: 'success' }, { status: 200 });
             } catch (error) {
-                return NextResponse.json({ message: error.message }, { status: 400 });
+                const errorMessage = (error as Error).message;
+                return NextResponse.json({ message: errorMessage }, { status: 400 });
             }
 
         // Return an error if the createdWith is invalid
