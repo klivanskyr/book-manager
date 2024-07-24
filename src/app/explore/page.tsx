@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall, Filter, FilterType, FilterBarExplore, ModalElement } from '@/components';
 import { UserProfile, ExploreIcon, Settings, Questionmark, SearchIcon, MenuIcon } from '@/assets';
@@ -164,7 +164,7 @@ export default function Explore() {
     }
 
     return (
-        <>  
+        <Suspense>  
             <ModalElement placement='bottom' active={mobileNavModal} onOpenChange={setMobileNavModal} size='full' Body={MobileNavModal()} />
             <ModalElement placement='bottom' active={mobileSearchModal} onOpenChange={setMobileSearchModal} size='5xl' Body={MobileSearchModal()} />
             <NavBarLMR className='flex flex-row w-full justify-between h-16 p-4 border bg-slate-700' leftElements={leftNavElements} middleElements={middleNavElements} rightElements={rightNavElements} />
@@ -183,6 +183,6 @@ export default function Explore() {
                     </Filter>
                 </div>
             </div>
-        </>
+        </Suspense>
     )
 }

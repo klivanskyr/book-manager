@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Popover, PopoverContent, PopoverTrigger, Spinner } from "@nextui-org/react";
 
@@ -100,12 +100,12 @@ export default function Page({ params }: { params: { shelfId: string }}) {
         )
     }
     return (
-        <div className="w-screen">
+        <Suspense>
             <Header />
             <FilterBar shelf={shelf} setShelf={setShelf} isLoading={isBooksLoading} setIsLoading={setIsBooksLoading}  />
             {isBooksLoading 
             ? <div className="flex flex-row justify-center items-center w-full h-full"><Spinner size="lg"/></div> 
             : <BooksList shelf={shelf} books={shelf.shownBooks} />}
-        </div>
+        </Suspense>
     )
 }

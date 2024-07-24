@@ -1,6 +1,6 @@
 'use client'; 
 
-import { useState, ReactElement } from 'react';
+import { useState, ReactElement, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -88,6 +88,8 @@ export default function Login(): ReactElement {
   ];
 
   return (
-    <Form elements={formElements} />
+    <Suspense>
+      <Form elements={formElements} />
+    </Suspense>
   );
 }
