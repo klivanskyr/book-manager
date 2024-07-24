@@ -82,21 +82,6 @@ export default function Explore() {
         setShelves(newShelves);
     }
 
-    const handleSignOut = async () => {
-        await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
-            method: 'DELETE',
-            cache: 'no-cache',
-        });
-        signOut(auth)
-        .then(() => {
-            router.push('/explore');
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-        router.push('/explore');
-    }
-
     const leftNavElements = [
         <h1 className="font-medium text-lg text-center text-white">Book Manager</h1>,
     ];
@@ -109,7 +94,6 @@ export default function Explore() {
         <Button className='w-[38px] h-[38px] bg-slate-600 rounded-full mr-2 lg:hidden'isIconOnly onClick={() => setMobileSearchModal(true)}><SearchIcon className='w-[28px] h-[28px]'/></Button>,
         <Button className='w-[38px] h-[38px] bg-slate-600 rounded-full mr-2 lg:hidden'isIconOnly onClick={() => setMobileNavModal(true)}><MenuIcon className='w-[28px] h-[28px]'/></Button>,
         (!userId ? <Button className='rounded-full text-white bg-slate-600 hidden lg:block' onClick={() => router.push('/login')}>Sign In</Button> : <></>),
-        (userId ? <Button className="w-[100px] border-1.5 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white transition-all rounded-full h-12 hidden lg:block" onClick={handleSignOut}>Sign Out</Button> : <></>),
     ];
 
     const toImplement = 'text-red-600 text-2xl lg:text-base'
@@ -135,7 +119,7 @@ export default function Explore() {
         "Settings": {
             "startContent": <Settings className='h-[35px] w-[40px]'/>,
             "subsections": [
-                <Link className='cursor-pointer text-2xl lg:text-base' href={userId ? `/profile/${userId}` : `/login?redirectUrl=/explore`}>Profile</Link>,
+                <Link className={toImplement} href={userId ? `/profile/${userId}` : `/login?redirectUrl=/explore`}>Profile</Link>,
                 <Link className='cursor-pointer text-2xl lg:text-base' href={userId ? `/profile/${userId}/settings` : `/login?redirectUrl=/explore`}>Account</Link>,
                 <Link className={toImplement}>Appearance</Link>,
                 <Link className={toImplement}>Notifications</Link>

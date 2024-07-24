@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Key } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Spinner } from "@nextui-org/react";
+import { Button, dropdown, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Spinner } from "@nextui-org/react";
 
 import { Book, Shelf } from "@/types";
 import { getAllBooks, getShelf, removeBookFromAllShelves, removeBookFromShelf, updateBookOnUserShelf } from "@/firebase/firestore";
@@ -117,6 +117,38 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
 
     function Header() {
+        const dropdownitems = [
+            {
+                key: "dashboard",
+                startContent: <ReturnIcon className='w-[20px] h-[20px]' />,
+                textValue: "Go to Dashboard",
+                textDiv: <div>Go to Dashboard</div>,
+            },
+        ];
+
+        if (!isAllBooks) {
+            dropdownitems.push({
+                key: "add-book",
+                startContent: <BookIcon className='w-[20px] h-[20px]' />,
+                textValue: "Add Book",
+                textDiv: <div>Add Book</div>,
+            });
+            
+            dropdownitems.push({
+                key: "copy",
+                startContent: <CopyIcon className='w-[20px] h-[20px]' />,
+                textValue: "Copy Link",
+                textDiv: <div>{isCopied ? "Copied!" : "Copy Link"}</div>,
+            });
+
+            dropdownitems.push({
+                key: "settings",
+                startContent: <Settings className='w-[20px] h-[20px]' />,
+                textValue: "Settings",
+                textDiv: <div>Settings</div>,
+            });
+        }
+
         return (
             <div className="w-full h-auto flex flex-row items-center justify-between p-2 px-4 lg:p-7">
                 <div className="flex flex-col h-full w-1/2 lg:w-auto justify-evenly">
@@ -130,36 +162,11 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                                 <Button variant="bordered">Options</Button>
                             </DropdownTrigger>
                             <DropdownMenu variant="faded" aria-label="Drop-down menu" onAction={(key: Key) => handleDropDown(String(key) as DropDownKeys)}>
-                                <DropdownItem
-                                    key='add-book'
-                                    startContent={<BookIcon className='w-[20px] h-[20px]' />}
-                                    textValue="Add Book"
-                                    color='primary'
-                                >
-                                    <div>Add Book</div>
-                                </DropdownItem>
-                                <DropdownItem
-                                    key="copy"
-                                    startContent={<CopyIcon className='w-[20px] h-[20px]' />}
-                                    color={isCopied ? "success" : "default"}
-                                    textValue="Copy Link"
-                                >
-                                    <div>{isCopied ? "Copied!" : "Copy Link"}</div>
-                                </DropdownItem>
-                                {!isAllBooks && <DropdownItem
-                                    key='settings'
-                                    startContent={<Settings className='w-[20px] h-[20px]' />}
-                                    textValue="Settings"
-                                >
-                                    <div>Settings</div>
-                                </DropdownItem>}
-                                <DropdownItem
-                                    key="dashboard"
-                                    startContent={<ReturnIcon className='w-[20px] h-[20px]'/>}
-                                    textValue="Go to Dashboard"
-                                >
-                                    <div>Go to Dashboard</div>
-                                </DropdownItem>
+                                {dropdownitems.map((item) => (
+                                    <DropdownItem key={item.key} startContent={item.startContent} textValue={item.textValue} >
+                                        {item.textDiv}
+                                    </DropdownItem>
+                                ))}
                             </DropdownMenu>
                         </Dropdown>
                     </div>

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 
 import { Button, Image, Input, Skeleton } from "@nextui-org/react";
-import { getUser } from "@/firebase/firestore";
+import { auth, getUser } from "@/firebase/firestore";
 import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
 
 type UserData = {
     image: string,
@@ -67,6 +68,21 @@ export default function ProfileSettings({ params }: { params: { userId: string }
         setTimeout(() => setMessage(''), 3000);
     }
 
+    const handleSignOut = async () => {
+        await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/logout`, {
+            method: 'DELETE',
+            cache: 'no-cache',
+        });
+        signOut(auth)
+        .then(() => {
+            router.push('/explore');
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+        router.push('/explore');
+    }
+
     return (
         <div className='w-auto h-full p-6 lg:p-16 lg:m-8 lg:shadow-large flex flex-col'>
             <h1 className="font-light text-4xl mb-8" >Account Settings</h1>
@@ -98,8 +114,9 @@ export default function ProfileSettings({ params }: { params: { userId: string }
                     <div>
                         <p className={`text-center h-[100px] ${message.includes('Error') || message.includes('error') ? 'text-red-600' : 'text-blue-600'}`}>{message}</p>
                     </div>
-                    <div className='flex flex-col justify-between h-[100px] mt-2'>
+                    <div className='flex flex-col justify-between h-[140px] mt-2'>
                         <Button className='border-1 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white' onClick={() => router.push('/reset')}>Reset Password</Button>
+                        <Button className="border-1 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white" onClick={handleSignOut}>Sign Out</Button>
                         <Button variant="bordered" onClick={() => router.push(`/profile/${params.userId}`)}>Return to Profile</Button>
                     </div>
                 </div>
