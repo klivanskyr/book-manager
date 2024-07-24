@@ -24,3 +24,4 @@ export { default as FilterBar } from './FilterBar/FiliterBar';
 export { default as Filter } from './Filter';
 export type { Filter as FilterType } from './Filter';
 export { default as FilterBarExplore } from './FilterBarExplore';
+export { default as AllBooksReview } from './AllBooksReview';

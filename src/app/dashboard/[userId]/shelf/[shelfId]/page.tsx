@@ -14,6 +14,7 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
     const [isBooksLoading, setIsBooksLoading] = useState<boolean>(true);
     const [bookSelectActive, setBookSelectActive] = useState<boolean>(false);
     const [isCopied, setIsCopied] = useState<boolean>(false);
+    const [isAllBooks, setIsAllBooks] = useState<boolean>(false);
     const router = useRouter();
 
     const isOwner = shelf?.createdById === params.userId;
@@ -35,6 +36,10 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
 
     useEffect(() => {
         fetchShelf();
+
+        if (params.shelfId === 'all-books') {
+            setIsAllBooks(true);
+        }       
     }, []);
 
     const handleRemoveBook = async (book: Book) => {
@@ -125,14 +130,14 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                                 <Button variant="bordered">Options</Button>
                             </DropdownTrigger>
                             <DropdownMenu variant="faded" aria-label="Drop-down menu" onAction={(key) => handleDropDown(key as DropDownKeys)}>
-                                {isOwner ? <DropdownItem
+                                {<DropdownItem
                                     key='add-book'
                                     startContent={<BookIcon className='w-[20px] h-[20px]' />}
                                     textValue="Add Book"
                                     color='primary'
                                 >
                                     <div>Add Book</div>
-                                </DropdownItem> : <></>}
+                                </DropdownItem>}
                                 <DropdownItem
                                     key="copy"
                                     startContent={<CopyIcon className='w-[20px] h-[20px]' />}
@@ -141,13 +146,13 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                                 >
                                     <div>{isCopied ? "Copied!" : "Copy Link"}</div>
                                 </DropdownItem>
-                                {isOwner ? <DropdownItem
+                                {!isAllBooks ? <DropdownItem
                                     key='settings'
                                     startContent={<Settings className='w-[20px] h-[20px]' />}
                                     textValue="Settings"
                                 >
                                     <div>Settings</div>
-                                </DropdownItem> : <></>}
+                                </DropdownItem>: <></>}
                                 <DropdownItem
                                     key="dashboard"
                                     startContent={<ReturnIcon className='w-[20px] h-[20px]'/>}

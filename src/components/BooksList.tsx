@@ -1,8 +1,7 @@
 'use client';
 
-import { FallBackImage, ModalElement, Stars } from "@/components";
-import { Book } from "../types/Book";
-import { Shelf } from "../types/Shelf";
+import { FallBackImage, ModalElement, Stars, AllBooksReview } from "@/components";
+import { Book, Shelf } from "@/types";
 import { FaTimes } from "react-icons/fa";
 import { useState } from "react";
 import { Button, Modal, Textarea } from "@nextui-org/react";
@@ -84,7 +83,7 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
     }
 
     function ReviewHeader() {
-        if (!selectedBook) return <></>;
+        if (!selectedBook || isAllBooks) return <></>;
         return (
           <div className='w-full flex flex-col justify-center'>
             <h2 className="text-center text-2xl font-semibold mb-1">{`Review of`}</h2>
@@ -95,12 +94,17 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
     
     function ReviewBody() {
         if (!selectedBook) return <></>;
+        if (isAllBooks) {
+            return (
+                <AllBooksReview userId={shelf.createdById} book={selectedBook} />
+            )
+        }
         return <Textarea disabled={!isOwner} color='primary' size='lg' variant='bordered' placeholder={isOwner ? 'Input review here' : ''} value={selectedBook.review} onChange={(e) => setSelectedBook({ ...selectedBook, review: e.target.value })} />
 
     }
     
     function ReviewFooter() {
-        if (!selectedBook) return <></>;
+        if (!selectedBook || isAllBooks) return <></>;
         const book = shelf.books.find((b) => b.bookId === selectedBook.bookId);
         if (!book) return <></>;
         return (
@@ -117,7 +121,7 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
     return (
         <>
             <ModalElement active={activeDeleteModal} onOpenChange={setActiveDeleteModal} Header={DeleteHeader()} Body={DeleteBody()} />
-            <ModalElement active={activeReviewModal} onOpenChange={setActiveReviewModal} Header={ReviewHeader()} Body={ReviewBody()} Footer={ReviewFooter()} />
+            <ModalElement classNames={{ base: `${isAllBooks && 'lg:min-w-[1300px] lg:min-h-[600px] py-4 px-1'}` }} active={activeReviewModal} onOpenChange={setActiveReviewModal} Header={ReviewHeader()} Body={ReviewBody()} Footer={ReviewFooter()} />
             <div className="flex flex-col mx-2 lg:mx-0 lg:grid lg:grid-cols-3 max-w-[1500px] pb-8">
                 {books.map(book => (
                     <div key={book.bookId} className="shadow-medium flex flex-row items-center p-4 m-2.5 justify-between">
@@ -134,8 +138,8 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
                                         <p className="">ISBN: {book.isbn}</p>
                                     </div>
                                     <div>
-                                        <Stars className="flex flex-row" book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} shelfId={shelf.shelfId} size={25} userId={shelf.createdById} disabled={!isOwner} />
-                                        <h3 className='text-blue-500 mt-1.5 hover:cursor-pointer' onClick={() => handleReviewOpen(book)}>{isAllBooks ? 'View Reviews' : 'View Review'}</h3>
+                                        {!isAllBooks && <Stars className="flex flex-row" book={book} handleUpdate={(newBook: Book) => handleUpdateShelf(newBook)} shelfId={shelf.shelfId} size={25} userId={shelf.createdById} disabled={!isOwner} />}
+                                        <h3 className={`text-blue-500 mt-1.5 hover:cursor-pointer ${isAllBooks && 'text-xl'}`} onClick={() => handleReviewOpen(book)}>{isAllBooks ? 'View Reviews' : 'View Review'}</h3>
                                     </div>
                                 </div>
                             </div>
