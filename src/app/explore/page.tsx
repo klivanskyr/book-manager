@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
-import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall, Filter, FilterType, FilterBar, FilterBarExplore, ModalElement } from '@/components';
+import { NavBarLMR, SideBar, SideBarSections, ExploreCardSmall, Filter, FilterType, FilterBarExplore, ModalElement } from '@/components';
 import { UserProfile, ExploreIcon, Settings, Questionmark, SearchIcon, MenuIcon } from '@/assets';
 import { Button, Link, Spinner } from '@nextui-org/react';
-import { Book, Shelf } from '@/types';
-import { auth, getAllPublicShelves, getUserShelves } from '@/firebase/firestore';
+import { Shelf } from '@/types';
+import { getAllPublicShelves, getUserShelves } from '@/firebase/firestore';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signOut } from 'firebase/auth';
 
 
 export default function Explore() {

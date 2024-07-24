@@ -85,7 +85,7 @@ export default function filterBarExplore({ setShelves, setLoading, className }: 
                     <DropdownTrigger>
                         <Button className='h-[50px] w-1/2 lg:w-[175px] font-light text-[1.025rem] px-2 mx-0.5' variant='faded'>Search by {filters[selectedSearchIndex]}</Button>
                     </DropdownTrigger>
-                    <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={searchKeys} onSelectionChange={setSearchKeys} >
+                    <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={searchKeys} onSelectionChange={keys => setSearchKeys(new Set(Array.from(keys, key => key.toString())))} >
                         {filters.map((filter, index) => (
                             <DropdownItem key={index} textValue={filter}>
                                 <div>{filter}</div>
@@ -98,7 +98,7 @@ export default function filterBarExplore({ setShelves, setLoading, className }: 
                     <DropdownTrigger>
                         <Button className='h-[50px] w-1/2 lg:w-[175px] font-light text-[1.025rem] mx-0.5' variant='faded'>Sort by {sorts[selectedSortIndex]}</Button>
                     </DropdownTrigger>
-                    <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={sortKeys} onSelectionChange={setSortKeys} >
+                    <DropdownMenu selectionMode='single' disallowEmptySelection selectedKeys={sortKeys} onSelectionChange={keys => setSortKeys(new Set(Array.from(keys, key => key.toString())))} >
                         {sorts.map((sort, index) => (
                             <DropdownItem key={index} textValue={sort}>
                                 <div>{sort}</div>
