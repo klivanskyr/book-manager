@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 import { Book, Shelf } from "@/types";
 import { getUserShelves } from "@/firebase/firestore";
-import { Image, Spinner, Textarea } from "@nextui-org/react";
+import { Image, ScrollShadow, Spinner, Textarea } from "@nextui-org/react";
 import Stars from "./Stars";
 
 
@@ -45,7 +45,7 @@ export default function AllBookReview({ userId, book }: { userId: string, book: 
             const review = shelf.books.find(b => b.isbn === book.isbn);
             if (review) {
                 return (
-                    <div tabIndex={0} className={`shadow-medium p-2 my-1.5 w-full rounded-md cursor-pointer border-2 ${activeReview === review && 'border-blue-300'}`} key={shelf.shelfId} onClick={() => handleClick(review)}>
+                    <div tabIndex={0} className={`shadow-md p-2 my-1.5 w-full rounded-md cursor-pointer border-2 ${activeReview === review && 'border-blue-300'}`} key={shelf.shelfId} onClick={() => handleClick(review)}>
                         <div className='flex flex-row'>
                             {shelf.image && <Image src={shelf.image} alt="Shelf Image"/>}
                             <div className='flex flex-col'>
@@ -59,9 +59,9 @@ export default function AllBookReview({ userId, book }: { userId: string, book: 
         })
 
         return (
-            <div className='flex flex-col justify-center items-center w-full'>
-                <h1 className='w-full border-b-2'>Reviews</h1>
-                <div className="w-full px-1 flex flex-col items-center justify-center">{reviews}</div>
+            <div className='flex flex-col justify-center items-center w-full m-1 my-2 overflow-y-auto'>
+                <h1 className='text-center lg:text-left text-lg lg:text-base w-full border-b-2'>Reviews</h1>
+                <div className="w-full px-1 my-1 flex flex-col items-center justify-center">{reviews}</div>
             </div>
         )
     }
@@ -76,7 +76,7 @@ export default function AllBookReview({ userId, book }: { userId: string, book: 
         }
 
         return (
-            <div className="h-full flex flex-row shadow-medium rounded-md p-4">
+            <div className="h-full flex flex-row shadow-medium rounded-md lg:p-4">
                 <div className="flex flex-col justify-center items-center mx-1 text-center">
                     <Image src={book.coverUrl} alt={book.title} width={200} height={250} />
                     <h2 className="mt-2 font-semibold">Title: <span className='font-normal'>{book.title}</span></h2>
@@ -96,18 +96,15 @@ export default function AllBookReview({ userId, book }: { userId: string, book: 
     }
 
     return (
-        <div className="flex flex-row items-center justify-center w-full h-screen">
-            
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-center w-full h-screen">
             {isLoading 
                 ? <div  className="flex flex-row justify-center items-center w-full h-full"><Spinner size='lg' color='primary' /></div>
                 : 
                 <>
-                    {/* Left Side --> Review List */}
-                    <div className='w-1/2 h-full mx-2'>
+                    <div className='w-full lg:w-1/2 h-2/5 lg:h-full mx-2 overflow-x-hidden overflow-y-scroll lg:overflow-x-hidden lg:overflow-y-hidden p-4'>
                         <ReviewSelect shelves={shelves}/>
                     </div>
-                    {/* Right Side --> Detailed Review Viewer */}
-                    <div className='w-1/2 h-full mx-2`'>
+                    <div className='w-full lg:w-1/2 h-3/5 mx-2 overflow-hidden'>
                         <ReviewView book={activeReview}/>
                     </div> 
                 </>

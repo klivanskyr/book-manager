@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Key } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Spinner } from "@nextui-org/react";
 
@@ -129,15 +129,15 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                             <DropdownTrigger>
                                 <Button variant="bordered">Options</Button>
                             </DropdownTrigger>
-                            <DropdownMenu variant="faded" aria-label="Drop-down menu" onAction={(key) => handleDropDown(key as DropDownKeys)}>
-                                {<DropdownItem
+                            <DropdownMenu variant="faded" aria-label="Drop-down menu" onAction={(key: Key) => handleDropDown(String(key) as DropDownKeys)}>
+                                <DropdownItem
                                     key='add-book'
                                     startContent={<BookIcon className='w-[20px] h-[20px]' />}
                                     textValue="Add Book"
                                     color='primary'
                                 >
                                     <div>Add Book</div>
-                                </DropdownItem>}
+                                </DropdownItem>
                                 <DropdownItem
                                     key="copy"
                                     startContent={<CopyIcon className='w-[20px] h-[20px]' />}
@@ -146,13 +146,13 @@ export default function Page({ params }: { params: { userId: string, shelfId: st
                                 >
                                     <div>{isCopied ? "Copied!" : "Copy Link"}</div>
                                 </DropdownItem>
-                                {!isAllBooks ? <DropdownItem
+                                {!isAllBooks && <DropdownItem
                                     key='settings'
                                     startContent={<Settings className='w-[20px] h-[20px]' />}
                                     textValue="Settings"
                                 >
                                     <div>Settings</div>
-                                </DropdownItem>: <></>}
+                                </DropdownItem>}
                                 <DropdownItem
                                     key="dashboard"
                                     startContent={<ReturnIcon className='w-[20px] h-[20px]'/>}
