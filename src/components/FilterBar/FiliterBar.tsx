@@ -31,17 +31,14 @@ export default function FilterBar({ isLoading, setIsLoading, shelf, setShelf }: 
         }
     }, [titleFilter, authorFilter, ratingFilter]);
 
-    const leftElements = [
-        <TextInput className='h-13 w-[250px] pr-2' label='Title' value={titleFilter} setValue={setTitleFilter} disabled={isLoading} />,
-        <TextInput className='h-13 w-[250px] pr-1' label='Author' value={authorFilter} setValue={setAuthorFilter} disabled={isLoading} />,
-        <Slider classNames={{ thumb: 'bg-blue-700', base: 'w-[250px] mx-2 my-1' }} showSteps size='lg' disableThumbScale label='Filter Rating' step={1} minValue={0} maxValue={5} value={ratingFilter} onChange={(e: any) => setRatingFilter(e)} />
-    ]
 
-    const rightElements = [
         // <SortBy isLoading={isLoading} setIsLoading={setIsLoading} />
-    ]
 
     return (
-        <NavBarLR className='flex flex-row justify-between my-2 mx-4' leftElements={leftElements} rightElements={rightElements} />
+        <div className="px-2 flex flex-col justify-center lg:justify-start items-center lg:flex-row">
+            <TextInput className='h-13 w-[400px] lg:w-[250px] pr-2' label='Title' value={titleFilter} setValue={setTitleFilter} disabled={isLoading} />,
+            <TextInput className='h-13 w-[400px] lg:w-[250px] pr-1' label='Author' value={authorFilter} setValue={setAuthorFilter} disabled={isLoading} />,
+            {shelf.shelfId !== 'all-books' && <Slider classNames={{ labelWrapper: 'relative top-16 lg:top-0', thumb: 'bg-blue-700', base: 'w-[250px] mx-2 -mt-[30px] mb-[50px] lg:my-1' }} showSteps size='lg' disableThumbScale label='Filter Rating' step={1} minValue={0} maxValue={5} value={ratingFilter} onChange={(e: any) => setRatingFilter(e)} />}
+        </div>
     )
 }

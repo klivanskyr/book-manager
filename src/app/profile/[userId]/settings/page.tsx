@@ -96,9 +96,7 @@ export default function ProfileSettings({ params }: { params: { userId: string }
                         <Button className='mx-1 h-[45px] text-base font-medium border-1 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white' onClick={() => handleUpdate({ newEmail: input.email })}>Reset</Button>
                     </div>
                     <div>
-                        <p className={`text-center h-[100px] ${message.includes('Error') || message.includes('error') ? 'text-red-600' : 'text-blue-600'}`}>
-                            {message}
-                        </p>
+                        <p className={`text-center h-[100px] ${message.includes('Error') || message.includes('error') ? 'text-red-600' : 'text-blue-600'}`}>{message}</p>
                     </div>
                     <div className='flex flex-col justify-between h-[100px] mt-2'>
                         <Button className='border-1 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white' onClick={() => router.push('/reset')}>Reset Password</Button>
@@ -107,6 +105,7 @@ export default function ProfileSettings({ params }: { params: { userId: string }
                 </div>
 
                 {/* Photos */}
+                <div></div>
                 <div className='flex flex-row justify-center items-center w-full lg:w-[600px] h-full lg:h-[350px] my-16 lg:my-0 lg:mx-16 text-center'>
                     <div className='shadow-medium p-2 m-2 rounded-lg flex flex-col items-center justify-center'>
                         <h3 className='font-light mb-2'>Current Profile Image</h3>

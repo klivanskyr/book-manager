@@ -2,9 +2,8 @@
 import { Book } from "@/types/Book";
 import { Shelf } from "@/types/Shelf";
 import { initializeApp } from "firebase/app";
-import { getAuth, signOut, updateEmail, updateProfile } from "firebase/auth";
-import { Timestamp, addDoc, collection, deleteDoc, doc, documentId, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy, getDoc } from "firebase/firestore";
-import { adminAuth } from "./firebase-admin";
+import { getAuth } from "firebase/auth";
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, setDoc, updateDoc, where, orderBy, getDoc } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -211,6 +210,11 @@ export async function getShelf(shelfId: string): Promise<Option<Shelf>> {
 
 /** Gets all the books by userId. Returns a Shelf */
 export async function getAllBooks(userId: string) : Promise<Shelf> {
+
+  const userDoc = await getDoc(doc(db, 'users', userId));
+  const userData = userDoc.data();
+
+
   const booksRef = await getDocs(collection(db, 'users', userId, 'books'));
   const books = booksRef.docs.map(doc => {
     const bookData = doc.data();
@@ -235,8 +239,8 @@ export async function getAllBooks(userId: string) : Promise<Shelf> {
     followers: 0,
     image: '',
     createdById: userId,
-    createdByImage: '',
-    createdByName: 'You',
+    createdByImage: userData?.profileImage || '',
+    createdByName: userData?.username || 'You',
     createdAt: Timestamp.now(),
     isPublic: false,
     shelfId: 'all-books',
@@ -551,6 +555,49 @@ export async function getUserIdByEmail(email: string): Promise<Option<string>> {
     return userDocs.docs[0].id;
   } catch (error) {
     console.log('Error in getUserIdByEmail', error);
+    return `${error}`;
+  }
+}
+
+export async function removeBookFromAllShelves(userId: string, bookId: string): Promise<Option<string>> {
+  try {
+     // Remove book from all shelves
+    const userShelvesDocs = await getDocs(collection(db, 'users', userId, 'ownedShelves'));
+    const shelfPromises = userShelvesDocs.docs.map(shelfDoc => {
+      return deleteDoc(doc(db, 'users', userId, 'ownedShelves', shelfDoc.id, 'books', bookId));
+    });
+
+    await Promise.all(shelfPromises);
+
+    // Remove book from user/books
+    await deleteDoc(doc(db, 'users', userId, 'books', bookId));
+
+    // Remove book from shelves
+    // does not matter if book is not in shelf
+    const shelvesDocs = await getDocs(query(collection(db, 'shelves'), where('createdById', '==', userId)));
+    const shelfPromises2 = shelvesDocs.docs.map(shelfDoc => {
+      return deleteDoc(doc(db, 'shelves', shelfDoc.id, 'books', bookId));
+    });
+
+    await Promise.all(shelfPromises2);
+
+    // Remove book from books if last instance
+    let needToRemoveBook = true; // false if book is in any shelf
+    const allShelvesDocs = await getDocs(collection(db, 'shelves'));
+    allShelvesDocs.docs.map(async shelfDoc => {
+      const shelfBookDoc = await getDoc(doc(db, 'shelves', shelfDoc.id, 'books', bookId));
+      if (shelfBookDoc.exists()) {
+        needToRemoveBook = false;
+      }
+    });
+
+    if (needToRemoveBook) {
+      await deleteDoc(doc(db, 'books', bookId));
+    }
+
+    return null;
+  } catch (error) {
+    console.log('Error in removeBookFromAllShelves', error);
     return `${error}`;
   }
 }
