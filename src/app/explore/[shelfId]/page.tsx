@@ -100,7 +100,7 @@ export default function Page({ params }: { params: { shelfId: string }}) {
         )
     }
     return (
-        <Suspense>
+        <Suspense fallback={<div className='w-screen h-screen flex flex-row justify-center items-center'><Spinner size='lg'/></div>}>  
             <Header />
             <FilterBar shelf={shelf} setShelf={setShelf} isLoading={isBooksLoading} setIsLoading={setIsBooksLoading}  />
             {isBooksLoading 

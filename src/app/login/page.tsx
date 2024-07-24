@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { EmailInput, PasswordInput, ActionButton, LoadingButton, SignInWithGoogleButton } from '@/components';
 import { Form } from '../../components';
 import emailIsValid from '../../utils/emailIsValid';
+import { Spinner } from '@nextui-org/react';
 
 export default function Login(): ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -88,7 +89,7 @@ export default function Login(): ReactElement {
   ];
 
   return (
-    <Suspense>
+    <Suspense fallback={<div className='w-screen h-screen flex flex-row justify-center items-center'><Spinner size='lg'/></div>}>  
       <Form elements={formElements} />
     </Suspense>
   );

@@ -164,7 +164,7 @@ export default function Explore() {
     }
 
     return (
-        <Suspense>  
+        <Suspense fallback={<div className='w-screen h-screen flex flex-row justify-center items-center'><Spinner size='lg'/></div>}>  
             <ModalElement placement='bottom' active={mobileNavModal} onOpenChange={setMobileNavModal} size='full' Body={MobileNavModal()} />
             <ModalElement placement='bottom' active={mobileSearchModal} onOpenChange={setMobileSearchModal} size='5xl' Body={MobileSearchModal()} />
             <NavBarLMR className='flex flex-row w-full justify-between h-16 p-4 border bg-slate-700' leftElements={leftNavElements} middleElements={middleNavElements} rightElements={rightNavElements} />
