@@ -10,7 +10,7 @@ import { getAllPublicShelves, getUserShelves } from '@/firebase/firestore';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 
-export default function Explore() {
+function Explore() {
     const [shelves, setShelves] = useState<Shelf[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [filter, setFilter] = useState<FilterType>('none');
@@ -164,7 +164,7 @@ export default function Explore() {
     }
 
     return (
-        <Suspense fallback={<div className='w-screen h-screen flex flex-row justify-center items-center'><Spinner size='lg'/></div>}>  
+        <>  
             <ModalElement placement='bottom' active={mobileNavModal} onOpenChange={setMobileNavModal} size='full' Body={MobileNavModal()} />
             <ModalElement placement='bottom' active={mobileSearchModal} onOpenChange={setMobileSearchModal} size='5xl' Body={MobileSearchModal()} />
             <NavBarLMR className='flex flex-row w-full justify-between h-16 p-4 border bg-slate-700' leftElements={leftNavElements} middleElements={middleNavElements} rightElements={rightNavElements} />
@@ -183,6 +183,14 @@ export default function Explore() {
                     </Filter>
                 </div>
             </div>
+        </>
+    )
+}
+
+export default function SuspendedExplore() {
+    return (
+        <Suspense fallback={<div className='w-screen h-screen flex flex-row justify-center items-center'><Spinner size='lg'/></div>}>
+            <Explore />
         </Suspense>
     )
 }
