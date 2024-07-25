@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest) {
 
     } catch (error) {
         // console.error('Middleware error:', error);
-        return NextResponse.error();
+        return NextResponse.json({ code: 500, message: `${error}` });
     }
 }
 
