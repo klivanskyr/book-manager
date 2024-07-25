@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, handleNoToken, handleValidToken } from '@/utils/middlewareHelpers';
 
 export async function middleware(req: NextRequest) {
-    // console.log('\n\nMiddleware', req.nextUrl.pathname, req.nextUrl.searchParams);
+    console.log('\n\nMiddleware', req.nextUrl.pathname, req.nextUrl.searchParams);
     try {
         const cookie = req.cookies.get('token');
 
         if (!cookie) {
-            // console.log('No token found');
+            console.log('No token found');
             return handleNoToken(req);
         } 
 
@@ -15,14 +15,14 @@ export async function middleware(req: NextRequest) {
         const { status, message, uid } = await verifyToken(token);
 
         if (status !== 200 || !uid) {
-            // console.log('Token error:', message);
+            console.log('Token error:', message);
             return handleNoToken(req);
         }
 
         return handleValidToken(req, uid);
 
     } catch (error) {
-        // console.error('Middleware error:', error);
+        console.error('Middleware error:', error);
         return NextResponse.json({ code: 500, message: `${error}` });
     }
 }

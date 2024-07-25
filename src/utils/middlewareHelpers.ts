@@ -13,8 +13,9 @@ export async function verifyToken(token: string): Promise<{ status: number, mess
             'Cookie': `token=${token}`
         }
     });
-
+    console.log('verifyToken res', res);
     const data = await res.json();
+    console.log('verifyToken data', data);
     return { status: data.code, message: data.message, uid: data?.uid };
 }
 
