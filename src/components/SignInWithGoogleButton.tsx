@@ -29,6 +29,8 @@ export default function SignInWithGoogleButton() {
             // console.log('userInfo', userInfo);
             // console.log('userId', userId);
             // console.log('userToken', userToken);
+            const url = `${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/login`;
+            console.log('url', url);
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/login`, {
                 method: 'POST',
                 headers: {
