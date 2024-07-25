@@ -37,9 +37,9 @@ export default function SignInWithGoogleButton() {
                 cache: 'no-cache',
                 body: JSON.stringify({ email: userInfo.email, createdWith: 'google', token: userToken })
             });
-            // console.log('response', response);
+            console.log('response', response);
             const data = await response.json();
-            // console.log('data', data);
+            console.log('data', data);
             if (data.code !== 200) {
                 console.error('Error logging in with Google:', data.message);
                 return;

@@ -89,9 +89,7 @@ function Login(): ReactElement {
   ];
 
   return (
-    <Suspense fallback={<div className='w-screen h-screen flex flex-row justify-center items-center'><Spinner size='lg'/></div>}>  
-      <Form elements={formElements} />
-    </Suspense>
+    <Form elements={formElements} />
   );
 }
 
