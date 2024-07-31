@@ -63,7 +63,7 @@ export default function filterBarExplore({ setShelves, setLoading, className }: 
     const debouncedHandler = useCallback(
         debounce(async (search: string) => {
             setLoading(true);
-            filterShelves(search).then(() => setLoading(false));
+            filterShelves(search.toLowerCase()).then(() => setLoading(false));
         }, 600),
         []
     )
