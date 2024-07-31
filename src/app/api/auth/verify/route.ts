@@ -5,7 +5,7 @@ import { adminAuth } from "@/firebase/firebase-admin";
 export async function POST(req: NextRequest): Promise<NextResponse> {
     console.log("POST /api/auth/verify");
     try {
-        console.log("Cookies: ", cookies().get('token'));
+        console.log("Cookies: ", req.cookies.get('token'));
         const token = cookies().get('token');        
 
         console.log("Token: ", token);
