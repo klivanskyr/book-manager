@@ -15,6 +15,7 @@ export async function verifyToken(token: string): Promise<{ status: number, mess
         }
     });
     console.log('verifyToken res', res);
+    console.log('verifyToken res.json', await res.json());
     const data = await res.json();
     console.log('verifyToken data', data);
     return { status: data.code, message: data.message, uid: data?.uid };
