@@ -7,15 +7,15 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function verifyToken(token: string): Promise<{ status: number, message: string, uid?: string }> {
     try {
-        console.log('verifyToken url', `${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/verify`);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/verify`, {
+        console.log('verifyToken url', `${process.env.API_DOMAIN}/api/auth/verify`);
+        const res = await fetch(`${process.env.API_DOMAIN}/api/auth/verify`, {
             method: 'POST',
             cache: 'no-cache',
             headers: {
                 'Cookie': `token=${token}`
             }
         });
-        console.log('verifyToken res', res);
+        // console.log('verifyToken res', res);
         const data = await res.json();
         console.log('verifyToken data', data);
         return { status: data.code, message: data.message, uid: data?.uid };
