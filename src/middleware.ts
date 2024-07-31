@@ -13,7 +13,7 @@ export async function middleware(req: NextRequest) {
 
         const token = cookie.value;
         const { status, message, uid } = await verifyToken(token);
-
+        console.error('Token:', token, status, message, uid);
         if (status !== 200 || !uid) {
             console.log('Token error:', message);
             return handleNoToken(req);

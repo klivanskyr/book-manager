@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminAuth } from "@/firebase/firebase-admin";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
     console.log("POST /api/auth/verify");
     try {
         console.log("Cookies: ", cookies().get('token'));
@@ -24,6 +24,6 @@ export async function POST(req: NextRequest) {
 
     } catch (error) {
         console.log("Error: ", error);
-        return NextResponse.json({ code: 500, message: `Internal Server Error: ${error}` }, { status: 500 });
+        return NextResponse.json({ code: 500, message: `Internal Server Error: ${error}` });
     }
 }
