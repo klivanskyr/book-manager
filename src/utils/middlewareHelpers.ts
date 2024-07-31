@@ -6,19 +6,24 @@ import { NextRequest, NextResponse } from "next/server";
  * @returns The status of the token and the user ID: Promise<{ status: number, uid: string }>
  */
 export async function verifyToken(token: string): Promise<{ status: number, message: string, uid?: string }> {
-    console.log('verifyToken url', `${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/verify`);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/verify`, {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-            'Cookie': `token=${token}`
-        }
-    });
-    console.log('verifyToken res', res);
-    console.log('verifyToken res.json', await res.json());
-    const data = await res.json();
-    console.log('verifyToken data', data);
-    return { status: data.code, message: data.message, uid: data?.uid };
+    try {
+        console.log('verifyToken url', `${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/verify`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}/api/auth/verify`, {
+            method: 'POST',
+            cache: 'no-cache',
+            headers: {
+                'Cookie': `token=${token}`
+            }
+        });
+        console.log('verifyToken res', res);
+        console.log('verifyToken res.json', await res.json());
+        const data = await res.json();
+        console.log('verifyToken data', data);
+        return { status: data.code, message: data.message, uid: data?.uid };
+    } catch (error) {
+        console.error('verifyToken error', error);
+        return { status: 500, message: `ERROR IN VERIFYTOKEN: ${error}` };
+    }
 }
 
 /**
