@@ -76,11 +76,11 @@ export default function AllBookReview({ userId, book }: { userId: string, book: 
         }
 
         return (
-            <div className="h-full flex flex-row shadow-medium rounded-md lg:p-4">
+            <div className="h-full flex flex-row shadow-medium rounded-md lg:p-4 overflow-y-scroll">
                 <div className="flex flex-col justify-center items-center mx-1 text-center">
                     <Image src={book.coverUrl} alt={book.title} width={200} height={250} />
-                    <h2 className="mt-2 font-semibold">Title: <span className='font-normal'>{book.title}</span></h2>
-                    <h2 className='py-1 font-semibold'>Author: <span className='font-normal'>{book.author}</span></h2>
+                    <h2 className="mt-2 font-semibold text-sm lg:text-base">Title: <span className='font-normal'>{book.title}</span></h2>
+                    <h2 className='py-1 font-semibold text-sm lg:text-base'>Author: <span className='font-normal'>{book.author}</span></h2>
                 </div>
                 <div className="flex flex-col justify-between h-full py-16 px-2 items-center w-full">
                     <div className="relative w-full h-full">

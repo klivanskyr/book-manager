@@ -83,8 +83,8 @@ export default function Page({ params }: { params: { shelfId: string }}) {
                         </Dropdown>
                     </div>
                     <div className="flex flex-row mt-2">
-                        <p className="mr-8">Created By: {shelf?.createdByName || "Username"}</p>
-                        <p className="mr-2">IMAGE</p>
+                        {shelf?.createdByImage && <p className="mr-2 text-end">{shelf?.createdByImage}</p>}
+                        <p className="text-center">{shelf?.createdByName || "Username"}</p>
                     </div>
                 </div>
             </div>

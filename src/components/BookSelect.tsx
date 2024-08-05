@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
 
 import { TextInput, ActionButton, ModalElement } from "@/components"
@@ -81,25 +81,25 @@ export default function BookSelect({ shelves, fetchShelves, userId, active, setA
     // Header contains search bar, submit button and selected shelves button
     function Header() {
         return (
-            <div className='w-full flex flex-row justify-between items-center'>
-                <form className="flex w-full lg:w-1/2" onSubmit={undefined}>
-                    <TextInput className='w-full h-16 bg-slate-100 rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg shadow-small' radius='sm' label='Search by Title, Author or ISBN' value={text} setValue={setText} error={error} />
+            <div className='w-full flex flex-col lg:flex-row justify-between items-center'>
+                <form className="flex lg:w-1/2 mb-1" onSubmit={(e) => e.preventDefault()}>
+                    <TextInput className='w-full h-full rounded-l-lg rounded-r-none rounded-t-lg rounded-b-lg' radius='sm' label='' value={text} setValue={setText} error={error} />
                     {selectedShelves.length === 0 
-                        ? <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-400" text='Submit' onClick={() => {}} disabled={true} />
-                        : <ActionButton className="w-8 h-16 rounded-md shadow-small bg-blue-600" text='Submit' onClick={handleClick} disabled={isLoading} />
+                        ? <ActionButton className="rounded-md shadow-small bg-blue-400 text-sm lg:text-base" text='Submit' onClick={() => {}} disabled={true} />
+                        : <ActionButton className="rounded-md shadow-small bg-blue-600 text-sm lg:text-base" text='Submit' onClick={handleClick} disabled={isLoading} />
                     }
                 </form>
-                <div className='w-auto lg:w-1/2 flex flex-row justify-between items-center ml-2'>
+                <div className='w-full lg:w-1/2 flex flex-row justify-center lg:justify-between items-center ml-2'>
                     {shelves.length > 1 && 
                         <>
-                            <div className='flex flex-row'>
+                            <div className='hidden lg:flex lg:flex-row'>
                                 {selectedShelves.map((shelf) => (
                                     <Chip key={shelf.shelfId} onClose={() => setSelectedShelves(selectedShelves.filter((selectedShelf) => shelf.shelfId !== selectedShelf.shelfId))}>{shelf.name}</Chip>
                                 ))}
                             </div>
                             <Dropdown>
                                 <DropdownTrigger>
-                                    <Button color='primary' className='w-[150px] h-12 rounded-lg shadow-small bg-blue-600 text-white text-medium'>Select Shelves</Button>
+                                    <Button color='primary' className='w-[150px] m-1 mb-0 h-12 rounded-lg shadow-small bg-blue-600 text-wrap text-xs lg:text-medium text-white'>Select Shelves</Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
                                     variant="flat"

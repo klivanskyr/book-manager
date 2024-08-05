@@ -8,7 +8,7 @@ import { BookSelect, ModalElement } from '@/components';
 import { NavBarLR, ActionButton, ShelfTables, AddShelfModal } from "@/components";
 import { auth, getAllBooks, getUserShelves } from '@/firebase/firestore';
 import { Shelf } from '@/types/Shelf';
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 
 type Tab = 'owned' | 'followed';
 
@@ -71,7 +71,7 @@ export default function Dashboard({ params }: { params: { userId: string } }): R
         <ActionButton className="hidden lg:block m-1 border-1.5 border-red-600 bg-white text-red-600 hover:bg-red-600 hover:text-white transition-all rounded-full h-12" onClick={handleSignOut} text="Sign Out" />,
 
         //Mobile buttons
-        <Button className='lg:hidden bg-slate-600 text-white' variant='flat' onClick={() => setMobileNavModal(true)}>Options</Button>
+        <Button className='lg:hidden bg-slate-600 text-white m-0.5' variant='flat' onClick={() => setMobileNavModal(true)}>Options</Button>
     ];
 
     function MobileNav() {

@@ -16,7 +16,7 @@ export default function BooksList({ isOwner=false, handleRemoveBook=()=>{}, book
     if (books.length === 0) {
         return (
             <div className="flex flex-row justify-center items-center text-center">
-                <h1 className="text-3xl font-light pt-[50px]">Looking a little empty here...</h1>
+                <h1 className="text-3xl font-light pt-[50px] px-1">Looking a little empty here...</h1>
             </div>
         )
     }
